@@ -1,0 +1,30 @@
+package: EvelyApi
+import:
+- package: github.com/goadesign/goa
+  version: master
+  vcs: git
+  subpackages:
+  - client
+  - design
+  - design/apidsl
+  - dslengine
+  - goagen
+  - middleware
+- package: golang.org/x/tools
+  subpackages:
+  - go/ast/astutil
+- package: gopkg.in/mgo.v2
+- package: gopkg.in/yaml.v2
+- package: github.com/dimfeld/httppath
+- package: github.com/dimfeld/httptreemux
+- package: github.com/manveru/faker
+- package: github.com/satori/go.uuid
+- package: github.com/spf13/cobra
+- package: github.com/spf13/pflag
+- package: github.com/zach-klippenstein/goregen
+- package: github.com/armon/go-metrics
+- package: github.com/dimfeld/httptreemux
+- package: golang.org/x/net/websocket
+- package: github.com/hashicorp/go-immutable-radix
+- package: github.com/hashicorp/golang-lru/simplelru
+- package: github.com/dgrijalva/jwt-go

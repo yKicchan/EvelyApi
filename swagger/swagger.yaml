@@ -1,0 +1,122 @@
+basePath: /sandbox/v1
+consumes:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+definitions:
+  LoginPayload:
+    example:
+      id: user
+      password: 123qwe
+    properties:
+      id:
+        description: ユーザーID
+        example: user
+        minLength: 1
+        type: string
+      password:
+        description: パスワード
+        example: 123qwe
+        minLength: 1
+        type: string
+    required:
+    - id
+    - password
+    title: LoginPayload
+    type: object
+  Token:
+    description: アクセストークン (default view)
+    example:
+      token: token string
+    properties:
+      token:
+        description: アクセストークン
+        example: token string
+        type: string
+    required:
+    - token
+    title: 'Mediatype identifier: application/vnd.token+json; view=default'
+    type: object
+host: api.localhost:8888
+info:
+  contact:
+    email: yKicchanApp@gmail.com
+    name: yKicchan
+  description: 卒業制作のアプリケーションで使用するAPIです
+  license:
+    name: Apache License 2.0
+    url: https://github.com/yKicchan/EvelyApi/blob/master/LICENSE
+  title: EvelyApi
+  version: ""
+paths:
+  /actions/ping:
+    get:
+      description: |-
+        導通確認
+
+        Required security scopes:
+          * `api:access`
+      operationId: actions#ping
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: ping actions
+      tags:
+      - actions
+  /auth/signin:
+    post:
+      description: サインイン
+      operationId: auth#signin
+      parameters:
+      - in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/LoginPayload'
+      produces:
+      - application/vnd.token+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Token'
+        "401":
+          description: Unauthorized
+      schemes:
+      - http
+      summary: signin auth
+      tags:
+      - auth
+produces:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+responses:
+  OK:
+    description: OK
+  Unauthorized:
+    description: Unauthorized
+schemes:
+- http
+securityDefinitions:
+  jwt:
+    description: |2-
+
+
+      **Security Scopes**:
+        * `api:access`: API access
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
