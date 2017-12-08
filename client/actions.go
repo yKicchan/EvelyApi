@@ -20,7 +20,7 @@ import (
 // PingActionsPath computes a request path to the ping action of actions.
 func PingActionsPath() string {
 
-	return fmt.Sprintf("/sandbox/v1/actions/ping")
+	return fmt.Sprintf("/develop/v1/actions/ping")
 }
 
 // 導通確認

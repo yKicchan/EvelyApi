@@ -32,7 +32,7 @@ func main() {
 	}
 	// DB切断
 	defer session.Close()
-	db := session.DB("sandbox")
+	db := session.DB("develop")
 
 	// Mount "actions" controller
 	c := controller.NewActionsController(service)

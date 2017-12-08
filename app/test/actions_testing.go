@@ -49,7 +49,7 @@ func PingActionsOK(t goatest.TInterface, ctx context.Context, service *goa.Servi
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/sandbox/v1/actions/ping"),
+		Path: fmt.Sprintf("/develop/v1/actions/ping"),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -105,7 +105,7 @@ func PingActionsUnauthorized(t goatest.TInterface, ctx context.Context, service 
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/sandbox/v1/actions/ping"),
+		Path: fmt.Sprintf("/develop/v1/actions/ping"),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {

@@ -1,4 +1,4 @@
-basePath: /sandbox/v1
+basePath: /develop/v1
 consumes:
 - application/json
 - application/xml

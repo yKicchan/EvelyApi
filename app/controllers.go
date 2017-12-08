@@ -42,7 +42,7 @@ type ActionsController interface {
 func MountActionsController(service *goa.Service, ctrl ActionsController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/sandbox/v1/actions/ping", ctrl.MuxHandler("preflight", handleActionsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/develop/v1/actions/ping", ctrl.MuxHandler("preflight", handleActionsOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -58,8 +58,8 @@ func MountActionsController(service *goa.Service, ctrl ActionsController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleActionsOrigin(h)
-	service.Mux.Handle("GET", "/sandbox/v1/actions/ping", ctrl.MuxHandler("ping", h, nil))
-	service.LogInfo("mount", "ctrl", "Actions", "action", "Ping", "route", "GET /sandbox/v1/actions/ping", "security", "jwt")
+	service.Mux.Handle("GET", "/develop/v1/actions/ping", ctrl.MuxHandler("ping", h, nil))
+	service.LogInfo("mount", "ctrl", "Actions", "action", "Ping", "route", "GET /develop/v1/actions/ping", "security", "jwt")
 }
 
 // handleActionsOrigin applies the CORS response headers corresponding to the origin.
@@ -99,7 +99,7 @@ type AuthController interface {
 func MountAuthController(service *goa.Service, ctrl AuthController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/sandbox/v1/auth/signin", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/develop/v1/auth/signin", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -120,8 +120,8 @@ func MountAuthController(service *goa.Service, ctrl AuthController) {
 		return ctrl.Signin(rctx)
 	}
 	h = handleAuthOrigin(h)
-	service.Mux.Handle("POST", "/sandbox/v1/auth/signin", ctrl.MuxHandler("signin", h, unmarshalSigninAuthPayload))
-	service.LogInfo("mount", "ctrl", "Auth", "action", "Signin", "route", "POST /sandbox/v1/auth/signin")
+	service.Mux.Handle("POST", "/develop/v1/auth/signin", ctrl.MuxHandler("signin", h, unmarshalSigninAuthPayload))
+	service.LogInfo("mount", "ctrl", "Auth", "action", "Signin", "route", "POST /develop/v1/auth/signin")
 }
 
 // handleAuthOrigin applies the CORS response headers corresponding to the origin.

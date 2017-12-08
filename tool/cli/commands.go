@@ -56,7 +56,7 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	}
 	tmp1 := new(PingActionsCommand)
 	sub = &cobra.Command{
-		Use:   `actions ["/sandbox/v1/actions/ping"]`,
+		Use:   `actions ["/develop/v1/actions/ping"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp1.Run(c, args) },
 	}
@@ -70,7 +70,7 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	}
 	tmp2 := new(SigninAuthCommand)
 	sub = &cobra.Command{
-		Use:   `auth ["/sandbox/v1/auth/signin"]`,
+		Use:   `auth ["/develop/v1/auth/signin"]`,
 		Short: ``,
 		Long: `
 
@@ -305,7 +305,7 @@ func (cmd *PingActionsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/sandbox/v1/actions/ping"
+		path = "/develop/v1/actions/ping"
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -329,7 +329,7 @@ func (cmd *SigninAuthCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/sandbox/v1/auth/signin"
+		path = "/develop/v1/auth/signin"
 	}
 	var payload client.LoginPayload
 	if cmd.Payload != "" {
