@@ -62,7 +62,7 @@ var validationHandler, _ = goa.NewMiddleware(func(ctx context.Context, w http.Re
 		return jwt.ErrJWTError("unsupported claims shape")
 	}
 	// claimsを検査
-	if val, ok := claims["id"].(string); !ok || val != "" {
+	if val, ok := claims["id"].(string); !ok || val == "" {
 		return jwt.ErrJWTError("you are not user")
 	}
 	return nil
