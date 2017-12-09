@@ -91,7 +91,7 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 	user := GetLoginUser(ctx)
 	eventID, err := c.db.NewEvent(user.ID)
 	if err != nil {
-		log.Printf("failed to create event: %s", err)
+		log.Printf("[EvelyApi] failed to create event: %s", err)
 	}
 
 	p := ctx.Payload
@@ -119,7 +119,7 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 
 	err = c.db.SaveEvent(event)
 	if err != nil {
-		log.Printf("faild to save event: %s", err)
+		log.Printf("[EvelyApi] faild to save event: %s", err)
 		return ctx.BadRequest()
 	}
 
@@ -144,7 +144,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 	// Put your logic here
 	events, err := c.db.GetEvents(ctx.Limit, ctx.Offset, ctx.Keyword, ctx.UserID)
 	if err != nil {
-		log.Printf("faild to search events: %s", err)
+		log.Printf("[EvelyApi] faild to search events: %s", err)
 		return ctx.NotFound()
 	}
 

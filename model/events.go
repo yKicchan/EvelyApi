@@ -45,13 +45,8 @@ var EVENT_TINY_SELECTOR = bson.M{
 	"id":            1,
 	"title":         1,
 	"host":          1,
-	"body":          0,
 	"place":         1,
-	"update_date":   0,
 	"upcoming_date": 1,
-	"url":           0,
-	"mail":          0,
-	"tel":           0,
 }
 
 func NewEventDB(db *mgo.Database) *EventDB {
