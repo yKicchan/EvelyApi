@@ -105,7 +105,7 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 		Body: p.Body,
 		Place: model.Location{
 			Name:   p.Place.Name,
-			LngLat: model.Location.LngLat{p.Place.Lng, p.Place.Lat},
+			LngLat: [2]float64{p.Place.Lng, p.Place.Lat},
 		},
 		UpdateDate: time.Now(),
 		UpcomingDate: model.UpcomingDate{
@@ -152,7 +152,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 	for i := range events {
 		res[i] = ToEventTinyMedia(&events[i])
 	}
-	return ctx.OK(res)
+	return ctx.OKTiny(res)
 	// EventsController_List: end_implement
 }
 

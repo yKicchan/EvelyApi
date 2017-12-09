@@ -48,12 +48,7 @@ var _ = Resource("events", func() {
 			})
 			Required("limit", "offset")
 		})
-		Response(OK, func() {
-			Media(CollectionOf(EventMedia, func() {
-				View("default")
-				View("tiny")
-			}))
-		})
+		Response(OK, CollectionOf(EventMedia))
 		Response(NotFound)
 		Response(BadRequest)
 	})
