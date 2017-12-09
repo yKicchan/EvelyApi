@@ -1,6 +1,7 @@
 package model
 
 import (
+	"log"
 	"time"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -79,16 +80,23 @@ func (db *EventDB) GetEvents(limit int, offset int, keyword *string, userID *str
 	query := bson.M{}
 
 	if keyword != nil {
-		q := bson.M{"$regex": bson.RegEx{Pattern: `^*` + *keyword + `*$`, Options: "m"}}
-		query["title"] = q
-		query["body"] = q
-		query["place"] = q
-		query["host"] = bson.M{"name": q}
+		regex := bson.M{"$regex": bson.RegEx{Pattern: `.*` + *keyword + `.*`, Options: "m"}}
+		query = bson.M{
+			"$or": []interface{}{
+				bson.M{"title": regex},
+				bson.M{"body": regex},
+				bson.M{"place": regex},
+				bson.M{"host": bson.M{"name": regex}},
+			},
+		}
+		log.Printf("[EvelyApi] keyword: %s", *keyword)
 	}
 
 	if userID != nil {
-		query["host"] = bson.M{"id": userID}
+		query = bson.M{"host": bson.M{"id": bson.M{"$regex": bson.RegEx{Pattern: *userID, Options: "m"}}}}
+		log.Printf("[EvelyApi] userID: %s", *userID)
 	}
+	log.Print(query)
 
 	err = db.C("events").Find(query).Select(EVENT_TINY_SELECTOR).Skip(offset).Limit(limit).All(&events)
 	return
