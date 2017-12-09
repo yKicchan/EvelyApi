@@ -40,16 +40,6 @@ func (ut *eventPayload) Finalize() {
 	if ut.Mail == nil {
 		ut.Mail = &defaultMail
 	}
-	if ut.Place != nil {
-		var defaultLat = 34.706424
-		if ut.Place.Lat == nil {
-			ut.Place.Lat = &defaultLat
-		}
-		var defaultLng = 135.501230
-		if ut.Place.Lng == nil {
-			ut.Place.Lng = &defaultLng
-		}
-	}
 	var defaultTel = ""
 	if ut.Tel == nil {
 		ut.Tel = &defaultTel
@@ -228,18 +218,6 @@ type location struct {
 	Lng *float64 `form:"lng,omitempty" json:"lng,omitempty" xml:"lng,omitempty"`
 	// 名前
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-}
-
-// Finalize sets the default values for location type instance.
-func (ut *location) Finalize() {
-	var defaultLat = 34.706424
-	if ut.Lat == nil {
-		ut.Lat = &defaultLat
-	}
-	var defaultLng = 135.501230
-	if ut.Lng == nil {
-		ut.Lng = &defaultLng
-	}
 }
 
 // Validate validates the location type instance.

@@ -204,14 +204,12 @@ definitions:
       name: ECCコンピュータ専門学校2303教室
     properties:
       lat:
-        default: 34.706425
         description: 緯度
         example: 34.706425
         maximum: 90
         minimum: -90
         type: number
       lng:
-        default: 135.50124
         description: 経度
         example: 135.50124
         maximum: 180

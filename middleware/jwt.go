@@ -1,16 +1,16 @@
 package middleware
 
 import (
-	"EvelyApi/app"
-	"context"
 	"fmt"
-	jwtgo "github.com/dgrijalva/jwt-go"
+	"log"
+	"context"
+	"net/http"
+	"io/ioutil"
+	"path/filepath"
+	"EvelyApi/app"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"path/filepath"
+	jwtgo "github.com/dgrijalva/jwt-go"
 )
 
 /**

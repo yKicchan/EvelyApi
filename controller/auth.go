@@ -1,13 +1,15 @@
 package controller
 
 import (
-	"log"
 	"fmt"
+	"log"
+	"context"
 	"io/ioutil"
 	"crypto/rsa"
 	"EvelyApi/app"
 	"EvelyApi/model"
 	"github.com/goadesign/goa"
+	"github.com/goadesign/goa/middleware/security/jwt"
 	mgo "gopkg.in/mgo.v2"
 	jwtgo "github.com/dgrijalva/jwt-go"
 )
@@ -19,20 +21,29 @@ type AuthController struct {
 	privateKey *rsa.PrivateKey
 }
 
+/**
+ * JWTを複合してログインしているユーザーの情報を取得する
+ * @param  ctx  コンテキスト
+ * @return user ログインしているユーザーの情報
+ */
+func GetLoginUser(ctx context.Context) (user *model.UserModel) {
+	token := jwt.ContextJWT(ctx)
+	claims, ok := token.Claims.(jwtgo.MapClaims)
+	if !ok {
+		log.Fatalf("unsupported claims shape")
+	}
+	user = &model.UserModel{
+		ID: claims["id"].(string),
+		Name: claims["name"].(string),
+	}
+	return user
+}
+
 // NewAuthController creates a auth controller.
 func NewAuthController(service *goa.Service, db *mgo.Database) *AuthController {
-	pem, err := ioutil.ReadFile("./keys/id_rsa")
-	if err != nil {
-		log.Fatalf("faild to load file: %s", err)
-	}
-	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM(pem)
-	if err != nil {
-		log.Fatalf("faild to parse private key: %s", err)
-	}
 	return &AuthController{
 		Controller: service.NewController("AuthController"),
 		db:         model.NewUserDB(db),
-		privateKey: privateKey,
 	}
 }
 
@@ -52,10 +63,20 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	token := jwtgo.New(jwtgo.SigningMethodRS512)
 	token.Claims = jwtgo.MapClaims{
 		"scopes": "api:access",
-		"user":   user,
-
+		"id": user.ID,
+		"name": user.Name,
 	}
-	signedToken, err := token.SignedString(c.privateKey)
+	// 秘密鍵読み込み
+	pem, err := ioutil.ReadFile("./keys/id_rsa")
+	if err != nil {
+		log.Fatalf("faild to load file: %s", err)
+	}
+	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM(pem)
+	if err != nil {
+		log.Fatalf("faild to parse private key: %s", err)
+	}
+	// jwtを暗号化
+	signedToken, err := token.SignedString(privateKey)
 	if err != nil {
 		return fmt.Errorf("failed to sign token: %s", err) // internal error
 	}

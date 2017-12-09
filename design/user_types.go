@@ -31,7 +31,7 @@ var EventPayload = Type("EventPayload", func() {
 		Example("初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。")
 	})
 	Attribute("place", Location, "開催場所")
-	Attribute("upcomingDate", UpcomingDate ,"開催予定日")
+	Attribute("upcomingDate", UpcomingDate, "開催予定日")
 	Attribute("url", String, "URL", func() {
 		Format("uri")
 		Default("")
@@ -87,13 +87,11 @@ var Location = Type("Location", func() {
 		Minimum(-90.0)
 		Maximum(90.0)
 		Example(34.706424)
-		Default(34.706424)
 	})
 	Attribute("lng", Number, "経度", func() {
 		Minimum(-180.0)
 		Maximum(180.0)
 		Example(135.50123)
-		Default(135.50123)
 	})
 	Required("name", "lat", "lng")
 })
