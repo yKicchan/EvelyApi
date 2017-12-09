@@ -1,14 +1,15 @@
 package controller
 
 import (
+	"log"
+	"fmt"
+	"io/ioutil"
+	"crypto/rsa"
 	"EvelyApi/app"
 	"EvelyApi/model"
-	"crypto/rsa"
-	"fmt"
-	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	mgo "gopkg.in/mgo.v2"
-	"io/ioutil"
+	jwtgo "github.com/dgrijalva/jwt-go"
 )
 
 // AuthController implements the auth resource.
@@ -19,20 +20,20 @@ type AuthController struct {
 }
 
 // NewAuthController creates a auth controller.
-func NewAuthController(service *goa.Service, db *mgo.Database) (*AuthController, error) {
+func NewAuthController(service *goa.Service, db *mgo.Database) *AuthController {
 	pem, err := ioutil.ReadFile("./keys/id_rsa")
 	if err != nil {
-		return nil, err
+		log.Fatalf("faild to load file: %s", err)
 	}
 	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM(pem)
 	if err != nil {
-		return nil, err
+		log.Fatalf("faild to parse private key: %s", err)
 	}
 	return &AuthController{
 		Controller: service.NewController("AuthController"),
 		db:         model.NewUserDB(db),
 		privateKey: privateKey,
-	}, nil
+	}
 }
 
 // Signin runs the signin action.
@@ -51,7 +52,8 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	token := jwtgo.New(jwtgo.SigningMethodRS512)
 	token.Claims = jwtgo.MapClaims{
 		"scopes": "api:access",
-		"id":     user.ID,
+		"user":   user,
+
 	}
 	signedToken, err := token.SignedString(c.privateKey)
 	if err != nil {

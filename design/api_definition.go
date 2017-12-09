@@ -42,4 +42,9 @@ var _ = API("EvelyApi", func() {
 		// Access-Control-Allow-Credentialsヘッダーを設定する
 		Credentials()
 	})
+
+	// リソースに対するアクセス権限
+	Security(JWT, func() {
+		Scope("api:access")
+	})
 })

@@ -3,13 +3,13 @@
 package main
 
 import (
+	"log"
 	"EvelyApi/app"
 	"EvelyApi/controller"
 	. "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	mgo "gopkg.in/mgo.v2"
-	"log"
 )
 
 func main() {
@@ -34,15 +34,18 @@ func main() {
 	defer session.Close()
 	db := session.DB("develop")
 
-	// Mount "actions" controller
-	c := controller.NewActionsController(service)
-	app.MountActionsController(service, c)
 	// Mount "auth" controller
-	c2, _ := controller.NewAuthController(service, db)
-	app.MountAuthController(service, c2)
+	c := controller.NewAuthController(service, db)
+	app.MountAuthController(service, c)
+	// Mount "events" controller
+	c2 := controller.NewEventsController(service, db)
+	app.MountEventsController(service, c2)
 	// Mount "swagger" controller
 	c3 := controller.NewSwaggerController(service)
 	app.MountSwaggerController(service, c3)
+	// Mount "users" controller
+	c4 := controller.NewUsersController(service, db)
+	app.MountUsersController(service, c4)
 
 	// Start service
 	if err := service.ListenAndServe(":8888"); err != nil {

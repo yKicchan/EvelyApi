@@ -14,42 +14,9 @@ import (
 	"context"
 	"github.com/goadesign/goa"
 	"net/http"
+	"strconv"
+	"unicode/utf8"
 )
-
-// PingActionsContext provides the actions ping action context.
-type PingActionsContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-}
-
-// NewPingActionsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the actions controller ping action.
-func NewPingActionsContext(ctx context.Context, r *http.Request, service *goa.Service) (*PingActionsContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := PingActionsContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *PingActionsContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// Unauthorized sends a HTTP response with status code 401.
-func (ctx *PingActionsContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
-}
 
 // SigninAuthContext provides the auth signin action context.
 type SigninAuthContext struct {
@@ -82,5 +49,377 @@ func (ctx *SigninAuthContext) OK(r *Token) error {
 // Unauthorized sends a HTTP response with status code 401.
 func (ctx *SigninAuthContext) Unauthorized() error {
 	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
+// CreateEventsContext provides the events create action context.
+type CreateEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *EventPayload
+}
+
+// NewCreateEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller create action.
+func NewCreateEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*CreateEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := CreateEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// Created sends a HTTP response with status code 201.
+func (ctx *CreateEventsContext) Created(r *Event) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 201, r)
+}
+
+// CreatedTiny sends a HTTP response with status code 201.
+func (ctx *CreateEventsContext) CreatedTiny(r *EventTiny) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 201, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *CreateEventsContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// DeleteEventsContext provides the events delete action context.
+type DeleteEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	EventID string
+	UserID  string
+}
+
+// NewDeleteEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller delete action.
+func NewDeleteEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*DeleteEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := DeleteEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramEventID := req.Params["event_id"]
+	if len(paramEventID) > 0 {
+		rawEventID := paramEventID[0]
+		rctx.EventID = rawEventID
+		if ok := goa.ValidatePattern(`^[0-9]{8}-[0-9]+$`, rctx.EventID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{8}-[0-9]+$`))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		rctx.UserID = rawUserID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *DeleteEventsContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *DeleteEventsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// ListEventsContext provides the events list action context.
+type ListEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Keyword *string
+	Limit   int
+	Offset  int
+	UserID  *string
+}
+
+// NewListEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller list action.
+func NewListEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ListEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ListEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramKeyword := req.Params["keyword"]
+	if len(paramKeyword) > 0 {
+		rawKeyword := paramKeyword[0]
+		rctx.Keyword = &rawKeyword
+		if rctx.Keyword != nil {
+			if utf8.RuneCountInString(*rctx.Keyword) < 1 {
+				err = goa.MergeErrors(err, goa.InvalidLengthError(`keyword`, *rctx.Keyword, utf8.RuneCountInString(*rctx.Keyword), 1, true))
+			}
+		}
+		if rctx.Keyword != nil {
+			if utf8.RuneCountInString(*rctx.Keyword) > 50 {
+				err = goa.MergeErrors(err, goa.InvalidLengthError(`keyword`, *rctx.Keyword, utf8.RuneCountInString(*rctx.Keyword), 50, false))
+			}
+		}
+	}
+	paramLimit := req.Params["limit"]
+	if len(paramLimit) == 0 {
+		rctx.Limit = 10
+	} else {
+		rawLimit := paramLimit[0]
+		if limit, err2 := strconv.Atoi(rawLimit); err2 == nil {
+			rctx.Limit = limit
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("limit", rawLimit, "integer"))
+		}
+		if rctx.Limit < 5 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`limit`, rctx.Limit, 5, true))
+		}
+		if rctx.Limit > 50 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`limit`, rctx.Limit, 50, false))
+		}
+	}
+	paramOffset := req.Params["offset"]
+	if len(paramOffset) == 0 {
+		rctx.Offset = 0
+	} else {
+		rawOffset := paramOffset[0]
+		if offset, err2 := strconv.Atoi(rawOffset); err2 == nil {
+			rctx.Offset = offset
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("offset", rawOffset, "integer"))
+		}
+		if rctx.Offset < 0 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`offset`, rctx.Offset, 0, true))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		rctx.UserID = &rawUserID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ListEventsContext) OK(r EventCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKTiny sends a HTTP response with status code 200.
+func (ctx *ListEventsContext) OKTiny(r EventTinyCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventTinyCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ListEventsContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *ListEventsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// ShowEventsContext provides the events show action context.
+type ShowEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	EventID string
+	UserID  string
+}
+
+// NewShowEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller show action.
+func NewShowEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ShowEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ShowEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramEventID := req.Params["event_id"]
+	if len(paramEventID) > 0 {
+		rawEventID := paramEventID[0]
+		rctx.EventID = rawEventID
+		if ok := goa.ValidatePattern(`^[0-9]{8}-[0-9]+$`, rctx.EventID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{8}-[0-9]+$`))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		rctx.UserID = rawUserID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ShowEventsContext) OK(r *Event) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKTiny sends a HTTP response with status code 200.
+func (ctx *ShowEventsContext) OKTiny(r *EventTiny) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *ShowEventsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// UpdateEventsContext provides the events update action context.
+type UpdateEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	EventID string
+	UserID  string
+	Payload *EventPayload
+}
+
+// NewUpdateEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller update action.
+func NewUpdateEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := UpdateEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramEventID := req.Params["event_id"]
+	if len(paramEventID) > 0 {
+		rawEventID := paramEventID[0]
+		rctx.EventID = rawEventID
+		if ok := goa.ValidatePattern(`^[0-9]{8}-[0-9]+$`, rctx.EventID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{8}-[0-9]+$`))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		rctx.UserID = rawUserID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *UpdateEventsContext) OK(r *Event) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKTiny sends a HTTP response with status code 200.
+func (ctx *UpdateEventsContext) OKTiny(r *EventTiny) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *UpdateEventsContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *UpdateEventsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
+// ShowUsersContext provides the users show action context.
+type ShowUsersContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	UserID string
+}
+
+// NewShowUsersContext parses the incoming request URL and body, performs validations and creates the
+// context used by the users controller show action.
+func NewShowUsersContext(ctx context.Context, r *http.Request, service *goa.Service) (*ShowUsersContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ShowUsersContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		rctx.UserID = rawUserID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ShowUsersContext) OK(r *User) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.user+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKTiny sends a HTTP response with status code 200.
+func (ctx *ShowUsersContext) OKTiny(r *UserTiny) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.user+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ShowUsersContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *ShowUsersContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
 	return nil
 }
