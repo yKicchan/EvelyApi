@@ -60,7 +60,7 @@ func SigninAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/auth/signin"),
+		Path: fmt.Sprintf("/api/develop/v1/auth/signin"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -140,7 +140,7 @@ func SigninAuthUnauthorized(t goatest.TInterface, ctx context.Context, service *
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/auth/signin"),
+		Path: fmt.Sprintf("/api/develop/v1/auth/signin"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {

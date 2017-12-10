@@ -21,7 +21,7 @@ import (
 func ShowUsersPath(userID string) string {
 	param0 := userID
 
-	return fmt.Sprintf("/develop/v1/users/%s", param0)
+	return fmt.Sprintf("/api/develop/v1/users/%s", param0)
 }
 
 // アカウント情報取得

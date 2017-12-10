@@ -26,13 +26,13 @@ var _ = API("EvelyApi", func() {
 
 	// ホスト設定
 	Scheme("http")
-	Host("api.localhost:8888")
+	Host("localhost:8888")
 
 	// 全エンドポイントのBasePath
-	BasePath("/develop/v1")
+	BasePath("/api/develop/v1")
 
 	// CORSポリシーの定義
-	Origin("http://api.localhost:8888/swaggerui", func() {
+	Origin("http://localhost:8888/swaggerui", func() {
 		// クライアントに公開された1つ以上のヘッダー
 		Expose("X-Time")
 		// 許可されたHTTPメソッド

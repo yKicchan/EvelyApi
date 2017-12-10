@@ -106,7 +106,7 @@ func RegisterCommands(app *cobra.Command, c *client.Client) {
 	}
 	tmp1 := new(CreateEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events ["/develop/v1/events"]`,
+		Use:   `events ["/api/develop/v1/events"]`,
 		Short: ``,
 		Long: `
 
@@ -140,7 +140,7 @@ Payload example:
 	}
 	tmp2 := new(DeleteEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events ["/develop/v1/events/USER_ID/EVENT_ID"]`,
+		Use:   `events ["/api/develop/v1/events/USER_ID/EVENT_ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp2.Run(c, args) },
 	}
@@ -154,7 +154,7 @@ Payload example:
 	}
 	tmp3 := new(ListEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events ["/develop/v1/events"]`,
+		Use:   `events ["/api/develop/v1/events"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp3.Run(c, args) },
 	}
@@ -168,7 +168,7 @@ Payload example:
 	}
 	tmp4 := new(ShowEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events ["/develop/v1/events/USER_ID/EVENT_ID"]`,
+		Use:   `events ["/api/develop/v1/events/USER_ID/EVENT_ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp4.Run(c, args) },
 	}
@@ -177,7 +177,7 @@ Payload example:
 	command.AddCommand(sub)
 	tmp5 := new(ShowUsersCommand)
 	sub = &cobra.Command{
-		Use:   `users ["/develop/v1/users/USER_ID"]`,
+		Use:   `users ["/api/develop/v1/users/USER_ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp5.Run(c, args) },
 	}
@@ -191,7 +191,7 @@ Payload example:
 	}
 	tmp6 := new(SigninAuthCommand)
 	sub = &cobra.Command{
-		Use:   `auth ["/develop/v1/auth/signin"]`,
+		Use:   `auth ["/api/develop/v1/auth/signin"]`,
 		Short: ``,
 		Long: `
 
@@ -213,7 +213,7 @@ Payload example:
 	}
 	tmp7 := new(UpdateEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events ["/develop/v1/events/USER_ID/EVENT_ID"]`,
+		Use:   `events ["/api/develop/v1/events/USER_ID/EVENT_ID"]`,
 		Short: ``,
 		Long: `
 
@@ -460,7 +460,7 @@ func (cmd *SigninAuthCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/develop/v1/auth/signin"
+		path = "/api/develop/v1/auth/signin"
 	}
 	var payload client.LoginPayload
 	if cmd.Payload != "" {
@@ -493,7 +493,7 @@ func (cmd *CreateEventsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/develop/v1/events"
+		path = "/api/develop/v1/events"
 	}
 	var payload client.EventPayload
 	if cmd.Payload != "" {
@@ -526,7 +526,7 @@ func (cmd *DeleteEventsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/develop/v1/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
+		path = fmt.Sprintf("/api/develop/v1/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -554,7 +554,7 @@ func (cmd *ListEventsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = "/develop/v1/events"
+		path = "/api/develop/v1/events"
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -585,7 +585,7 @@ func (cmd *ShowEventsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/develop/v1/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
+		path = fmt.Sprintf("/api/develop/v1/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -613,7 +613,7 @@ func (cmd *UpdateEventsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/develop/v1/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
+		path = fmt.Sprintf("/api/develop/v1/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
 	}
 	var payload client.EventPayload
 	if cmd.Payload != "" {
@@ -650,7 +650,7 @@ func (cmd *ShowUsersCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/develop/v1/users/%v", url.QueryEscape(cmd.UserID))
+		path = fmt.Sprintf("/api/develop/v1/users/%v", url.QueryEscape(cmd.UserID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)

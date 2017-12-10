@@ -21,7 +21,7 @@ import (
 // SigninAuthPath computes a request path to the signin action of auth.
 func SigninAuthPath() string {
 
-	return fmt.Sprintf("/develop/v1/auth/signin")
+	return fmt.Sprintf("/api/develop/v1/auth/signin")
 }
 
 // サインイン

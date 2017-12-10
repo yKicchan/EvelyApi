@@ -1,4 +1,4 @@
-basePath: /develop/v1
+basePath: /api/develop/v1
 consumes:
 - application/json
 - application/xml
@@ -342,7 +342,7 @@ definitions:
     - name
     title: 'Mediatype identifier: application/vnd.user+json; view=tiny'
     type: object
-host: api.localhost:8888
+host: localhost:8888
 info:
   contact:
     email: yKicchanApp@gmail.com

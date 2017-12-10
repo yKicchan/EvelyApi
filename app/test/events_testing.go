@@ -61,7 +61,7 @@ func CreateEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events"),
+		Path: fmt.Sprintf("/api/develop/v1/events"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -129,7 +129,7 @@ func CreateEventsCreated(t goatest.TInterface, ctx context.Context, service *goa
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events"),
+		Path: fmt.Sprintf("/api/develop/v1/events"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -209,7 +209,7 @@ func CreateEventsCreatedTiny(t goatest.TInterface, ctx context.Context, service 
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events"),
+		Path: fmt.Sprintf("/api/develop/v1/events"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -278,7 +278,7 @@ func DeleteEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
@@ -336,7 +336,7 @@ func DeleteEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
@@ -411,7 +411,7 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 		query["user_id"] = sliceVal
 	}
 	u := &url.URL{
-		Path:     fmt.Sprintf("/develop/v1/events"),
+		Path:     fmt.Sprintf("/api/develop/v1/events"),
 		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -501,7 +501,7 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 		query["user_id"] = sliceVal
 	}
 	u := &url.URL{
-		Path:     fmt.Sprintf("/develop/v1/events"),
+		Path:     fmt.Sprintf("/api/develop/v1/events"),
 		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -591,7 +591,7 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 		query["user_id"] = sliceVal
 	}
 	u := &url.URL{
-		Path:     fmt.Sprintf("/develop/v1/events"),
+		Path:     fmt.Sprintf("/api/develop/v1/events"),
 		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -693,7 +693,7 @@ func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 		query["user_id"] = sliceVal
 	}
 	u := &url.URL{
-		Path:     fmt.Sprintf("/develop/v1/events"),
+		Path:     fmt.Sprintf("/api/develop/v1/events"),
 		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -778,7 +778,7 @@ func ShowEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -836,7 +836,7 @@ func ShowEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -906,7 +906,7 @@ func ShowEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -987,7 +987,7 @@ func UpdateEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
@@ -1057,7 +1057,7 @@ func UpdateEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
@@ -1127,7 +1127,7 @@ func UpdateEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
@@ -1209,7 +1209,7 @@ func UpdateEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/develop/v1/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v1/events/%v/%v", userID, eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
