@@ -60,17 +60,17 @@ func NewEventDB(db *mgo.Database) *EventDB {
  * @return eventID 生成したイベントのID
  * @return err     作成時に発生したエラー
  */
-func (db *EventDB) NewEvent(userID string) (eventID string, err error) {
-	y, m, d := time.Now().Date()
-	today := strconv.Itoa(y) + strconv.Itoa(int(m)) + strconv.Itoa(d)
+func (db *EventDB) NewEvent(userID string, upcomingDate time.Time) (eventID string, err error) {
+	y, m, d := upcomingDate.Date()
+	date := strconv.Itoa(y) + strconv.Itoa(int(m)) + strconv.Itoa(d)
 	query := bson.M{
 		"$and": []interface{}{
-			bson.M{"id": bson.M{"$regex": bson.RegEx{Pattern: today + `-[0-9]+`}}},
+			bson.M{"id": bson.M{"$regex": bson.RegEx{Pattern: date + `-[0-9]+`}}},
 			bson.M{"host.id": userID},
 		},
 	}
 	n, _ := db.C("events").Find(query).Count()
-	eventID = today + "-" + strconv.Itoa(n + 1)
+	eventID = date + "-" + strconv.Itoa(n + 1)
 	event := &EventModel{
 		ID: eventID,
 		Host: Host{ID: userID},

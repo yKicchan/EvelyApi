@@ -89,12 +89,13 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 
 	// Put your logic here
 	user := GetLoginUser(ctx)
-	eventID, err := c.db.NewEvent(user.ID)
+	p := ctx.Payload
+
+	eventID, err := c.db.NewEvent(user.ID, p.UpcomingDate.StartDate)
 	if err != nil {
 		log.Printf("[EvelyApi] failed to create event: %s", err)
 	}
 
-	p := ctx.Payload
 	event := &model.EventModel{
 		ID:    eventID,
 		Title: p.Title,
