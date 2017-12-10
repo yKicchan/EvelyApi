@@ -88,12 +88,12 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	p := ctx.Payload
 	user, err := c.db.GetUser(p.ID)
 	if err != nil {
-		return ctx.Unauthorized()
+		return ctx.BadRequest()
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(p.Password))
 	if err != nil {
 		log.Printf("[EvelyApi] %s", err)
-		return ctx.Unauthorized()
+		return ctx.BadRequest()
 	}
 	return ctx.OK(newToken(user))
 	// AuthController_Signin: end_implement

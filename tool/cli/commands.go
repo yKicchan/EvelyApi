@@ -53,7 +53,8 @@ type (
 	// DeleteEventsCommand is the command line data structure for the delete action of events
 	DeleteEventsCommand struct {
 		// イベントID
-		EventID     string
+		EventID string
+		// ユーザーID
 		UserID      string
 		PrettyPrint bool
 	}
@@ -83,7 +84,8 @@ type (
 		Payload     string
 		ContentType string
 		// イベントID
-		EventID     string
+		EventID string
+		// ユーザーID
 		UserID      string
 		PrettyPrint bool
 	}
@@ -228,7 +230,7 @@ Payload example:
    "id": "yKicchan",
    "mail": "yKicchanApp@gmail.com",
    "name": "きっちゃそ",
-   "password": "Password",
+   "password": "password",
    "tel": "090-1234-5678"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
@@ -608,7 +610,7 @@ func (cmd *DeleteEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Clien
 	var eventID string
 	cc.Flags().StringVar(&cmd.EventID, "event_id", eventID, `イベントID`)
 	var userID string
-	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, ``)
+	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
 }
 
 // Run makes the HTTP request corresponding to the ListEventsCommand command.
@@ -702,7 +704,7 @@ func (cmd *UpdateEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Clien
 	var eventID string
 	cc.Flags().StringVar(&cmd.EventID, "event_id", eventID, `イベントID`)
 	var userID string
-	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, ``)
+	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
 }
 
 // Run makes the HTTP request corresponding to the ShowUsersCommand command.

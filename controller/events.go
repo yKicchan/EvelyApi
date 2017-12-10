@@ -70,6 +70,30 @@ func ToEventTinyMedia(e *model.EventModel) *app.EventTiny {
 	}
 }
 
+func ToEventModel(p *app.EventPayload, id string, user *model.UserModel) *model.EventModel {
+	return &model.EventModel{
+		ID:    id,
+		Title: p.Title,
+		Host: model.Host{
+			ID:   user.ID,
+			Name: user.Name,
+		},
+		Body: p.Body,
+		Place: model.Location{
+			Name:   p.Place.Name,
+			LngLat: [2]float64{p.Place.Lng, p.Place.Lat},
+		},
+		UpdateDate: time.Now(),
+		UpcomingDate: model.UpcomingDate{
+			StartDate: p.UpcomingDate.StartDate,
+			EndDate:   p.UpcomingDate.EndDate,
+		},
+		URL:  p.URL,
+		Mail: p.Mail,
+		Tel:  p.Tel,
+	}
+}
+
 // EventsController implements the events resource.
 type EventsController struct {
 	*goa.Controller
@@ -90,34 +114,14 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 
 	// Put your logic here
 	user := GetLoginUser(ctx)
-	p := ctx.Payload
+	payload := ctx.Payload
 
-	eventID, err := c.db.NewEvent(user.ID, p.UpcomingDate.StartDate)
+	eventID, err := c.db.NewEvent(user.ID, payload.UpcomingDate.StartDate)
 	if err != nil {
 		log.Printf("[EvelyApi] failed to create event: %s", err)
 	}
 
-	event := &model.EventModel{
-		ID:    eventID,
-		Title: p.Title,
-		Host: model.Host{
-			ID:   user.ID,
-			Name: user.Name,
-		},
-		Body: p.Body,
-		Place: model.Location{
-			Name:   p.Place.Name,
-			LngLat: [2]float64{p.Place.Lng, p.Place.Lat},
-		},
-		UpdateDate: time.Now(),
-		UpcomingDate: model.UpcomingDate{
-			StartDate: p.UpcomingDate.StartDate,
-			EndDate:   p.UpcomingDate.EndDate,
-		},
-		URL:  p.URL,
-		Mail: p.Mail,
-		Tel:  p.Tel,
-	}
+	event := ToEventModel(payload, eventID, user)
 
 	err = c.db.SaveEvent(event)
 	if err != nil {
@@ -177,8 +181,18 @@ func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
 	// EventsController_Update: start_implement
 
 	// Put your logic here
+	user := GetLoginUser(ctx)
+	if user.ID != ctx.UserID {
+		log.Printf("[EvelyApi] permission error")
+		return ctx.Forbidden()
+	}
 
-	res := &app.Event{}
-	return ctx.OK(res)
+	event := ToEventModel(ctx.Payload, ctx.EventID, user)
+	err := c.db.SaveEvent(event)
+	if err != nil {
+		log.Printf("[EvelyApi] faild to save event: %s", err)
+		return ctx.NotFound()
+	}
+	return ctx.OK(ToEventMedia(event))
 	// EventsController_Update: end_implement
 }

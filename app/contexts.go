@@ -46,9 +46,9 @@ func (ctx *SigninAuthContext) OK(r *Token) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
-// Unauthorized sends a HTTP response with status code 401.
-func (ctx *SigninAuthContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SigninAuthContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
 	return nil
 }
 
@@ -128,6 +128,12 @@ func (ctx *CreateEventsContext) BadRequest() error {
 	return nil
 }
 
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *CreateEventsContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
 // DeleteEventsContext provides the events delete action context.
 type DeleteEventsContext struct {
 	context.Context
@@ -170,6 +176,18 @@ func (ctx *DeleteEventsContext) OK(resp []byte) error {
 	ctx.ResponseData.WriteHeader(200)
 	_, err := ctx.ResponseData.Write(resp)
 	return err
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *DeleteEventsContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
+// Forbidden sends a HTTP response with status code 403.
+func (ctx *DeleteEventsContext) Forbidden() error {
+	ctx.ResponseData.WriteHeader(403)
+	return nil
 }
 
 // NotFound sends a HTTP response with status code 404.
@@ -391,6 +409,18 @@ func (ctx *UpdateEventsContext) OKTiny(r *EventTiny) error {
 // BadRequest sends a HTTP response with status code 400.
 func (ctx *UpdateEventsContext) BadRequest() error {
 	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *UpdateEventsContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
+// Forbidden sends a HTTP response with status code 403.
+func (ctx *UpdateEventsContext) Forbidden() error {
+	ctx.ResponseData.WriteHeader(403)
 	return nil
 }
 

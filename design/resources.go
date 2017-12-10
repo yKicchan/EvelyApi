@@ -15,7 +15,7 @@ var _ = Resource("auth", func() {
 		Routing(POST("/signin"))
 		Payload(LoginPayload)
 		Response(OK, TokenMedia)
-		Response(Unauthorized)
+		Response(BadRequest)
 	})
 
 	Action("signup", func() {
@@ -86,12 +86,16 @@ var _ = Resource("events", func() {
 		Payload(EventPayload)
 		Response(Created, EventMedia)
 		Response(BadRequest)
+		Response(Unauthorized)
 	})
 
 	Action("update", func() {
 		Description("イベント編集")
 		Routing(PUT("/:user_id/:event_id"))
 		Params(func() {
+			Param("user_id", String, "ユーザーID", func() {
+				Example("yKicchan")
+			})
 			Param("event_id", String, "イベントID", func() {
 				Pattern("^[0-9]{8}-[0-9]+$")
 				Example("20170225-2")
@@ -99,20 +103,27 @@ var _ = Resource("events", func() {
 		})
 		Payload(EventPayload)
 		Response(OK, EventMedia)
-		Response(NotFound)
 		Response(BadRequest)
+		Response(Unauthorized)
+		Response(Forbidden)
+		Response(NotFound)
 	})
 
 	Action("delete", func() {
 		Description("イベント削除")
 		Routing(DELETE("/:user_id/:event_id"))
 		Params(func() {
+			Param("user_id", String, "ユーザーID", func() {
+				Example("yKicchan")
+			})
 			Param("event_id", String, "イベントID", func() {
 				Pattern("^[0-9]{8}-[0-9]+$")
 				Example("20170225-2")
 			})
 		})
 		Response(OK)
+		Response(Unauthorized)
+		Response(Forbidden)
 		Response(NotFound)
 	})
 })
