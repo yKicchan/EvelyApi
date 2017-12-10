@@ -1,24 +1,56 @@
 package controller
 
 import (
-	"fmt"
-	"log"
-	"context"
-	"io/ioutil"
-	"crypto/rsa"
 	"EvelyApi/app"
 	"EvelyApi/model"
+	"context"
+	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
+	"golang.org/x/crypto/bcrypt"
 	mgo "gopkg.in/mgo.v2"
-	jwtgo "github.com/dgrijalva/jwt-go"
+	"io/ioutil"
+	"log"
 )
 
 // AuthController implements the auth resource.
 type AuthController struct {
 	*goa.Controller
 	db         *model.UserDB
-	privateKey *rsa.PrivateKey
+}
+
+func newToken(user *model.UserModel) *app.Token {
+	// jwt生成
+	token := jwtgo.New(jwtgo.SigningMethodRS512)
+	token.Claims = jwtgo.MapClaims{
+		"scopes": "api:access",
+		"id":     user.ID,
+		"name":   user.Name,
+	}
+	// 秘密鍵読み込み
+	pem := loadPrivateKey()
+	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM(pem)
+	if err != nil {
+		log.Fatalf("[EvelyApi] faild to parse private key: %s", err)
+	}
+	// jwtを暗号化
+	signedToken, err := token.SignedString(privateKey)
+	if err != nil {
+		log.Fatalf("[EvelyApi] failed to sign token: %s", err)
+	}
+	return &app.Token{Token: "Bearer " + signedToken}
+}
+
+/**
+ * 秘密鍵を読み込む
+ * @return 秘密鍵
+ */
+func loadPrivateKey() []byte {
+	pem, err := ioutil.ReadFile("./keys/id_rsa")
+	if err != nil {
+		log.Fatalf("[EvelyApi] faild to load file: %s", err)
+	}
+	return pem
 }
 
 /**
@@ -33,7 +65,7 @@ func GetLoginUser(ctx context.Context) (user *model.UserModel) {
 		log.Fatalf("unsupported claims shape")
 	}
 	user = &model.UserModel{
-		ID: claims["id"].(string),
+		ID:   claims["id"].(string),
 		Name: claims["name"].(string),
 	}
 	return user
@@ -53,35 +85,51 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 
 	// Put your logic here
 	// ログイン認証
-	payload := ctx.Payload
-	user, err := c.db.Authentication(payload.ID, payload.Password)
+	p := ctx.Payload
+	user, err := c.db.GetUser(p.ID)
 	if err != nil {
 		return ctx.Unauthorized()
 	}
-
-	// jwt生成
-	token := jwtgo.New(jwtgo.SigningMethodRS512)
-	token.Claims = jwtgo.MapClaims{
-		"scopes": "api:access",
-		"id": user.ID,
-		"name": user.Name,
-	}
-	// 秘密鍵読み込み
-	pem, err := ioutil.ReadFile("./keys/id_rsa")
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(p.Password))
 	if err != nil {
-		log.Fatalf("faild to load file: %s", err)
+		log.Printf("[EvelyApi] %s", err)
+		return ctx.Unauthorized()
 	}
-	privateKey, err := jwtgo.ParseRSAPrivateKeyFromPEM(pem)
-	if err != nil {
-		log.Fatalf("faild to parse private key: %s", err)
-	}
-	// jwtを暗号化
-	signedToken, err := token.SignedString(privateKey)
-	if err != nil {
-		return fmt.Errorf("failed to sign token: %s", err) // internal error
-	}
-
-	res := &app.Token{Token: "Bearer " + signedToken}
-	return ctx.OK(res)
+	return ctx.OK(newToken(user))
 	// AuthController_Signin: end_implement
+}
+
+// Signup runs the signup action.
+func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
+	// AuthController_Signup: start_implement
+
+	// Put your logic here
+	p := ctx.Payload
+	err := c.db.NewUser(p.ID)
+	if err != nil {
+		log.Printf("[EvelyApi] faild to create user: %s", err)
+		return ctx.BadRequest()
+	}
+
+	pass, err := bcrypt.GenerateFromPassword([]byte(p.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Printf("[EvelyApi] faild to generate hash: %s", err)
+		return ctx.BadRequest()
+	}
+	log.Print("[Password]%s", string(pass))
+	user := &model.UserModel{
+		ID:       p.ID,
+		Password: string(pass),
+		Name:     p.Name,
+		Mail:     p.Mail,
+		Tel:      p.Tel,
+	}
+	err = c.db.SaveUser(user)
+	if err != nil {
+		log.Printf("[EvelyApi] faild to save user: %s", err)
+		return ctx.BadRequest()
+	}
+
+	return ctx.OK(newToken(user))
+	// AuthController_Signup: end_implement
 }

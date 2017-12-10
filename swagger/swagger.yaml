@@ -319,6 +319,50 @@ definitions:
     - tel
     title: 'Mediatype identifier: application/vnd.user+json; view=default'
     type: object
+  UserPayload:
+    description: アカウント作成時に受け取る情報
+    example:
+      id: yKicchan
+      mail: yKicchanApp@gmail.com
+      name: きっちゃそ
+      password: Password
+      tel: 090-1234-5678
+    properties:
+      id:
+        description: ユーザーID
+        example: yKicchan
+        maxLength: 15
+        minLength: 4
+        type: string
+      mail:
+        description: メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+      name:
+        description: 名前
+        example: きっちゃそ
+        maxLength: 50
+        minLength: 1
+        type: string
+      password:
+        description: パスワード
+        example: Password
+        minLength: 8
+        type: string
+      tel:
+        default: ""
+        description: 電話番号
+        example: 090-1234-5678
+        type: string
+    required:
+    - id
+    - password
+    - name
+    - mail
+    - tel
+    title: UserPayload
+    type: object
   UserTiny:
     description: ユーザー情報 (tiny view)
     example:
@@ -356,7 +400,7 @@ info:
 paths:
   /auth/signin:
     post:
-      description: サインイン
+      description: ログイン
       operationId: auth#signin
       parameters:
       - description: 認証時に受け取るログイン情報
@@ -377,6 +421,31 @@ paths:
       schemes:
       - http
       summary: signin auth
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      description: 新規登録
+      operationId: auth#signup
+      parameters:
+      - description: アカウント作成時に受け取る情報
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserPayload'
+      produces:
+      - application/vnd.token+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Token'
+        "400":
+          description: Bad Request
+      schemes:
+      - http
+      summary: signup auth
       tags:
       - auth
   /events:

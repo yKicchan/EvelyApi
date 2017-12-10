@@ -28,3 +28,6 @@ import:
 - package: github.com/hashicorp/go-immutable-radix
 - package: github.com/hashicorp/golang-lru/simplelru
 - package: github.com/dgrijalva/jwt-go
+- package: golang.org/x/crypto
+  subpackages:
+  - scrypt

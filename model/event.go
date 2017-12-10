@@ -1,10 +1,10 @@
 package model
 
 import (
-	"time"
-	"strconv"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"strconv"
+	"time"
 )
 
 // イベントのリソースに対するDBオブジェクト
@@ -70,7 +70,7 @@ func WithUserID(userID string) GetEventsOption {
  * @return         クロージャ
  */
 func WithKeyword(keyword string) GetEventsOption {
-	return func(ops *getEventsOptions)  {
+	return func(ops *getEventsOptions) {
 		ops.keyword = keyword
 	}
 }
@@ -106,9 +106,9 @@ func (db *EventDB) NewEvent(userID string, upcomingDate time.Time) (eventID stri
 		},
 	}
 	n, _ := db.C("events").Find(query).Count()
-	eventID = date + "-" + strconv.Itoa(n + 1)
+	eventID = date + "-" + strconv.Itoa(n+1)
 	event := &EventModel{
-		ID: eventID,
+		ID:   eventID,
 		Host: Host{ID: userID},
 	}
 	err = db.C("events").Insert(event)
@@ -126,9 +126,9 @@ func (db *EventDB) NewEvent(userID string, upcomingDate time.Time) (eventID stri
 func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (events []EventModel, err error) {
 	// 検索オプションを取得
 	opt := getEventsOptions{}
-    for _, o := range options {
-        o(&opt)
-    }
+	for _, o := range options {
+		o(&opt)
+	}
 	// 検索オプションの内容からクエリを作成
 	query := bson.M{}
 	if len(opt.keyword) > 0 {
@@ -168,7 +168,7 @@ func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (eve
 func (db *EventDB) GetEvent(userID, eventID string) (event *EventModel, err error) {
 	query := bson.M{
 		"$and": []interface{}{
-			bson.M{"id":      eventID},
+			bson.M{"id": eventID},
 			bson.M{"host.id": userID},
 		},
 	}
@@ -184,13 +184,12 @@ func (db *EventDB) GetEvent(userID, eventID string) (event *EventModel, err erro
 func (db *EventDB) SaveEvent(event *EventModel) error {
 	selector := bson.M{
 		"$and": []interface{}{
-			bson.M{"id":      event.ID},
+			bson.M{"id": event.ID},
 			bson.M{"host.id": event.Host.ID},
 		},
 	}
 	update := bson.M{"$set": event}
-	err := db.C("events").Update(selector, update)
-	return err
+	return db.C("events").Update(selector, update)
 }
 
 // // イベント削除

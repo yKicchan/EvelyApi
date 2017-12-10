@@ -59,7 +59,7 @@ var UserPayload = Type("UserPayload", func() {
 	})
 	Attribute("password", String, "パスワード", func() {
 		MinLength(8)
-		Example("Password")
+		Example("password")
 	})
 	Attribute("name", String, "名前", func() {
 		MinLength(1)

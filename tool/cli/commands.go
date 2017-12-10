@@ -36,6 +36,13 @@ type (
 		PrettyPrint bool
 	}
 
+	// SignupAuthCommand is the command line data structure for the signup action of auth
+	SignupAuthCommand struct {
+		Payload     string
+		ContentType string
+		PrettyPrint bool
+	}
+
 	// CreateEventsCommand is the command line data structure for the create action of events
 	CreateEventsCommand struct {
 		Payload     string
@@ -185,7 +192,7 @@ Payload example:
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "signin",
-		Short: `サインイン`,
+		Short: `ログイン`,
 	}
 	tmp6 := new(SigninAuthCommand)
 	sub = &cobra.Command{
@@ -206,10 +213,35 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
+		Use:   "signup",
+		Short: `新規登録`,
+	}
+	tmp7 := new(SignupAuthCommand)
+	sub = &cobra.Command{
+		Use:   `auth ["/api/develop/v1/auth/signup"]`,
+		Short: ``,
+		Long: `
+
+Payload example:
+
+{
+   "id": "yKicchan",
+   "mail": "yKicchanApp@gmail.com",
+   "name": "きっちゃそ",
+   "password": "Password",
+   "tel": "090-1234-5678"
+}`,
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
+	}
+	tmp7.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp7.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
 		Use:   "update",
 		Short: `イベント編集`,
 	}
-	tmp7 := new(UpdateEventsCommand)
+	tmp8 := new(UpdateEventsCommand)
 	sub = &cobra.Command{
 		Use:   `events ["/api/develop/v1/events/USER_ID/EVENT_ID"]`,
 		Short: ``,
@@ -233,10 +265,10 @@ Payload example:
    },
    "url": "http://comp.ecc.ac.jp/"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp8.Run(c, args) },
 	}
-	tmp7.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp7.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp8.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp8.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -481,6 +513,39 @@ func (cmd *SigninAuthCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *SigninAuthCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
+	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
+}
+
+// Run makes the HTTP request corresponding to the SignupAuthCommand command.
+func (cmd *SignupAuthCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/api/develop/v1/auth/signup"
+	}
+	var payload client.UserPayload
+	if cmd.Payload != "" {
+		err := json.Unmarshal([]byte(cmd.Payload), &payload)
+		if err != nil {
+			return fmt.Errorf("failed to deserialize payload: %s", err)
+		}
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.SignupAuth(ctx, path, &payload, cmd.ContentType)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *SignupAuthCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 }

@@ -52,6 +52,40 @@ func (ctx *SigninAuthContext) Unauthorized() error {
 	return nil
 }
 
+// SignupAuthContext provides the auth signup action context.
+type SignupAuthContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *UserPayload
+}
+
+// NewSignupAuthContext parses the incoming request URL and body, performs validations and creates the
+// context used by the auth controller signup action.
+func NewSignupAuthContext(ctx context.Context, r *http.Request, service *goa.Service) (*SignupAuthContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SignupAuthContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *SignupAuthContext) OK(r *Token) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.token+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SignupAuthContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // CreateEventsContext provides the events create action context.
 type CreateEventsContext struct {
 	context.Context

@@ -8,13 +8,23 @@ import (
 // 認証系、サインアップ、サインインなど
 var _ = Resource("auth", func() {
 	BasePath("/auth")
+
 	Action("signin", func() {
-		Description("サインイン")
+		Description("ログイン")
 		NoSecurity()
 		Routing(POST("/signin"))
 		Payload(LoginPayload)
 		Response(OK, TokenMedia)
 		Response(Unauthorized)
+	})
+
+	Action("signup", func(){
+		Description("新規登録")
+		NoSecurity()
+		Routing(POST("/signup"))
+		Payload(UserPayload)
+		Response(OK, TokenMedia)
+		Response(BadRequest)
 	})
 })
 

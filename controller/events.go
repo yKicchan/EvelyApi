@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"log"
-	"time"
 	"EvelyApi/app"
 	"EvelyApi/model"
 	"github.com/goadesign/goa"
 	mgo "gopkg.in/mgo.v2"
+	"log"
+	"time"
 )
 
 // 緯度経度の配列番号を定数化

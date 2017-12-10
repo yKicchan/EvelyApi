@@ -24,7 +24,7 @@ func SigninAuthPath() string {
 	return fmt.Sprintf("/api/develop/v1/auth/signin")
 }
 
-// サインイン
+// ログイン
 func (c *Client) SigninAuth(ctx context.Context, path string, payload *LoginPayload, contentType string) (*http.Response, error) {
 	req, err := c.NewSigninAuthRequest(ctx, path, payload, contentType)
 	if err != nil {
@@ -35,6 +35,49 @@ func (c *Client) SigninAuth(ctx context.Context, path string, payload *LoginPayl
 
 // NewSigninAuthRequest create the request corresponding to the signin action endpoint of the auth resource.
 func (c *Client) NewSigninAuthRequest(ctx context.Context, path string, payload *LoginPayload, contentType string) (*http.Request, error) {
+	var body bytes.Buffer
+	if contentType == "" {
+		contentType = "*/*" // Use default encoder
+	}
+	err := c.Encoder.Encode(payload, &body, contentType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	if contentType == "*/*" {
+		header.Set("Content-Type", "application/json")
+	} else {
+		header.Set("Content-Type", contentType)
+	}
+	return req, nil
+}
+
+// SignupAuthPath computes a request path to the signup action of auth.
+func SignupAuthPath() string {
+
+	return fmt.Sprintf("/api/develop/v1/auth/signup")
+}
+
+// 新規登録
+func (c *Client) SignupAuth(ctx context.Context, path string, payload *UserPayload, contentType string) (*http.Response, error) {
+	req, err := c.NewSignupAuthRequest(ctx, path, payload, contentType)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSignupAuthRequest create the request corresponding to the signup action endpoint of the auth resource.
+func (c *Client) NewSignupAuthRequest(ctx context.Context, path string, payload *UserPayload, contentType string) (*http.Request, error) {
 	var body bytes.Buffer
 	if contentType == "" {
 		contentType = "*/*" // Use default encoder

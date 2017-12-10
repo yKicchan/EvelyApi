@@ -36,6 +36,7 @@ func initService(service *goa.Service) {
 type AuthController interface {
 	goa.Muxer
 	Signin(*SigninAuthContext) error
+	Signup(*SignupAuthContext) error
 }
 
 // MountAuthController "mounts" a Auth resource controller on the given service.
@@ -43,6 +44,7 @@ func MountAuthController(service *goa.Service, ctrl AuthController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signin", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signup", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -65,6 +67,28 @@ func MountAuthController(service *goa.Service, ctrl AuthController) {
 	h = handleAuthOrigin(h)
 	service.Mux.Handle("POST", "/api/develop/v1/auth/signin", ctrl.MuxHandler("signin", h, unmarshalSigninAuthPayload))
 	service.LogInfo("mount", "ctrl", "Auth", "action", "Signin", "route", "POST /api/develop/v1/auth/signin")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSignupAuthContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*UserPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Signup(rctx)
+	}
+	h = handleAuthOrigin(h)
+	service.Mux.Handle("POST", "/api/develop/v1/auth/signup", ctrl.MuxHandler("signup", h, unmarshalSignupAuthPayload))
+	service.LogInfo("mount", "ctrl", "Auth", "action", "Signup", "route", "POST /api/develop/v1/auth/signup")
 }
 
 // handleAuthOrigin applies the CORS response headers corresponding to the origin.
@@ -100,6 +124,22 @@ func unmarshalSigninAuthPayload(ctx context.Context, service *goa.Service, req *
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalSignupAuthPayload unmarshals the request body into the context request data Payload field.
+func unmarshalSignupAuthPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &userPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	payload.Finalize()
 	if err := payload.Validate(); err != nil {
 		// Initialize payload with private data structure so it can be logged
 		goa.ContextRequest(ctx).Payload = payload
