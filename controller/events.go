@@ -163,9 +163,12 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 	// EventsController_Show: start_implement
 
 	// Put your logic here
-
-	res := &app.Event{}
-	return ctx.OK(res)
+	event, err := c.db.GetEvent(ctx.UserID, ctx.EventID)
+	if err != nil {
+		log.Printf("[EvelyApi] faild to find event: %s", err)
+		return ctx.NotFound()
+	}
+	return ctx.OK(ToEventMedia(event))
 	// EventsController_Show: end_implement
 }
 
