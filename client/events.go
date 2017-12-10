@@ -109,9 +109,16 @@ func ListEventsPath() string {
 	return fmt.Sprintf("/api/develop/v1/events")
 }
 
+// ListEventsPath2 computes a request path to the list action of events.
+func ListEventsPath2(userID string) string {
+	param0 := userID
+
+	return fmt.Sprintf("/api/develop/v1/events/%s", param0)
+}
+
 // イベント複数取得
-func (c *Client) ListEvents(ctx context.Context, path string, limit int, offset int, keyword *string, userID *string) (*http.Response, error) {
-	req, err := c.NewListEventsRequest(ctx, path, limit, offset, keyword, userID)
+func (c *Client) ListEvents(ctx context.Context, path string, limit int, offset int, keyword *string) (*http.Response, error) {
+	req, err := c.NewListEventsRequest(ctx, path, limit, offset, keyword)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +126,7 @@ func (c *Client) ListEvents(ctx context.Context, path string, limit int, offset 
 }
 
 // NewListEventsRequest create the request corresponding to the list action endpoint of the events resource.
-func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit int, offset int, keyword *string, userID *string) (*http.Request, error) {
+func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit int, offset int, keyword *string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
@@ -132,9 +139,6 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit in
 	values.Set("offset", tmp9)
 	if keyword != nil {
 		values.Set("keyword", *keyword)
-	}
-	if userID != nil {
-		values.Set("user_id", *userID)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

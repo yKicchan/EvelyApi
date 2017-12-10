@@ -373,7 +373,7 @@ func DeleteEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 // It returns the response writer so it's possible to inspect the response headers.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword *string, limit int, offset int, userID *string) http.ResponseWriter {
+func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) http.ResponseWriter {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -394,8 +394,8 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
-	if keyword != nil {
-		sliceVal := []string{*keyword}
+	{
+		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
 	}
 	{
@@ -406,10 +406,6 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 		sliceVal := []string{strconv.Itoa(offset)}
 		query["offset"] = sliceVal
 	}
-	if userID != nil {
-		sliceVal := []string{*userID}
-		query["user_id"] = sliceVal
-	}
 	u := &url.URL{
 		Path:     fmt.Sprintf("/api/develop/v1/events"),
 		RawQuery: query.Encode(),
@@ -419,8 +415,8 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	if keyword != nil {
-		sliceVal := []string{*keyword}
+	{
+		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
 	}
 	{
@@ -431,9 +427,88 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 		sliceVal := []string{strconv.Itoa(offset)}
 		prms["offset"] = sliceVal
 	}
-	if userID != nil {
-		sliceVal := []string{*userID}
-		prms["user_id"] = sliceVal
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	listCtx, _err := app.NewListEventsContext(goaCtx, req, service)
+	if _err != nil {
+		panic("invalid test data " + _err.Error()) // bug
+	}
+
+	// Perform action
+	_err = ctrl.List(listCtx)
+
+	// Validate response
+	if _err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
+	}
+	if rw.Code != 400 {
+		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
+	}
+
+	// Return results
+	return rw
+}
+
+// ListEventsBadRequest1 runs the method List of the given controller with the given parameters.
+// It returns the response writer so it's possible to inspect the response headers.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func ListEventsBadRequest1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) http.ResponseWriter {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	query := url.Values{}
+	{
+		sliceVal := []string{keyword}
+		query["keyword"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		query["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		query["offset"] = sliceVal
+	}
+	u := &url.URL{
+		Path:     fmt.Sprintf("/api/develop/v1/events/%v", userID),
+		RawQuery: query.Encode(),
+	}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		panic("invalid test " + err.Error()) // bug
+	}
+	prms := url.Values{}
+	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	{
+		sliceVal := []string{keyword}
+		prms["keyword"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		prms["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		prms["offset"] = sliceVal
 	}
 	if ctx == nil {
 		ctx = context.Background()
@@ -463,7 +538,7 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 // It returns the response writer so it's possible to inspect the response headers.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword *string, limit int, offset int, userID *string) http.ResponseWriter {
+func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) http.ResponseWriter {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -484,8 +559,8 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
-	if keyword != nil {
-		sliceVal := []string{*keyword}
+	{
+		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
 	}
 	{
@@ -496,10 +571,6 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 		sliceVal := []string{strconv.Itoa(offset)}
 		query["offset"] = sliceVal
 	}
-	if userID != nil {
-		sliceVal := []string{*userID}
-		query["user_id"] = sliceVal
-	}
 	u := &url.URL{
 		Path:     fmt.Sprintf("/api/develop/v1/events"),
 		RawQuery: query.Encode(),
@@ -509,8 +580,8 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	if keyword != nil {
-		sliceVal := []string{*keyword}
+	{
+		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
 	}
 	{
@@ -521,9 +592,88 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 		sliceVal := []string{strconv.Itoa(offset)}
 		prms["offset"] = sliceVal
 	}
-	if userID != nil {
-		sliceVal := []string{*userID}
-		prms["user_id"] = sliceVal
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	listCtx, _err := app.NewListEventsContext(goaCtx, req, service)
+	if _err != nil {
+		panic("invalid test data " + _err.Error()) // bug
+	}
+
+	// Perform action
+	_err = ctrl.List(listCtx)
+
+	// Validate response
+	if _err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
+	}
+	if rw.Code != 404 {
+		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
+	}
+
+	// Return results
+	return rw
+}
+
+// ListEventsNotFound1 runs the method List of the given controller with the given parameters.
+// It returns the response writer so it's possible to inspect the response headers.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func ListEventsNotFound1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) http.ResponseWriter {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	query := url.Values{}
+	{
+		sliceVal := []string{keyword}
+		query["keyword"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		query["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		query["offset"] = sliceVal
+	}
+	u := &url.URL{
+		Path:     fmt.Sprintf("/api/develop/v1/events/%v", userID),
+		RawQuery: query.Encode(),
+	}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		panic("invalid test " + err.Error()) // bug
+	}
+	prms := url.Values{}
+	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	{
+		sliceVal := []string{keyword}
+		prms["keyword"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		prms["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		prms["offset"] = sliceVal
 	}
 	if ctx == nil {
 		ctx = context.Background()
@@ -553,7 +703,7 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword *string, limit int, offset int, userID *string) (http.ResponseWriter, app.EventCollection) {
+func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, app.EventCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -574,8 +724,8 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
-	if keyword != nil {
-		sliceVal := []string{*keyword}
+	{
+		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
 	}
 	{
@@ -586,10 +736,6 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 		sliceVal := []string{strconv.Itoa(offset)}
 		query["offset"] = sliceVal
 	}
-	if userID != nil {
-		sliceVal := []string{*userID}
-		query["user_id"] = sliceVal
-	}
 	u := &url.URL{
 		Path:     fmt.Sprintf("/api/develop/v1/events"),
 		RawQuery: query.Encode(),
@@ -599,8 +745,8 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	if keyword != nil {
-		sliceVal := []string{*keyword}
+	{
+		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
 	}
 	{
@@ -610,10 +756,6 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 	{
 		sliceVal := []string{strconv.Itoa(offset)}
 		prms["offset"] = sliceVal
-	}
-	if userID != nil {
-		sliceVal := []string{*userID}
-		prms["user_id"] = sliceVal
 	}
 	if ctx == nil {
 		ctx = context.Background()
@@ -655,7 +797,7 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword *string, limit int, offset int, userID *string) (http.ResponseWriter, app.EventTinyCollection) {
+func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, app.EventTinyCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -676,8 +818,8 @@ func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
-	if keyword != nil {
-		sliceVal := []string{*keyword}
+	{
+		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
 	}
 	{
@@ -688,10 +830,6 @@ func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 		sliceVal := []string{strconv.Itoa(offset)}
 		query["offset"] = sliceVal
 	}
-	if userID != nil {
-		sliceVal := []string{*userID}
-		query["user_id"] = sliceVal
-	}
 	u := &url.URL{
 		Path:     fmt.Sprintf("/api/develop/v1/events"),
 		RawQuery: query.Encode(),
@@ -701,8 +839,8 @@ func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	if keyword != nil {
-		sliceVal := []string{*keyword}
+	{
+		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
 	}
 	{
@@ -713,9 +851,195 @@ func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 		sliceVal := []string{strconv.Itoa(offset)}
 		prms["offset"] = sliceVal
 	}
-	if userID != nil {
-		sliceVal := []string{*userID}
-		prms["user_id"] = sliceVal
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	listCtx, _err := app.NewListEventsContext(goaCtx, req, service)
+	if _err != nil {
+		panic("invalid test data " + _err.Error()) // bug
+	}
+
+	// Perform action
+	_err = ctrl.List(listCtx)
+
+	// Validate response
+	if _err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
+	}
+	if rw.Code != 200 {
+		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
+	}
+	var mt app.EventTinyCollection
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(app.EventTinyCollection)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.EventTinyCollection", resp, resp)
+		}
+		_err = mt.Validate()
+		if _err != nil {
+			t.Errorf("invalid response media type: %s", _err)
+		}
+	}
+
+	// Return results
+	return rw, mt
+}
+
+// ListEventsOK1 runs the method List of the given controller with the given parameters.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func ListEventsOK1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) (http.ResponseWriter, app.EventCollection) {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	query := url.Values{}
+	{
+		sliceVal := []string{keyword}
+		query["keyword"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		query["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		query["offset"] = sliceVal
+	}
+	u := &url.URL{
+		Path:     fmt.Sprintf("/api/develop/v1/events/%v", userID),
+		RawQuery: query.Encode(),
+	}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		panic("invalid test " + err.Error()) // bug
+	}
+	prms := url.Values{}
+	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	{
+		sliceVal := []string{keyword}
+		prms["keyword"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		prms["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		prms["offset"] = sliceVal
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	listCtx, _err := app.NewListEventsContext(goaCtx, req, service)
+	if _err != nil {
+		panic("invalid test data " + _err.Error()) // bug
+	}
+
+	// Perform action
+	_err = ctrl.List(listCtx)
+
+	// Validate response
+	if _err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
+	}
+	if rw.Code != 200 {
+		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
+	}
+	var mt app.EventCollection
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(app.EventCollection)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.EventCollection", resp, resp)
+		}
+		_err = mt.Validate()
+		if _err != nil {
+			t.Errorf("invalid response media type: %s", _err)
+		}
+	}
+
+	// Return results
+	return rw, mt
+}
+
+// ListEventsOK1Tiny runs the method List of the given controller with the given parameters.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func ListEventsOK1Tiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) (http.ResponseWriter, app.EventTinyCollection) {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	query := url.Values{}
+	{
+		sliceVal := []string{keyword}
+		query["keyword"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		query["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		query["offset"] = sliceVal
+	}
+	u := &url.URL{
+		Path:     fmt.Sprintf("/api/develop/v1/events/%v", userID),
+		RawQuery: query.Encode(),
+	}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		panic("invalid test " + err.Error()) // bug
+	}
+	prms := url.Values{}
+	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	{
+		sliceVal := []string{keyword}
+		prms["keyword"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		prms["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		prms["offset"] = sliceVal
 	}
 	if ctx == nil {
 		ctx = context.Background()

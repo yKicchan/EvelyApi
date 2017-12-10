@@ -384,10 +384,10 @@ paths:
       description: イベント複数取得
       operationId: events#list
       parameters:
-      - description: キーワード
+      - default: ""
+        description: キーワード
         in: query
         maxLength: 50
-        minLength: 1
         name: keyword
         required: false
         type: string
@@ -456,6 +456,54 @@ paths:
       - jwt:
         - api:access
       summary: create events
+      tags:
+      - events
+  /events/{user_id}:
+    get:
+      description: イベント複数取得
+      operationId: events#list#1
+      parameters:
+      - default: ""
+        description: キーワード
+        in: query
+        maxLength: 50
+        name: keyword
+        required: false
+        type: string
+      - default: 10
+        description: 取得件数
+        in: query
+        maximum: 50
+        minimum: 5
+        name: limit
+        required: true
+        type: integer
+      - default: 0
+        description: 除外件数
+        in: query
+        minimum: 0
+        name: offset
+        required: true
+        type: integer
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/vnd.event+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EventCollection'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: list events
       tags:
       - events
   /events/{user_id}/{event_id}:

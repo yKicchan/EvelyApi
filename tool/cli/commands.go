@@ -58,9 +58,7 @@ type (
 		// 取得件数
 		Limit int
 		// 除外件数
-		Offset int
-		// ユーザーID
-		UserID      string
+		Offset      int
 		PrettyPrint bool
 	}
 
@@ -154,7 +152,7 @@ Payload example:
 	}
 	tmp3 := new(ListEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events ["/api/develop/v1/events"]`,
+		Use:   `events [("/api/develop/v1/events"|"/api/develop/v1/events/USER_ID")]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp3.Run(c, args) },
 	}
@@ -558,7 +556,7 @@ func (cmd *ListEventsCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListEvents(ctx, path, cmd.Limit, cmd.Offset, stringFlagVal("keyword", cmd.Keyword), stringFlagVal("user_id", cmd.UserID))
+	resp, err := c.ListEvents(ctx, path, cmd.Limit, cmd.Offset, stringFlagVal("keyword", cmd.Keyword))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -575,8 +573,6 @@ func (cmd *ListEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client)
 	cc.Flags().IntVar(&cmd.Limit, "limit", 10, `取得件数`)
 	var offset int
 	cc.Flags().IntVar(&cmd.Offset, "offset", offset, `除外件数`)
-	var userID string
-	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
 }
 
 // Run makes the HTTP request corresponding to the ShowEventsCommand command.

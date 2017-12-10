@@ -125,6 +125,7 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/events", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/events/:user_id/:event_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v1/events/:user_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -181,6 +182,8 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	h = handleEventsOrigin(h)
 	service.Mux.Handle("GET", "/api/develop/v1/events", ctrl.MuxHandler("list", h, nil))
 	service.LogInfo("mount", "ctrl", "Events", "action", "List", "route", "GET /api/develop/v1/events")
+	service.Mux.Handle("GET", "/api/develop/v1/events/:user_id", ctrl.MuxHandler("list", h, nil))
+	service.LogInfo("mount", "ctrl", "Events", "action", "List", "route", "GET /api/develop/v1/events/:user_id")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

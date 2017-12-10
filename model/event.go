@@ -7,10 +7,12 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// イベントのリソースに対するDBオブジェクト
 type EventDB struct {
 	*mgo.Database
 }
 
+// イベントのDBモデル
 type EventModel struct {
 	ID           string       `bson:id`
 	Title        string       `bson:title`
@@ -24,19 +26,53 @@ type EventModel struct {
 	Tel          string       `bson:tel`
 }
 
+// イベント主催者のDBモデル
 type Host struct {
 	ID   string `bson:id`
 	Name string `bson:name`
 }
 
+// イベントの開催場所のDBモデル
 type Location struct {
 	Name   string     `bson:name`
 	LngLat [2]float64 `bson:lng_lat`
 }
 
+// イベントの開催予定期間のDBモデル
 type UpcomingDate struct {
 	StartDate time.Time `bson:start_date`
 	EndDate   time.Time `bson:end_date`
+}
+
+// イベントの検索オプション
+type getEventsOptions struct {
+	keyword string
+	userID  string
+}
+
+// イベントの検索オプションを関数化
+type GetEventsOption func(*getEventsOptions)
+
+/**
+ * ユーザーIDを検索オプションに設定するクロージャを返す
+ * @param  userID ユーザーID
+ * @return        クロージャ
+ */
+func WithUserID(userID string) GetEventsOption {
+	return func(ops *getEventsOptions) {
+		ops.userID = userID
+	}
+}
+
+/**
+ * キーワードを検索オプションに設定するクロージャを返す
+ * @param  keyword キーワード
+ * @return         クロージャ
+ */
+func WithKeyword(keyword string) GetEventsOption {
+	return func(ops *getEventsOptions)  {
+		ops.keyword = keyword
+	}
 }
 
 var EVENT_FULL_SELECTOR = bson.M{"_id": 0}
@@ -83,30 +119,41 @@ func (db *EventDB) NewEvent(userID string, upcomingDate time.Time) (eventID stri
  * イベント情報をパラメーターから検索し、複数件返す
  * @param  limit   検索件数
  * @param  offset  除外件数
- * @param  keyword 検索キーワード
- * @param  userID  ユーザーID
+ * @param  options 検索オプション
  * @return events  複数のイベント情報
  * @return err     検索時に発生したエラー
  */
-func (db *EventDB) GetEvents(limit int, offset int, keyword *string, userID *string) (events []EventModel, err error) {
+func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (events []EventModel, err error) {
+	// 検索オプションを取得
+	opt := getEventsOptions{}
+    for _, o := range options {
+        o(&opt)
+    }
+	// 検索オプションの内容からクエリを作成
 	query := bson.M{}
-
-	if keyword != nil {
-		regex := bson.M{"$regex": bson.RegEx{Pattern: `.*` + *keyword + `.*`, Options: "m"}}
+	if len(opt.keyword) > 0 {
+		regex := bson.M{"$regex": bson.RegEx{Pattern: `.*` + opt.keyword + `.*`, Options: "m"}}
 		query = bson.M{
 			"$or": []interface{}{
 				bson.M{"title": regex},
 				bson.M{"body": regex},
 				bson.M{"place": regex},
-				bson.M{"host": bson.M{"name": regex}},
+				bson.M{"host.name": regex},
 			},
 		}
 	}
-
-	if userID != nil {
-		query = bson.M{"host.id": *userID}
+	if len(opt.userID) != 0 {
+		if len(opt.keyword) > 0 {
+			query = bson.M{
+				"$and": []interface{}{
+					query,
+					bson.M{"host.id": opt.userID},
+				},
+			}
+		} else {
+			query = bson.M{"host.id": opt.userID}
+		}
 	}
-
 	err = db.C("events").Find(query).Select(EVENT_TINY_SELECTOR).Skip(offset).Limit(limit).All(&events)
 	return
 }
@@ -118,7 +165,7 @@ func (db *EventDB) GetEvents(limit int, offset int, keyword *string, userID *str
  * @return event   イベント情報
  * @return err     検索時に発生したエラー
  */
-func (db *EventDB) GetEvent(userID string, eventID string) (event *EventModel, err error) {
+func (db *EventDB) GetEvent(userID, eventID string) (event *EventModel, err error) {
 	query := bson.M{
 		"$and": []interface{}{
 			bson.M{"id":      eventID},

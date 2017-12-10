@@ -25,7 +25,7 @@ var _ = Resource("events", func() {
 	Action("list", func() {
 		Description("イベント複数取得")
 		NoSecurity()
-		Routing(GET(""))
+		Routing(GET(""), GET("/:user_id"))
 		Params(func() {
 			Param("limit", Integer, "取得件数", func() {
 				Minimum(5)
@@ -39,8 +39,8 @@ var _ = Resource("events", func() {
 				Example(10)
 			})
 			Param("keyword", String, "キーワード", func() {
-				MinLength(1)
 				MaxLength(50)
+				Default("")
 				Example("花澤香菜 Live")
 			})
 			Param("user_id", String, "ユーザーID", func() {

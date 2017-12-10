@@ -9,6 +9,7 @@ import (
 	mgo "gopkg.in/mgo.v2"
 )
 
+// 緯度経度の配列番号を定数化
 const (
 	Lng = 0
 	Lat = 1
@@ -143,7 +144,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 	// EventsController_List: start_implement
 
 	// Put your logic here
-	events, err := c.db.GetEvents(ctx.Limit, ctx.Offset, ctx.Keyword, ctx.UserID)
+	events, err := c.db.GetEvents(ctx.Limit, ctx.Offset, model.WithKeyword(ctx.Keyword), model.WithUserID(ctx.UserID))
 	if err != nil {
 		log.Printf("[EvelyApi] faild to search events: %s", err)
 		return ctx.NotFound()

@@ -149,10 +149,10 @@ type ListEventsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Keyword *string
+	Keyword string
 	Limit   int
 	Offset  int
-	UserID  *string
+	UserID  string
 }
 
 // NewListEventsContext parses the incoming request URL and body, performs validations and creates the
@@ -165,18 +165,13 @@ func NewListEventsContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req.Request = r
 	rctx := ListEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramKeyword := req.Params["keyword"]
-	if len(paramKeyword) > 0 {
+	if len(paramKeyword) == 0 {
+		rctx.Keyword = ""
+	} else {
 		rawKeyword := paramKeyword[0]
-		rctx.Keyword = &rawKeyword
-		if rctx.Keyword != nil {
-			if utf8.RuneCountInString(*rctx.Keyword) < 1 {
-				err = goa.MergeErrors(err, goa.InvalidLengthError(`keyword`, *rctx.Keyword, utf8.RuneCountInString(*rctx.Keyword), 1, true))
-			}
-		}
-		if rctx.Keyword != nil {
-			if utf8.RuneCountInString(*rctx.Keyword) > 50 {
-				err = goa.MergeErrors(err, goa.InvalidLengthError(`keyword`, *rctx.Keyword, utf8.RuneCountInString(*rctx.Keyword), 50, false))
-			}
+		rctx.Keyword = rawKeyword
+		if utf8.RuneCountInString(rctx.Keyword) > 50 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`keyword`, rctx.Keyword, utf8.RuneCountInString(rctx.Keyword), 50, false))
 		}
 	}
 	paramLimit := req.Params["limit"]
@@ -213,7 +208,7 @@ func NewListEventsContext(ctx context.Context, r *http.Request, service *goa.Ser
 	paramUserID := req.Params["user_id"]
 	if len(paramUserID) > 0 {
 		rawUserID := paramUserID[0]
-		rctx.UserID = &rawUserID
+		rctx.UserID = rawUserID
 	}
 	return &rctx, err
 }
