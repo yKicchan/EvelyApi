@@ -26,7 +26,7 @@ definitions:
         endDate: 1974-02-03T21:26:56Z
         startDate: 2003-06-21T02:17:51Z
       updateDate: 2011-05-25T02:41:20Z
-      url: evely.com
+      url: http://comp.ecc.ac.jp/
     properties:
       body:
         description: イベントの詳細
@@ -71,7 +71,7 @@ definitions:
       url:
         default: ""
         description: URL
-        example: evely.com
+        example: http://comp.ecc.ac.jp/
         format: uri
         type: string
     required:
@@ -109,7 +109,7 @@ definitions:
         endDate: 1974-02-03T21:26:56Z
         startDate: 2003-06-21T02:17:51Z
       updateDate: 2011-05-25T02:41:20Z
-      url: evely.com
+      url: http://comp.ecc.ac.jp/
     - body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
@@ -128,7 +128,7 @@ definitions:
         endDate: 1974-02-03T21:26:56Z
         startDate: 2003-06-21T02:17:51Z
       updateDate: 2011-05-25T02:41:20Z
-      url: evely.com
+      url: http://comp.ecc.ac.jp/
     items:
       $ref: '#/definitions/Event'
     title: 'Mediatype identifier: application/vnd.event+json; type=collection; view=default'
@@ -149,7 +149,7 @@ definitions:
       upcomingDate:
         endDate: 1974-02-03T21:26:56Z
         startDate: 2003-06-21T02:17:51Z
-      url: evely.com
+      url: http://comp.ecc.ac.jp/
     properties:
       body:
         description: イベントの詳細
@@ -183,7 +183,7 @@ definitions:
       url:
         default: ""
         description: URL
-        example: evely.com
+        example: http://comp.ecc.ac.jp/
         format: uri
         type: string
     required:
@@ -230,17 +230,17 @@ definitions:
   LoginPayload:
     description: 認証時に受け取るログイン情報
     example:
-      id: user1
-      password: password1
+      id: yKicchan
+      password: password
     properties:
       id:
         description: ユーザーID
-        example: user1
+        example: yKicchan
         minLength: 1
         type: string
       password:
         description: パスワード
-        example: password1
+        example: password
         minLength: 1
         type: string
     required:

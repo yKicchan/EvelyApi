@@ -9,11 +9,11 @@ var LoginPayload = Type("LoginPayload", func() {
 	Description("認証時に受け取るログイン情報")
 	Attribute("id", String, "ユーザーID", func() {
 		MinLength(1)
-		Example("user1")
+		Example("yKicchan")
 	})
 	Attribute("password", String, "パスワード", func() {
 		MinLength(1)
-		Example("password1")
+		Example("password")
 	})
 	Required("id", "password")
 })
@@ -28,14 +28,15 @@ var EventPayload = Type("EventPayload", func() {
 	Attribute("body", String, "イベントの詳細", func() {
 		MinLength(1)
 		MaxLength(1000)
-		Example("初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。")
+		Example(`初心者でもGitを扱えるようになる勉強会を開催します！
+ノートPCを各自持参してください。`)
 	})
 	Attribute("place", Location, "開催場所")
 	Attribute("upcomingDate", UpcomingDate, "開催予定日")
 	Attribute("url", String, "URL", func() {
 		Format("uri")
 		Default("")
-		Example("evely.com")
+		Example("http://comp.ecc.ac.jp/")
 	})
 	Attribute("mail", String, "連絡先メールアドレス", func() {
 		Format("email")
