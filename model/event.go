@@ -1,8 +1,8 @@
 package model
 
 import (
-	"log"
 	"time"
+	"strconv"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -57,13 +57,25 @@ func NewEventDB(db *mgo.Database) *EventDB {
 /**
  * イベントを新しく作成するためのイベントIDを生成し返す
  * @param  userID  作成者のユーザーID
- * @return eventID 作成するイベントのID
+ * @return eventID 生成したイベントのID
  * @return err     作成時に発生したエラー
  */
 func (db *EventDB) NewEvent(userID string) (eventID string, err error) {
-	query := bson.M{"host": bson.M{"id": userID}}
-	n, _ := db.C("users").Find(query).Count()
-	eventID = time.Now().Format("19890225") + "-" + string(n)
+	y, m, d := time.Now().Date()
+	today := strconv.Itoa(y) + strconv.Itoa(int(m)) + strconv.Itoa(d)
+	query := bson.M{
+		"$and": []interface{}{
+			bson.M{"id": bson.M{"$regex": bson.RegEx{Pattern: today + `-[0-9]+`}}},
+			bson.M{"host.id": userID},
+		},
+	}
+	n, _ := db.C("events").Find(query).Count()
+	eventID = today + "-" + strconv.Itoa(n + 1)
+	event := &EventModel{
+		ID: eventID,
+		Host: Host{ID: userID},
+	}
+	err = db.C("events").Insert(event)
 	return
 }
 
@@ -89,14 +101,11 @@ func (db *EventDB) GetEvents(limit int, offset int, keyword *string, userID *str
 				bson.M{"host": bson.M{"name": regex}},
 			},
 		}
-		log.Printf("[EvelyApi] keyword: %s", *keyword)
 	}
 
 	if userID != nil {
-		query = bson.M{"host": bson.M{"id": bson.M{"$regex": bson.RegEx{Pattern: *userID, Options: "m"}}}}
-		log.Printf("[EvelyApi] userID: %s", *userID)
+		query = bson.M{"host.id": *userID}
 	}
-	log.Print(query)
 
 	err = db.C("events").Find(query).Select(EVENT_TINY_SELECTOR).Skip(offset).Limit(limit).All(&events)
 	return
@@ -111,8 +120,10 @@ func (db *EventDB) GetEvents(limit int, offset int, keyword *string, userID *str
  */
 func (db *EventDB) GetEvent(userID string, eventID string) (event *EventModel, err error) {
 	query := bson.M{
-		"id":   eventID,
-		"host": bson.M{"id": userID},
+		"$and": []interface{}{
+			bson.M{"id":      eventID},
+			bson.M{"host.id": userID},
+		},
 	}
 	err = db.C("events").Find(query).Select(EVENT_FULL_SELECTOR).One(&event)
 	return
@@ -125,8 +136,10 @@ func (db *EventDB) GetEvent(userID string, eventID string) (event *EventModel, e
  */
 func (db *EventDB) SaveEvent(event *EventModel) error {
 	selector := bson.M{
-		"id":   event.ID,
-		"host": bson.M{"id": event.Host.ID},
+		"$and": []interface{}{
+			bson.M{"id":      event.ID},
+			bson.M{"host.id": event.Host.ID},
+		},
 	}
 	update := bson.M{"$set": event}
 	err := db.C("events").Update(selector, update)
