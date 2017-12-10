@@ -22,7 +22,7 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
-	// Mount security middlewares
+	// Mount security middleware
 	app.UseJWTMiddleware(service, NewJWTMiddleware())
 
 	// DB接続
