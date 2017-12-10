@@ -20,12 +20,12 @@ type UserModel struct {
 
 // ユーザーの全情報を抽出するセレクタ
 var USER_FULL_SELECTOR = bson.M{
-	"_id":  0,
-	"id":   1,
+	"_id":      0,
+	"id":       1,
 	"password": 1,
-	"name": 1,
-	"mail": 1,
-	"tel":  1,
+	"name":     1,
+	"mail":     1,
+	"tel":      1,
 }
 
 // ユーザーの一部情報のみ抽出するセレクタ

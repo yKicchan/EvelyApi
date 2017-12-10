@@ -16,7 +16,7 @@ import (
 // AuthController implements the auth resource.
 type AuthController struct {
 	*goa.Controller
-	db         *model.UserDB
+	db *model.UserDB
 }
 
 func newToken(user *model.UserModel) *app.Token {

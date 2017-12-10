@@ -18,7 +18,7 @@ var _ = Resource("auth", func() {
 		Response(Unauthorized)
 	})
 
-	Action("signup", func(){
+	Action("signup", func() {
 		Description("新規登録")
 		NoSecurity()
 		Routing(POST("/signup"))
