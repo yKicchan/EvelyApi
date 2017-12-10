@@ -126,7 +126,7 @@ Payload example:
       "endDate": "1974-02-03T21:26:56Z",
       "startDate": "2003-06-21T02:17:51Z"
    },
-   "url": "evely.com"
+   "url": "http://comp.ecc.ac.jp/"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp1.Run(c, args) },
 	}
@@ -198,8 +198,8 @@ Payload example:
 Payload example:
 
 {
-   "id": "user1",
-   "password": "password1"
+   "id": "yKicchan",
+   "password": "password"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp6.Run(c, args) },
 	}
@@ -233,7 +233,7 @@ Payload example:
       "endDate": "1974-02-03T21:26:56Z",
       "startDate": "2003-06-21T02:17:51Z"
    },
-   "url": "evely.com"
+   "url": "http://comp.ecc.ac.jp/"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
 	}
