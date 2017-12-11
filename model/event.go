@@ -123,7 +123,7 @@ func (db *EventDB) NewEvent(userID string, upcomingDate time.Time) (eventID stri
  * @return events  複数のイベント情報
  * @return err     検索時に発生したエラー
  */
-func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (events []EventModel, err error) {
+func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (events []*EventModel, err error) {
 	// 検索オプションを取得
 	opt := getEventsOptions{}
 	for _, o := range options {

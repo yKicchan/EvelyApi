@@ -156,7 +156,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 
 	res := make(app.EventTinyCollection, len(events))
 	for i := range events {
-		res[i] = ToEventTinyMedia(&events[i])
+		res[i] = ToEventTinyMedia(events[i])
 	}
 	return ctx.OKTiny(res)
 	// EventsController_List: end_implement
