@@ -179,7 +179,7 @@ func (db *EventDB) GetEvent(userID, eventID string) (event *EventModel, err erro
 /**
  * イベントを保存する
  * @param  event イベント情報
- * @return err   保存時に発生したエラー
+ * @return error 保存時に発生したエラー
  */
 func (db *EventDB) SaveEvent(event *EventModel) error {
 	selector := bson.M{
@@ -192,12 +192,18 @@ func (db *EventDB) SaveEvent(event *EventModel) error {
 	return db.C("events").Update(selector, update)
 }
 
-// // イベント削除
-// func (db *EventDB) DeleteEvent(id int) error {
-//
-// 	// イベント削除
-// 	c := db.C("events")
-// 	selector := bson.M{"id": id}
-// 	err := c.Remove(selector)
-// 	return err
-// }
+/**
+ * イベントを削除する
+ * @param  userID  ユーザーID
+ * @param  eventID イベントID
+ * @return error   削除時に発生したエラー
+ */
+func (db *EventDB) DeleteEvent(userID, eventID string) error {
+	selector := bson.M{
+		"$and": []interface{}{
+			bson.M{"id": eventID},
+			bson.M{"host.id": userID},
+		},
+	}
+	return db.C("events").Remove(selector)
+}

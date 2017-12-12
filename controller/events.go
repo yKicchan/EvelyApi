@@ -138,8 +138,18 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 	// EventsController_Delete: start_implement
 
 	// Put your logic here
+	user := GetLoginUser(ctx)
+	if user.ID != ctx.UserID {
+		log.Printf("[EvelyApi] permission error")
+		return ctx.Forbidden()
+	}
 
-	return nil
+	err := c.db.DeleteEvent(ctx.UserID, ctx.EventID)
+	if err != nil {
+		log.Printf("[EvelyApi] failed to delete event: %s", err)
+		return ctx.NotFound()
+	}
+	return ctx.OK([]byte("Seccess!!"))
 	// EventsController_Delete: end_implement
 }
 

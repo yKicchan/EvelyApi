@@ -72,7 +72,7 @@ var _ = Resource("events", func() {
 				Example("yKicchan")
 			})
 			Param("event_id", String, "イベントID", func() {
-				Pattern("^[0-9]{8}-[0-9]+$")
+				Pattern("^[0-9]{6,8}-[0-9]+$")
 				Example("20170225-2")
 			})
 		})
@@ -97,7 +97,7 @@ var _ = Resource("events", func() {
 				Example("yKicchan")
 			})
 			Param("event_id", String, "イベントID", func() {
-				Pattern("^[0-9]{8}-[0-9]+$")
+				Pattern("^[0-9]{6,8}-[0-9]+$")
 				Example("20170225-2")
 			})
 		})
@@ -117,7 +117,7 @@ var _ = Resource("events", func() {
 				Example("yKicchan")
 			})
 			Param("event_id", String, "イベントID", func() {
-				Pattern("^[0-9]{8}-[0-9]+$")
+				Pattern("^[0-9]{6,8}-[0-9]+$")
 				Example("20170225-2")
 			})
 		})

@@ -156,8 +156,8 @@ func NewDeleteEventsContext(ctx context.Context, r *http.Request, service *goa.S
 	if len(paramEventID) > 0 {
 		rawEventID := paramEventID[0]
 		rctx.EventID = rawEventID
-		if ok := goa.ValidatePattern(`^[0-9]{8}-[0-9]+$`, rctx.EventID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{8}-[0-9]+$`))
+		if ok := goa.ValidatePattern(`^[0-9]{6,8}-[0-9]+$`, rctx.EventID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{6,8}-[0-9]+$`))
 		}
 	}
 	paramUserID := req.Params["user_id"]
@@ -321,8 +321,8 @@ func NewShowEventsContext(ctx context.Context, r *http.Request, service *goa.Ser
 	if len(paramEventID) > 0 {
 		rawEventID := paramEventID[0]
 		rctx.EventID = rawEventID
-		if ok := goa.ValidatePattern(`^[0-9]{8}-[0-9]+$`, rctx.EventID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{8}-[0-9]+$`))
+		if ok := goa.ValidatePattern(`^[0-9]{6,8}-[0-9]+$`, rctx.EventID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{6,8}-[0-9]+$`))
 		}
 	}
 	paramUserID := req.Params["user_id"]
@@ -378,8 +378,8 @@ func NewUpdateEventsContext(ctx context.Context, r *http.Request, service *goa.S
 	if len(paramEventID) > 0 {
 		rawEventID := paramEventID[0]
 		rctx.EventID = rawEventID
-		if ok := goa.ValidatePattern(`^[0-9]{8}-[0-9]+$`, rctx.EventID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{8}-[0-9]+$`))
+		if ok := goa.ValidatePattern(`^[0-9]{6,8}-[0-9]+$`, rctx.EventID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{6,8}-[0-9]+$`))
 		}
 	}
 	paramUserID := req.Params["user_id"]
