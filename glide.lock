@@ -1,0 +1,66 @@
+hash: 7d390c13d48c57c6a0d4beb5854024bbc76d55e48b21d2f679cf1667b8cc98d0
+updated: 2017-12-10T11:50:42.273107358Z
+imports:
+- name: github.com/armon/go-metrics
+  version: 7aa49fde808223f8dadfdbfd3a20ff6c19e5f9ec
+- name: github.com/dgrijalva/jwt-go
+  version: dbeaa9332f19a944acb5736b4456cfcc02140e29
+- name: github.com/dimfeld/httppath
+  version: ee938bf735983d53694d79138ad9820efff94c92
+- name: github.com/dimfeld/httptreemux
+  version: 8cc36ee10f84b82d0742ffcab770815c7d3f9ad7
+- name: github.com/goadesign/goa
+  version: 4d161c69bc5b667a0b64ceeca528dc2d114936d5
+  vcs: git
+  subpackages:
+  - client
+  - cors
+  - design
+  - design/apidsl
+  - dslengine
+  - goagen
+  - goatest
+  - middleware
+  - middleware/security/jwt
+  - uuid
+- name: github.com/hashicorp/go-immutable-radix
+  version: 8aac2701530899b64bdea735a1de8da899815220
+- name: github.com/hashicorp/golang-lru
+  version: 0a025b7e63adc15a622f29b0b2c4c3848243bbf6
+  subpackages:
+  - simplelru
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/manveru/faker
+  version: 9fbc68a78c4dbc7914e1a23f88f126bea4383b97
+- name: github.com/satori/go.uuid
+  version: 5bf94b69c6b68ee1b541973bb8e1144db23a194b
+- name: github.com/spf13/cobra
+  version: ccaecb155a2177302cb56cae929251a256d0f646
+- name: github.com/spf13/pflag
+  version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
+- name: github.com/zach-klippenstein/goregen
+  version: 795b5e3961ea1912fde60af417ad85e86acc0d6a
+- name: golang.org/x/crypto
+  version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
+  subpackages:
+  - pbkdf2
+  - scrypt
+- name: golang.org/x/net
+  version: dc871a5d77e227f5bbf6545176ef3eeebf87e76e
+  subpackages:
+  - websocket
+- name: golang.org/x/tools
+  version: 9b32ad6a0077c7f766ad108c08f5852a8e0690fa
+  subpackages:
+  - go/ast/astutil
+- name: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+  subpackages:
+  - bson
+  - internal/json
+  - internal/sasl
+  - internal/scram
+- name: gopkg.in/yaml.v2
+  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+testImports: []

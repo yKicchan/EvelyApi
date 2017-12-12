@@ -1,0 +1,750 @@
+basePath: /api/develop/v1
+consumes:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+definitions:
+  Event:
+    description: イベント情報 (default view)
+    example:
+      body: |-
+        初心者でもGitを扱えるようになる勉強会を開催します！
+        ノートPCを各自持参してください。
+      host:
+        id: yKicchan
+        name: きっちゃそ
+      id: 20170225-2
+      mail: yKicchanApp@gmail.com
+      place:
+        lat: 34.706425
+        lng: 135.50124
+        name: ECCコンピュータ専門学校2303教室
+      tel: 090-1234-5678
+      title: Git勉強会
+      upcomingDate:
+        endDate: 1974-02-03T21:26:56Z
+        startDate: 2003-06-21T02:17:51Z
+      updateDate: 2011-05-25T02:41:20Z
+      url: http://comp.ecc.ac.jp/
+    properties:
+      body:
+        description: イベントの詳細
+        example: |-
+          初心者でもGitを扱えるようになる勉強会を開催します！
+          ノートPCを各自持参してください。
+        maxLength: 1000
+        minLength: 1
+        type: string
+      host:
+        $ref: '#/definitions/UserTiny'
+      id:
+        description: イベントID
+        example: 20170225-2
+        type: string
+      mail:
+        default: ""
+        description: 連絡先メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+      place:
+        $ref: '#/definitions/Location'
+      tel:
+        default: ""
+        description: 連絡先電話番号
+        example: 090-1234-5678
+        type: string
+      title:
+        description: イベントの名前
+        example: Git勉強会
+        maxLength: 30
+        minLength: 1
+        type: string
+      upcomingDate:
+        $ref: '#/definitions/UpcomingDate'
+      updateDate:
+        description: 最終更新日時
+        example: 2011-05-25T02:41:20Z
+        format: date-time
+        type: string
+      url:
+        default: ""
+        description: URL
+        example: http://comp.ecc.ac.jp/
+        format: uri
+        type: string
+    required:
+    - id
+    - title
+    - body
+    - host
+    - place
+    - updateDate
+    - upcomingDate
+    - url
+    - mail
+    - tel
+    title: 'Mediatype identifier: application/vnd.event+json; view=default'
+    type: object
+  EventCollection:
+    description: EventCollection is the media type for an array of Event (default
+      view)
+    example:
+    - body: |-
+        初心者でもGitを扱えるようになる勉強会を開催します！
+        ノートPCを各自持参してください。
+      host:
+        id: yKicchan
+        name: きっちゃそ
+      id: 20170225-2
+      mail: yKicchanApp@gmail.com
+      place:
+        lat: 34.706425
+        lng: 135.50124
+        name: ECCコンピュータ専門学校2303教室
+      tel: 090-1234-5678
+      title: Git勉強会
+      upcomingDate:
+        endDate: 1974-02-03T21:26:56Z
+        startDate: 2003-06-21T02:17:51Z
+      updateDate: 2011-05-25T02:41:20Z
+      url: http://comp.ecc.ac.jp/
+    - body: |-
+        初心者でもGitを扱えるようになる勉強会を開催します！
+        ノートPCを各自持参してください。
+      host:
+        id: yKicchan
+        name: きっちゃそ
+      id: 20170225-2
+      mail: yKicchanApp@gmail.com
+      place:
+        lat: 34.706425
+        lng: 135.50124
+        name: ECCコンピュータ専門学校2303教室
+      tel: 090-1234-5678
+      title: Git勉強会
+      upcomingDate:
+        endDate: 1974-02-03T21:26:56Z
+        startDate: 2003-06-21T02:17:51Z
+      updateDate: 2011-05-25T02:41:20Z
+      url: http://comp.ecc.ac.jp/
+    items:
+      $ref: '#/definitions/Event'
+    title: 'Mediatype identifier: application/vnd.event+json; type=collection; view=default'
+    type: array
+  EventPayload:
+    description: イベント作成・編集で受け取るイベント情報
+    example:
+      body: |-
+        初心者でもGitを扱えるようになる勉強会を開催します！
+        ノートPCを各自持参してください。
+      mail: yKicchanApp@gmail.com
+      place:
+        lat: 34.706425
+        lng: 135.50124
+        name: ECCコンピュータ専門学校2303教室
+      tel: 090-1234-5678
+      title: Git勉強会
+      upcomingDate:
+        endDate: 1974-02-03T21:26:56Z
+        startDate: 2003-06-21T02:17:51Z
+      url: http://comp.ecc.ac.jp/
+    properties:
+      body:
+        description: イベントの詳細
+        example: |-
+          初心者でもGitを扱えるようになる勉強会を開催します！
+          ノートPCを各自持参してください。
+        maxLength: 1000
+        minLength: 1
+        type: string
+      mail:
+        default: ""
+        description: 連絡先メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+      place:
+        $ref: '#/definitions/Location'
+      tel:
+        default: ""
+        description: 連絡先電話番号
+        example: 090-1234-5678
+        type: string
+      title:
+        description: イベントの名前
+        example: Git勉強会
+        maxLength: 30
+        minLength: 1
+        type: string
+      upcomingDate:
+        $ref: '#/definitions/UpcomingDate'
+      url:
+        default: ""
+        description: URL
+        example: http://comp.ecc.ac.jp/
+        format: uri
+        type: string
+    required:
+    - title
+    - body
+    - place
+    - upcomingDate
+    - url
+    - mail
+    - tel
+    title: EventPayload
+    type: object
+  Location:
+    description: イベントの開催場所
+    example:
+      lat: 34.706425
+      lng: 135.50124
+      name: ECCコンピュータ専門学校2303教室
+    properties:
+      lat:
+        description: 緯度
+        example: 34.706425
+        maximum: 90
+        minimum: -90
+        type: number
+      lng:
+        description: 経度
+        example: 135.50124
+        maximum: 180
+        minimum: -180
+        type: number
+      name:
+        description: 名前
+        example: ECCコンピュータ専門学校2303教室
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - name
+    - lat
+    - lng
+    title: Location
+    type: object
+  LoginPayload:
+    description: 認証時に受け取るログイン情報
+    example:
+      id: yKicchan
+      password: password
+    properties:
+      id:
+        description: ユーザーID
+        example: yKicchan
+        minLength: 1
+        type: string
+      password:
+        description: パスワード
+        example: password
+        minLength: 1
+        type: string
+    required:
+    - id
+    - password
+    title: LoginPayload
+    type: object
+  Token:
+    description: アクセストークン (default view)
+    example:
+      token: Bearer TokenString
+    properties:
+      token:
+        description: アクセストークン
+        example: Bearer TokenString
+        type: string
+    required:
+    - token
+    title: 'Mediatype identifier: application/vnd.token+json; view=default'
+    type: object
+  UpcomingDate:
+    description: イベントの開催予定日
+    example:
+      endDate: 1974-02-03T21:26:56Z
+      startDate: 2003-06-21T02:17:51Z
+    properties:
+      endDate:
+        description: 終了日時
+        example: 1974-02-03T21:26:56Z
+        format: date-time
+        type: string
+      startDate:
+        description: 開始日時
+        example: 2003-06-21T02:17:51Z
+        format: date-time
+        type: string
+    required:
+    - startDate
+    - endDate
+    title: UpcomingDate
+    type: object
+  User:
+    description: ユーザー情報 (default view)
+    example:
+      id: yKicchan
+      mail: yKicchanApp@gmail.com
+      name: きっちゃそ
+      tel: 090-1234-5678
+    properties:
+      id:
+        description: ユーザーID
+        example: yKicchan
+        maxLength: 15
+        minLength: 4
+        type: string
+      mail:
+        description: メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+      name:
+        description: 名前
+        example: きっちゃそ
+        maxLength: 50
+        minLength: 1
+        type: string
+      tel:
+        default: ""
+        description: 電話番号
+        example: 090-1234-5678
+        type: string
+    required:
+    - id
+    - name
+    - mail
+    - tel
+    title: 'Mediatype identifier: application/vnd.user+json; view=default'
+    type: object
+  UserPayload:
+    description: アカウント作成時に受け取る情報
+    example:
+      id: yKicchan
+      mail: yKicchanApp@gmail.com
+      name: きっちゃそ
+      password: password
+      tel: 090-1234-5678
+    properties:
+      id:
+        description: ユーザーID
+        example: yKicchan
+        maxLength: 15
+        minLength: 4
+        type: string
+      mail:
+        description: メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+      name:
+        description: 名前
+        example: きっちゃそ
+        maxLength: 50
+        minLength: 1
+        type: string
+      password:
+        description: パスワード
+        example: password
+        minLength: 8
+        type: string
+      tel:
+        default: ""
+        description: 電話番号
+        example: 090-1234-5678
+        type: string
+    required:
+    - id
+    - password
+    - name
+    - mail
+    - tel
+    title: UserPayload
+    type: object
+  UserTiny:
+    description: ユーザー情報 (tiny view)
+    example:
+      id: yKicchan
+      name: きっちゃそ
+    properties:
+      id:
+        description: ユーザーID
+        example: yKicchan
+        maxLength: 15
+        minLength: 4
+        type: string
+      name:
+        description: 名前
+        example: きっちゃそ
+        maxLength: 50
+        minLength: 1
+        type: string
+    required:
+    - id
+    - name
+    title: 'Mediatype identifier: application/vnd.user+json; view=tiny'
+    type: object
+host: localhost:8888
+info:
+  contact:
+    email: yKicchanApp@gmail.com
+    name: yKicchan
+  description: 卒業制作のアプリケーションで使用するAPIです
+  license:
+    name: Apache License 2.0
+    url: https://github.com/yKicchan/EvelyApi/blob/master/LICENSE
+  title: EvelyApi
+  version: ""
+paths:
+  /auth/signin:
+    post:
+      description: ログイン
+      operationId: auth#signin
+      parameters:
+      - description: 認証時に受け取るログイン情報
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/LoginPayload'
+      produces:
+      - application/vnd.token+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Token'
+        "400":
+          description: Bad Request
+      schemes:
+      - http
+      summary: signin auth
+      tags:
+      - auth
+  /auth/signup:
+    post:
+      description: 新規登録
+      operationId: auth#signup
+      parameters:
+      - description: アカウント作成時に受け取る情報
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserPayload'
+      produces:
+      - application/vnd.token+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Token'
+        "400":
+          description: Bad Request
+      schemes:
+      - http
+      summary: signup auth
+      tags:
+      - auth
+  /events:
+    get:
+      description: イベント複数取得
+      operationId: events#list
+      parameters:
+      - default: ""
+        description: キーワード
+        in: query
+        maxLength: 50
+        name: keyword
+        required: false
+        type: string
+      - default: 10
+        description: 取得件数
+        in: query
+        maximum: 50
+        minimum: 5
+        name: limit
+        required: true
+        type: integer
+      - default: 0
+        description: 除外件数
+        in: query
+        minimum: 0
+        name: offset
+        required: true
+        type: integer
+      - description: ユーザーID
+        in: query
+        name: user_id
+        required: false
+        type: string
+      produces:
+      - application/vnd.event+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EventCollection'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: list events
+      tags:
+      - events
+    post:
+      description: |-
+        イベント作成
+
+        Required security scopes:
+          * `api:access`
+      operationId: events#create
+      parameters:
+      - description: イベント作成・編集で受け取るイベント情報
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/EventPayload'
+      produces:
+      - application/vnd.event+json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Event'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: create events
+      tags:
+      - events
+  /events/{user_id}:
+    get:
+      description: イベント複数取得
+      operationId: events#list#1
+      parameters:
+      - default: ""
+        description: キーワード
+        in: query
+        maxLength: 50
+        name: keyword
+        required: false
+        type: string
+      - default: 10
+        description: 取得件数
+        in: query
+        maximum: 50
+        minimum: 5
+        name: limit
+        required: true
+        type: integer
+      - default: 0
+        description: 除外件数
+        in: query
+        minimum: 0
+        name: offset
+        required: true
+        type: integer
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/vnd.event+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EventCollection'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: list events
+      tags:
+      - events
+  /events/{user_id}/{event_id}:
+    delete:
+      description: |-
+        イベント削除
+
+        Required security scopes:
+          * `api:access`
+      operationId: events#delete
+      parameters:
+      - description: イベントID
+        in: path
+        name: event_id
+        pattern: ^[0-9]{6,8}-[0-9]+$
+        required: true
+        type: string
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: delete events
+      tags:
+      - events
+    get:
+      description: イベント情報取得
+      operationId: events#show
+      parameters:
+      - description: イベントID
+        in: path
+        name: event_id
+        pattern: ^[0-9]{6,8}-[0-9]+$
+        required: true
+        type: string
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/vnd.event+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Event'
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show events
+      tags:
+      - events
+    put:
+      description: |-
+        イベント編集
+
+        Required security scopes:
+          * `api:access`
+      operationId: events#update
+      parameters:
+      - description: イベントID
+        in: path
+        name: event_id
+        pattern: ^[0-9]{6,8}-[0-9]+$
+        required: true
+        type: string
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: イベント作成・編集で受け取るイベント情報
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/EventPayload'
+      produces:
+      - application/vnd.event+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Event'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: update events
+      tags:
+      - events
+  /users/{user_id}:
+    get:
+      description: アカウント情報取得
+      operationId: users#show
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/vnd.user+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: show users
+      tags:
+      - users
+produces:
+- application/json
+- application/xml
+- application/gob
+- application/x-gob
+responses:
+  BadRequest:
+    description: Bad Request
+  Forbidden:
+    description: Forbidden
+  NotFound:
+    description: Not Found
+  OK:
+    description: OK
+  Unauthorized:
+    description: Unauthorized
+schemes:
+- http
+securityDefinitions:
+  jwt:
+    description: |2-
+
+
+      **Security Scopes**:
+        * `api:access`: API access
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
