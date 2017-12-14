@@ -36,9 +36,6 @@ type UpcomingDate struct {
 	EndDate   time.Time `bson:end_date`
 }
 
-// イベントの全情報を取得するセレクタ
-var EVENT_FULL_SELECTOR = bson.M{"_id": 0}
-
 // イベントの一部情報のみを取得するセレクタ
 var EVENT_TINY_SELECTOR = bson.M{
 	"_id":           0,
