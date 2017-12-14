@@ -251,9 +251,9 @@ definitions:
   SignupPayload:
     description: 新規登録時のメール送信
     example:
-      mail_address: yKicchanApp@gmail.com
+      email: yKicchanApp@gmail.com
     properties:
-      mail_address:
+      email:
         description: メールアドレス
         example: yKicchanApp@gmail.com
         format: email

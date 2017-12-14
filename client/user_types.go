@@ -385,14 +385,14 @@ func (ut *LoginPayload) Validate() (err error) {
 // 新規登録時のメール送信
 type signupPayload struct {
 	// メールアドレス
-	MailAddress *string `form:"mail_address,omitempty" json:"mail_address,omitempty" xml:"mail_address,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 }
 
 // Validate validates the signupPayload type instance.
 func (ut *signupPayload) Validate() (err error) {
-	if ut.MailAddress != nil {
-		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.MailAddress); err2 != nil {
-			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.mail_address`, *ut.MailAddress, goa.FormatEmail, err2))
+	if ut.Email != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.email`, *ut.Email, goa.FormatEmail, err2))
 		}
 	}
 	return
@@ -401,8 +401,8 @@ func (ut *signupPayload) Validate() (err error) {
 // Publicize creates SignupPayload from signupPayload
 func (ut *signupPayload) Publicize() *SignupPayload {
 	var pub SignupPayload
-	if ut.MailAddress != nil {
-		pub.MailAddress = ut.MailAddress
+	if ut.Email != nil {
+		pub.Email = ut.Email
 	}
 	return &pub
 }
@@ -410,14 +410,14 @@ func (ut *signupPayload) Publicize() *SignupPayload {
 // 新規登録時のメール送信
 type SignupPayload struct {
 	// メールアドレス
-	MailAddress *string `form:"mail_address,omitempty" json:"mail_address,omitempty" xml:"mail_address,omitempty"`
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 }
 
 // Validate validates the SignupPayload type instance.
 func (ut *SignupPayload) Validate() (err error) {
-	if ut.MailAddress != nil {
-		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.MailAddress); err2 != nil {
-			err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail_address`, *ut.MailAddress, goa.FormatEmail, err2))
+	if ut.Email != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`type.email`, *ut.Email, goa.FormatEmail, err2))
 		}
 	}
 	return

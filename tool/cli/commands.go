@@ -189,7 +189,7 @@ Payload example:
 Payload example:
 
 {
-   "mail_address": "yKicchanApp@gmail.com"
+   "email": "yKicchanApp@gmail.com"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp4.Run(c, args) },
 	}
