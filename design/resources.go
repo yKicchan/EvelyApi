@@ -26,6 +26,15 @@ var _ = Resource("auth", func() {
 		Response(OK, TokenMedia)
 		Response(BadRequest)
 	})
+
+    Action("send_mail", func() {
+        Description("新規登録用のメール送信")
+        NoSecurity()
+        Routing(POST("/signup/send_mail"))
+        Payload(SignupPayload)
+        Response(OK)
+        Response(BadRequest)
+    })
 })
 
 // イベントに対するアクション

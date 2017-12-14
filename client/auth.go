@@ -18,6 +18,49 @@ import (
 	"net/url"
 )
 
+// SendMailAuthPath computes a request path to the send_mail action of auth.
+func SendMailAuthPath() string {
+
+	return fmt.Sprintf("/api/develop/v1/auth/signup/send_mail")
+}
+
+// 新規登録用のメール送信
+func (c *Client) SendMailAuth(ctx context.Context, path string, payload *SignupPayload, contentType string) (*http.Response, error) {
+	req, err := c.NewSendMailAuthRequest(ctx, path, payload, contentType)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewSendMailAuthRequest create the request corresponding to the send_mail action endpoint of the auth resource.
+func (c *Client) NewSendMailAuthRequest(ctx context.Context, path string, payload *SignupPayload, contentType string) (*http.Request, error) {
+	var body bytes.Buffer
+	if contentType == "" {
+		contentType = "*/*" // Use default encoder
+	}
+	err := c.Encoder.Encode(payload, &body, contentType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	if contentType == "*/*" {
+		header.Set("Content-Type", "application/json")
+	} else {
+		header.Set("Content-Type", contentType)
+	}
+	return req, nil
+}
+
 // SigninAuthPath computes a request path to the signin action of auth.
 func SigninAuthPath() string {
 

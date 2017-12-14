@@ -248,6 +248,18 @@ definitions:
     - password
     title: LoginPayload
     type: object
+  SignupPayload:
+    description: 新規登録時のメール送信
+    example:
+      mail_address: yKicchanApp@gmail.com
+    properties:
+      mail_address:
+        description: メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+    title: SignupPayload
+    type: object
   Token:
     description: アクセストークン (default view)
     example:
@@ -446,6 +458,29 @@ paths:
       schemes:
       - http
       summary: signup auth
+      tags:
+      - auth
+  /auth/signup/send_mail:
+    post:
+      description: 新規登録用のメール送信
+      operationId: auth#send_mail
+      parameters:
+      - description: 新規登録時のメール送信
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/SignupPayload'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - http
+      summary: send_mail auth
       tags:
       - auth
   /events:

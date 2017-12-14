@@ -382,6 +382,47 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// 新規登録時のメール送信
+type signupPayload struct {
+	// メールアドレス
+	MailAddress *string `form:"mail_address,omitempty" json:"mail_address,omitempty" xml:"mail_address,omitempty"`
+}
+
+// Validate validates the signupPayload type instance.
+func (ut *signupPayload) Validate() (err error) {
+	if ut.MailAddress != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.MailAddress); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.mail_address`, *ut.MailAddress, goa.FormatEmail, err2))
+		}
+	}
+	return
+}
+
+// Publicize creates SignupPayload from signupPayload
+func (ut *signupPayload) Publicize() *SignupPayload {
+	var pub SignupPayload
+	if ut.MailAddress != nil {
+		pub.MailAddress = ut.MailAddress
+	}
+	return &pub
+}
+
+// 新規登録時のメール送信
+type SignupPayload struct {
+	// メールアドレス
+	MailAddress *string `form:"mail_address,omitempty" json:"mail_address,omitempty" xml:"mail_address,omitempty"`
+}
+
+// Validate validates the SignupPayload type instance.
+func (ut *SignupPayload) Validate() (err error) {
+	if ut.MailAddress != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.MailAddress); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail_address`, *ut.MailAddress, goa.FormatEmail, err2))
+		}
+	}
+	return
+}
+
 // イベントの開催予定日
 type upcomingDate struct {
 	// 終了日時

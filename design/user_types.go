@@ -103,3 +103,11 @@ var UpcomingDate = Type("UpcomingDate", func() {
 	Attribute("endDate", DateTime, "終了日時")
 	Required("startDate", "endDate")
 })
+
+var SignupPayload = Type("SignupPayload", func() {
+    Description("新規登録時のメール送信")
+    Attribute("mail_address", String, "メールアドレス", func() {
+        Format("email")
+		Example("yKicchanApp@gmail.com")
+    })
+})

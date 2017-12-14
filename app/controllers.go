@@ -35,6 +35,7 @@ func initService(service *goa.Service) {
 // AuthController is the controller interface for the Auth actions.
 type AuthController interface {
 	goa.Muxer
+	SendMail(*SendMailAuthContext) error
 	Signin(*SigninAuthContext) error
 	Signup(*SignupAuthContext) error
 }
@@ -43,8 +44,31 @@ type AuthController interface {
 func MountAuthController(service *goa.Service, ctrl AuthController) {
 	initService(service)
 	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signup/send_mail", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signin", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signup", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSendMailAuthContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*SignupPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.SendMail(rctx)
+	}
+	h = handleAuthOrigin(h)
+	service.Mux.Handle("POST", "/api/develop/v1/auth/signup/send_mail", ctrl.MuxHandler("send_mail", h, unmarshalSendMailAuthPayload))
+	service.LogInfo("mount", "ctrl", "Auth", "action", "SendMail", "route", "POST /api/develop/v1/auth/signup/send_mail")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -116,6 +140,21 @@ func handleAuthOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// unmarshalSendMailAuthPayload unmarshals the request body into the context request data Payload field.
+func unmarshalSendMailAuthPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &signupPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // unmarshalSigninAuthPayload unmarshals the request body into the context request data Payload field.

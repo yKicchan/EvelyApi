@@ -133,10 +133,10 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit in
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	tmp9 := strconv.Itoa(limit)
-	values.Set("limit", tmp9)
-	tmp10 := strconv.Itoa(offset)
-	values.Set("offset", tmp10)
+	tmp10 := strconv.Itoa(limit)
+	values.Set("limit", tmp10)
+	tmp11 := strconv.Itoa(offset)
+	values.Set("offset", tmp11)
 	if keyword != nil {
 		values.Set("keyword", *keyword)
 	}
