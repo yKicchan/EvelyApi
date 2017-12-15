@@ -5,7 +5,7 @@ package main
 import (
 	"log"
 	"EvelyApi/app"
-	"EvelyApi/controller"
+    "EvelyApi/controller/api"
 	. "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
@@ -35,16 +35,16 @@ func main() {
 	db := session.DB("develop")
 
 	// Mount "auth" controller
-	c := controller.NewAuthController(service, db)
+	c := api.NewAuthController(service, db)
 	app.MountAuthController(service, c)
 	// Mount "events" controller
-	c2 := controller.NewEventsController(service, db)
+	c2 := api.NewEventsController(service, db)
 	app.MountEventsController(service, c2)
 	// Mount "swagger" controller
-	c3 := controller.NewSwaggerController(service)
+	c3 := api.NewSwaggerController(service)
 	app.MountSwaggerController(service, c3)
 	// Mount "users" controller
-	c4 := controller.NewUsersController(service, db)
+	c4 := api.NewUsersController(service, db)
 	app.MountUsersController(service, c4)
 
 	// Start service

@@ -38,6 +38,7 @@ type AuthController interface {
 	SendMail(*SendMailAuthContext) error
 	Signin(*SigninAuthContext) error
 	Signup(*SignupAuthContext) error
+	VerifyToken(*VerifyTokenAuthContext) error
 }
 
 // MountAuthController "mounts" a Auth resource controller on the given service.
@@ -47,6 +48,7 @@ func MountAuthController(service *goa.Service, ctrl AuthController) {
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signup/send_mail", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signin", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signup", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v1/auth/signup/verify_token", ctrl.MuxHandler("preflight", handleAuthOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -113,6 +115,22 @@ func MountAuthController(service *goa.Service, ctrl AuthController) {
 	h = handleAuthOrigin(h)
 	service.Mux.Handle("POST", "/api/develop/v1/auth/signup", ctrl.MuxHandler("signup", h, unmarshalSignupAuthPayload))
 	service.LogInfo("mount", "ctrl", "Auth", "action", "Signup", "route", "POST /api/develop/v1/auth/signup")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewVerifyTokenAuthContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.VerifyToken(rctx)
+	}
+	h = handleAuthOrigin(h)
+	service.Mux.Handle("GET", "/api/develop/v1/auth/signup/verify_token", ctrl.MuxHandler("verify_token", h, nil))
+	service.LogInfo("mount", "ctrl", "Auth", "action", "VerifyToken", "route", "GET /api/develop/v1/auth/signup/verify_token")
 }
 
 // handleAuthOrigin applies the CORS response headers corresponding to the origin.

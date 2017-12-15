@@ -1,4 +1,4 @@
-package controller
+package api
 
 import (
 	"EvelyApi/app"
@@ -17,7 +17,7 @@ func ToUserMedia(u *model.UserModel) *app.User {
 	return &app.User{
 		ID:   u.ID,
 		Name: u.Name,
-		Mail: u.Mail,
+		Mail: u.Mail.Email,
 		Tel:  u.Tel,
 	}
 }

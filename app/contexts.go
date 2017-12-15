@@ -122,6 +122,53 @@ func (ctx *SignupAuthContext) BadRequest() error {
 	return nil
 }
 
+// VerifyTokenAuthContext provides the auth verify_token action context.
+type VerifyTokenAuthContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Token string
+}
+
+// NewVerifyTokenAuthContext parses the incoming request URL and body, performs validations and creates the
+// context used by the auth controller verify_token action.
+func NewVerifyTokenAuthContext(ctx context.Context, r *http.Request, service *goa.Service) (*VerifyTokenAuthContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := VerifyTokenAuthContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramToken := req.Params["token"]
+	if len(paramToken) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("token"))
+	} else {
+		rawToken := paramToken[0]
+		rctx.Token = rawToken
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *VerifyTokenAuthContext) OK(r *TokenState) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.token_state+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *VerifyTokenAuthContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *VerifyTokenAuthContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // CreateEventsContext provides the events create action context.
 type CreateEventsContext struct {
 	context.Context

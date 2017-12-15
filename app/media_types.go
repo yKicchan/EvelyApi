@@ -203,6 +203,25 @@ func (mt *Token) Validate() (err error) {
 	return
 }
 
+// トークンの状態を返す (default view)
+//
+// Identifier: application/vnd.token_state+json; view=default
+type TokenState struct {
+	// 状態
+	State string `form:"state" json:"state" xml:"state"`
+}
+
+// Validate validates the TokenState media type instance.
+func (mt *TokenState) Validate() (err error) {
+	if mt.State == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "state"))
+	}
+	if !(mt.State == "Available" || mt.State == "Unavailable") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.state`, mt.State, []interface{}{"Available", "Unavailable"}))
+	}
+	return
+}
+
 // ユーザー情報 (default view)
 //
 // Identifier: application/vnd.user+json; view=default

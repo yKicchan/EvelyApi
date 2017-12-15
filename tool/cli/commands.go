@@ -50,6 +50,13 @@ type (
 		PrettyPrint bool
 	}
 
+	// VerifyTokenAuthCommand is the command line data structure for the verify_token action of auth
+	VerifyTokenAuthCommand struct {
+		// トークン
+		Token       string
+		PrettyPrint bool
+	}
+
 	// CreateEventsCommand is the command line data structure for the create action of events
 	CreateEventsCommand struct {
 		Payload     string
@@ -299,6 +306,20 @@ Payload example:
 	}
 	tmp9.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp9.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "verify-token",
+		Short: `新規登録時のトークンのチェック`,
+	}
+	tmp10 := new(VerifyTokenAuthCommand)
+	sub = &cobra.Command{
+		Use:   `auth ["/api/develop/v1/auth/signup/verify_token"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp10.Run(c, args) },
+	}
+	tmp10.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp10.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -611,6 +632,32 @@ func (cmd *SignupAuthCommand) Run(c *client.Client, args []string) error {
 func (cmd *SignupAuthCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
+}
+
+// Run makes the HTTP request corresponding to the VerifyTokenAuthCommand command.
+func (cmd *VerifyTokenAuthCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/api/develop/v1/auth/signup/verify_token"
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.VerifyTokenAuth(ctx, path, cmd.Token)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *VerifyTokenAuthCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var token string
+	cc.Flags().StringVar(&cmd.Token, "token", token, `トークン`)
 }
 
 // Run makes the HTTP request corresponding to the CreateEventsCommand command.

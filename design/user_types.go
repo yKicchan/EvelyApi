@@ -110,4 +110,5 @@ var SignupPayload = Type("SignupPayload", func() {
         Format("email")
 		Example("yKicchanApp@gmail.com")
     })
+    Required("email")
 })

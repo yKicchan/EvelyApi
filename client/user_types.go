@@ -390,6 +390,9 @@ type signupPayload struct {
 
 // Validate validates the signupPayload type instance.
 func (ut *signupPayload) Validate() (err error) {
+	if ut.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
+	}
 	if ut.Email != nil {
 		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
 			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.email`, *ut.Email, goa.FormatEmail, err2))
@@ -402,7 +405,7 @@ func (ut *signupPayload) Validate() (err error) {
 func (ut *signupPayload) Publicize() *SignupPayload {
 	var pub SignupPayload
 	if ut.Email != nil {
-		pub.Email = ut.Email
+		pub.Email = *ut.Email
 	}
 	return &pub
 }
@@ -410,15 +413,16 @@ func (ut *signupPayload) Publicize() *SignupPayload {
 // 新規登録時のメール送信
 type SignupPayload struct {
 	// メールアドレス
-	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	Email string `form:"email" json:"email" xml:"email"`
 }
 
 // Validate validates the SignupPayload type instance.
 func (ut *SignupPayload) Validate() (err error) {
-	if ut.Email != nil {
-		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
-			err = goa.MergeErrors(err, goa.InvalidFormatError(`type.email`, *ut.Email, goa.FormatEmail, err2))
-		}
+	if ut.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.email`, ut.Email, goa.FormatEmail, err2))
 	}
 	return
 }

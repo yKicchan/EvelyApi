@@ -35,6 +35,21 @@ var _ = Resource("auth", func() {
         Response(OK)
         Response(BadRequest)
     })
+
+    Action("verify_token", func() {
+        Description("新規登録時のトークンのチェック")
+        NoSecurity()
+        Routing(GET("/signup/verify_token"))
+        Params(func() {
+            Param("token", String, "トークン", func() {
+                Example("Token string")
+            })
+            Required("token")
+        })
+        Response(OK, TokenStateMedia)
+        Response(NotFound)
+        Response(BadRequest)
+    })
 })
 
 // イベントに対するアクション

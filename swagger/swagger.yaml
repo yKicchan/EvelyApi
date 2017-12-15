@@ -129,6 +129,25 @@ definitions:
         startDate: 2003-06-21T02:17:51Z
       updateDate: 2011-05-25T02:41:20Z
       url: http://comp.ecc.ac.jp/
+    - body: |-
+        初心者でもGitを扱えるようになる勉強会を開催します！
+        ノートPCを各自持参してください。
+      host:
+        id: yKicchan
+        name: きっちゃそ
+      id: 20170225-2
+      mail: yKicchanApp@gmail.com
+      place:
+        lat: 34.706425
+        lng: 135.50124
+        name: ECCコンピュータ専門学校2303教室
+      tel: 090-1234-5678
+      title: Git勉強会
+      upcomingDate:
+        endDate: 1974-02-03T21:26:56Z
+        startDate: 2003-06-21T02:17:51Z
+      updateDate: 2011-05-25T02:41:20Z
+      url: http://comp.ecc.ac.jp/
     items:
       $ref: '#/definitions/Event'
     title: 'Mediatype identifier: application/vnd.event+json; type=collection; view=default'
@@ -258,6 +277,8 @@ definitions:
         example: yKicchanApp@gmail.com
         format: email
         type: string
+    required:
+    - email
     title: SignupPayload
     type: object
   Token:
@@ -272,6 +293,22 @@ definitions:
     required:
     - token
     title: 'Mediatype identifier: application/vnd.token+json; view=default'
+    type: object
+  Token_state:
+    description: トークンの状態を返す (default view)
+    example:
+      state: Available
+    properties:
+      state:
+        description: 状態
+        enum:
+        - Available
+        - Unavailable
+        example: Available
+        type: string
+    required:
+    - state
+    title: 'Mediatype identifier: application/vnd.token_state+json; view=default'
     type: object
   UpcomingDate:
     description: イベントの開催予定日
@@ -481,6 +518,32 @@ paths:
       schemes:
       - http
       summary: send_mail auth
+      tags:
+      - auth
+  /auth/signup/verify_token:
+    get:
+      description: 新規登録時のトークンのチェック
+      operationId: auth#verify_token
+      parameters:
+      - description: トークン
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/vnd.token_state+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Token_state'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      schemes:
+      - http
+      summary: verify_token auth
       tags:
       - auth
   /events:

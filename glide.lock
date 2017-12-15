@@ -1,5 +1,5 @@
 hash: 7d390c13d48c57c6a0d4beb5854024bbc76d55e48b21d2f679cf1667b8cc98d0
-updated: 2017-12-10T11:50:42.273107358Z
+updated: 2017-12-15T01:11:24.377356926Z
 imports:
 - name: github.com/armon/go-metrics
   version: 7aa49fde808223f8dadfdbfd3a20ff6c19e5f9ec
@@ -10,7 +10,7 @@ imports:
 - name: github.com/dimfeld/httptreemux
   version: 8cc36ee10f84b82d0742ffcab770815c7d3f9ad7
 - name: github.com/goadesign/goa
-  version: 4d161c69bc5b667a0b64ceeca528dc2d114936d5
+  version: 4be504b4be3e40368f1993755686da3c572e5197
   vcs: git
   subpackages:
   - client
@@ -44,7 +44,8 @@ imports:
 - name: golang.org/x/crypto
   version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
   subpackages:
-  - pbkdf2
+  - bcrypt
+  - blowfish
   - scrypt
 - name: golang.org/x/net
   version: dc871a5d77e227f5bbf6545176ef3eeebf87e76e

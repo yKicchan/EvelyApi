@@ -239,6 +239,32 @@ func (c *Client) DecodeToken(resp *http.Response) (*Token, error) {
 	return &decoded, err
 }
 
+// トークンの状態を返す (default view)
+//
+// Identifier: application/vnd.token_state+json; view=default
+type TokenState struct {
+	// 状態
+	State string `form:"state" json:"state" xml:"state"`
+}
+
+// Validate validates the TokenState media type instance.
+func (mt *TokenState) Validate() (err error) {
+	if mt.State == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "state"))
+	}
+	if !(mt.State == "Available" || mt.State == "Unavailable") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.state`, mt.State, []interface{}{"Available", "Unavailable"}))
+	}
+	return
+}
+
+// DecodeTokenState decodes the TokenState instance encoded in resp body.
+func (c *Client) DecodeTokenState(resp *http.Response) (*TokenState, error) {
+	var decoded TokenState
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // ユーザー情報 (default view)
 //
 // Identifier: application/vnd.user+json; view=default

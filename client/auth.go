@@ -146,3 +146,35 @@ func (c *Client) NewSignupAuthRequest(ctx context.Context, path string, payload 
 	}
 	return req, nil
 }
+
+// VerifyTokenAuthPath computes a request path to the verify_token action of auth.
+func VerifyTokenAuthPath() string {
+
+	return fmt.Sprintf("/api/develop/v1/auth/signup/verify_token")
+}
+
+// 新規登録時のトークンのチェック
+func (c *Client) VerifyTokenAuth(ctx context.Context, path string, token string) (*http.Response, error) {
+	req, err := c.NewVerifyTokenAuthRequest(ctx, path, token)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewVerifyTokenAuthRequest create the request corresponding to the verify_token action endpoint of the auth resource.
+func (c *Client) NewVerifyTokenAuthRequest(ctx context.Context, path string, token string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	values.Set("token", token)
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
