@@ -10,37 +10,6 @@ type UserDB struct {
 	*mgo.Database
 }
 
-type UserModel struct {
-	ID       string `bson:id`
-	Password string `bson:password`
-	Name     string `bson:name`
-	Mail     Mail   `bson:mail`
-	Tel      string `bson:tel`
-}
-
-type Mail struct {
-    Email string `bson:email`
-    Status int `bson:status`
-}
-
-// ユーザーの全情報を抽出するセレクタ
-var USER_FULL_SELECTOR = bson.M{
-	"_id":      0,
-	"id":       1,
-	"password": 1,
-	"name":     1,
-	"mail":     1,
-	"tel":      1,
-}
-
-// ユーザーの一部情報のみ抽出するセレクタ
-var USER_TINY_SELECTOR = bson.M{
-	"_id":  0,
-	"id":   1,
-	"name": 1,
-	"mail": 1,
-}
-
 /**
  * Usesコレクションを操作するDBオブジェクトを生成して返す
  * @param  db DBオブジェクト
