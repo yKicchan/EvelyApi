@@ -114,10 +114,10 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 
 	// Put your logic here
 	claims := GetJWTClaims(ctx)
-    user := &model.UserModel{
-        ID: claims["id"].(string),
-        Name: claims["name"].(string),
-    }
+	user := &model.UserModel{
+		ID:   claims["id"].(string),
+		Name: claims["name"].(string),
+	}
 	payload := ctx.Payload
 
 	eventID, err := c.db.NewEvent(user.ID, payload.UpcomingDate.StartDate)
@@ -142,8 +142,8 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 	// EventsController_Delete: start_implement
 
 	// Put your logic here
-    claims := GetJWTClaims(ctx)
-    userID := claims["id"].(string)
+	claims := GetJWTClaims(ctx)
+	userID := claims["id"].(string)
 
 	if userID != ctx.UserID {
 		log.Printf("[EvelyApi] permission error")
@@ -198,10 +198,10 @@ func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
 
 	// Put your logic here
 	claims := GetJWTClaims(ctx)
-    user := &model.UserModel{
-        ID: claims["id"].(string),
-        Name: claims["name"].(string),
-    }
+	user := &model.UserModel{
+		ID:   claims["id"].(string),
+		Name: claims["name"].(string),
+	}
 	if user.ID != ctx.UserID {
 		log.Printf("[EvelyApi] permission error")
 		return ctx.Forbidden()

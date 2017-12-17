@@ -84,12 +84,12 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 })
 
 var TokenStateMedia = MediaType("application/vnd.token_state+json", func() {
-    Description("トークンの状態を返す")
-    Attribute("state", String, "状態", func() {
-        Enum("Available", "Unavailable")
-    })
-    Required("state")
-    View("default", func() {
-        Attribute("state")
-    })
+	Description("トークンの状態を返す")
+	Attribute("state", String, "状態", func() {
+		Enum("Available", "Unavailable")
+	})
+	Required("state")
+	View("default", func() {
+		Attribute("state")
+	})
 })
