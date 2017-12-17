@@ -12,7 +12,6 @@ type EventDB struct {
 	*mgo.Database
 }
 
-
 // イベントの検索オプション
 type getEventsOptions struct {
 	keyword string
@@ -130,7 +129,7 @@ func (db *EventDB) GetEvent(userID, eventID string) (event *EventModel, err erro
 			bson.M{"host.id": userID},
 		},
 	}
-	err = db.C("events").Find(query).Select(EVENT_FULL_SELECTOR).One(&event)
+	err = db.C("events").Find(query).Select(FULL_SELECTOR).One(&event)
 	return
 }
 

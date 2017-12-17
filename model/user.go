@@ -27,7 +27,7 @@ func NewUserDB(db *mgo.Database) *UserDB {
  */
 func (db *UserDB) GetUser(id string) (user *UserModel, err error) {
 	query := bson.M{"id": id}
-	err = db.C("users").Find(query).Select(USER_FULL_SELECTOR).One(&user)
+	err = db.C("users").Find(query).Select(FULL_SELECTOR).One(&user)
 	return
 }
 

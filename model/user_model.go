@@ -1,12 +1,21 @@
 package model
 
+import (
+	"gopkg.in/mgo.v2/bson"
+)
+
 // ユーザーのDBモデル
 type UserModel struct {
 	ID       string `bson:id`
 	Password string `bson:password`
 	Name     string `bson:name`
-	Mail     string `bson:mail`
+	Mail     Mail   `bson:mail`
 	Tel      string `bson:tel`
+}
+
+type Mail struct {
+	Email  string `bson:email`
+	Status int    `bson:status`
 }
 
 // ユーザーの一部情報のみ抽出するセレクタ
