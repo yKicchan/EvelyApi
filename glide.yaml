@@ -13,7 +13,6 @@ import:
 - package: golang.org/x/tools
   subpackages:
   - go/ast/astutil
-- package: gopkg.in/mgo.v2
 - package: gopkg.in/yaml.v2
 - package: github.com/dimfeld/httppath
 - package: github.com/dimfeld/httptreemux
@@ -31,3 +30,4 @@ import:
 - package: golang.org/x/crypto
   subpackages:
   - scrypt
+- package: labix.org/v2/mgo

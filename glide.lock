@@ -1,5 +1,5 @@
-hash: 7d390c13d48c57c6a0d4beb5854024bbc76d55e48b21d2f679cf1667b8cc98d0
-updated: 2017-12-15T01:11:24.377356926Z
+hash: a96f5fe52cec0e8f244017bc4c6f7ef628273110a8e39c6de60275bc01f7e768
+updated: 2017-12-17T07:32:52.202774473Z
 imports:
 - name: github.com/armon/go-metrics
   version: 7aa49fde808223f8dadfdbfd3a20ff6c19e5f9ec
@@ -48,20 +48,18 @@ imports:
   - blowfish
   - scrypt
 - name: golang.org/x/net
-  version: dc871a5d77e227f5bbf6545176ef3eeebf87e76e
+  version: d866cfc389cec985d6fda2859936a575a55a3ab6
   subpackages:
   - websocket
 - name: golang.org/x/tools
-  version: 9b32ad6a0077c7f766ad108c08f5852a8e0690fa
+  version: 64890f4e2b733655fee5077a5435a8812404c3a3
   subpackages:
   - go/ast/astutil
-- name: gopkg.in/mgo.v2
-  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
-  subpackages:
-  - bson
-  - internal/json
-  - internal/sasl
-  - internal/scram
 - name: gopkg.in/yaml.v2
   version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+- name: labix.org/v2/mgo
+  version: "287"
+  subpackages:
+  - bson
+  - sasl
 testImports: []

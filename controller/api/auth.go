@@ -9,7 +9,7 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 	"golang.org/x/crypto/bcrypt"
-	mgo "gopkg.in/mgo.v2"
+	"labix.org/v2/mgo"
 	"io/ioutil"
 	"log"
 	"time"

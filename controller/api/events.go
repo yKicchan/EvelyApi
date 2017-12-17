@@ -4,7 +4,7 @@ import (
 	"EvelyApi/app"
 	"EvelyApi/model"
 	"github.com/goadesign/goa"
-	mgo "gopkg.in/mgo.v2"
+    "labix.org/v2/mgo"
 	"log"
 	"time"
 )

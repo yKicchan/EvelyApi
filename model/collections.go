@@ -1,7 +1,7 @@
 package model
 
 import (
-	"gopkg.in/mgo.v2/bson"
+	"labix.org/v2/mgo/bson"
 )
 
 // コレクション名を定数化

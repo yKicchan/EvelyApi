@@ -9,7 +9,7 @@ import (
 	. "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
-	mgo "gopkg.in/mgo.v2"
+	"labix.org/v2/mgo"
 )
 
 func main() {
