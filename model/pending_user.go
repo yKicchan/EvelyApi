@@ -1,22 +1,8 @@
 package model
 
 import (
-    "time"
 	"gopkg.in/mgo.v2/bson"
-    "log"
-)
-
-// 認証待ちユーザーモデル
-type PendingUserModel struct {
-    Email string `bson:email`
-    Token string `bson:token`
-    CreatedAt time.Time `bson:created_at`
-}
-
-// トークン状態を表す定数
-const (
-    STATE_AVAILABLE = "Available"
-    STATE_UNAVAILABLE = "UnAvailable"
+	"log"
 )
 
 /**
@@ -25,10 +11,10 @@ const (
  * @return bool  true: 使用可能, false: 使用不可(すでに使われている)
  */
 func (db *UserDB) VerifyEmail(email string) bool {
-    query := bson.M{"mail": email}
-    user := &UserModel{}
+	query := bson.M{"mail": email}
+	user := &UserModel{}
 	err := db.C("users").Find(query).One(user)
-    log.Printf("[EvelyApi] user: %v", user)
+	log.Printf("[EvelyApi] user: %v", user)
 	return err != nil
 }
 
@@ -38,10 +24,10 @@ func (db *UserDB) VerifyEmail(email string) bool {
  * @return error       クエリ実行時のエラー
  */
 func (db *UserDB) CreatePendingUser(pendingUser *PendingUserModel) error {
-    selector := bson.M{"email": pendingUser.Email}
-    info, err := db.C("PendingUsers").Upsert(selector, pendingUser)
-    log.Printf("[EvelyApi] upsert info: %v", info)
-    return err
+	selector := bson.M{"email": pendingUser.Email}
+	info, err := db.C("PendingUsers").Upsert(selector, pendingUser)
+	log.Printf("[EvelyApi] upsert info: %v", info)
+	return err
 }
 
 /**
@@ -50,7 +36,7 @@ func (db *UserDB) CreatePendingUser(pendingUser *PendingUserModel) error {
  * @return error クエリ実行時のエラー
  */
 func (db *UserDB) DeletePendingUser(email string) error {
-    selector := bson.M{"email": email}
+	selector := bson.M{"email": email}
 	return db.C("PendingUsers").Remove(selector)
 }
 
@@ -60,8 +46,8 @@ func (db *UserDB) DeletePendingUser(email string) error {
  * @return string トークン状態を示すメッセージ["Available", "UnAvailable"]
  */
 func (db *UserDB) GetTokenState(token string) string {
-    query := bson.M{"token": token}
-    pendingUser := &PendingUserModel{}
-    err := db.C("PendingUsers").Find(query).One(&pendingUser)
-    return map[bool]string{true: STATE_AVAILABLE, false: STATE_UNAVAILABLE}[err == nil]
+	query := bson.M{"token": token}
+	pendingUser := &PendingUserModel{}
+	err := db.C("PendingUsers").Find(query).One(&pendingUser)
+	return map[bool]string{true: STATE_AVAILABLE, false: STATE_UNAVAILABLE}[err == nil]
 }
