@@ -382,6 +382,72 @@ func (ut *LoginPayload) Validate() (err error) {
 	return
 }
 
+// メールアドレスとその状態
+type mail struct {
+	// メールアドレス
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+	// メールアドレスの状態
+	State *string `form:"state,omitempty" json:"state,omitempty" xml:"state,omitempty"`
+}
+
+// Validate validates the mail type instance.
+func (ut *mail) Validate() (err error) {
+	if ut.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
+	}
+	if ut.State == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "state"))
+	}
+	if ut.Email != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.email`, *ut.Email, goa.FormatEmail, err2))
+		}
+	}
+	if ut.State != nil {
+		if !(*ut.State == "Pending" || *ut.State == "OK" || *ut.State == "BAN") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`request.state`, *ut.State, []interface{}{"Pending", "OK", "BAN"}))
+		}
+	}
+	return
+}
+
+// Publicize creates Mail from mail
+func (ut *mail) Publicize() *Mail {
+	var pub Mail
+	if ut.Email != nil {
+		pub.Email = *ut.Email
+	}
+	if ut.State != nil {
+		pub.State = *ut.State
+	}
+	return &pub
+}
+
+// メールアドレスとその状態
+type Mail struct {
+	// メールアドレス
+	Email string `form:"email" json:"email" xml:"email"`
+	// メールアドレスの状態
+	State string `form:"state" json:"state" xml:"state"`
+}
+
+// Validate validates the Mail type instance.
+func (ut *Mail) Validate() (err error) {
+	if ut.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
+	}
+	if ut.State == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "state"))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.email`, ut.Email, goa.FormatEmail, err2))
+	}
+	if !(ut.State == "Pending" || ut.State == "OK" || ut.State == "BAN") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`type.state`, ut.State, []interface{}{"Pending", "OK", "BAN"}))
+	}
+	return
+}
+
 // 新規登録時のメール送信
 type signupPayload struct {
 	// メールアドレス

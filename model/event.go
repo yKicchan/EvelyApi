@@ -1,6 +1,7 @@
 package model
 
 import (
+    . "EvelyApi/config"
     "labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"strconv"

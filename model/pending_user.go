@@ -1,6 +1,7 @@
 package model
 
 import (
+    . "EvelyApi/config"
 	"labix.org/v2/mgo/bson"
 	"log"
 )

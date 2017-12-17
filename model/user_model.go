@@ -15,7 +15,7 @@ type UserModel struct {
 
 type Mail struct {
 	Email  string `bson:email`
-	Status int    `bson:status`
+	State  string `bson:state`
 }
 
 // ユーザーの一部情報のみ抽出するセレクタ

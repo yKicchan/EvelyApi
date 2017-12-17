@@ -229,7 +229,7 @@ type User struct {
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
 	// メールアドレス
-	Mail string `form:"mail" json:"mail" xml:"mail"`
+	Mail *Mail `form:"mail" json:"mail" xml:"mail"`
 	// 名前
 	Name string `form:"name" json:"name" xml:"name"`
 	// 電話番号
@@ -244,7 +244,7 @@ func (mt *User) Validate() (err error) {
 	if mt.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
 	}
-	if mt.Mail == "" {
+	if mt.Mail == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mail"))
 	}
 	if mt.Tel == "" {
@@ -256,8 +256,10 @@ func (mt *User) Validate() (err error) {
 	if utf8.RuneCountInString(mt.ID) > 15 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.id`, mt.ID, utf8.RuneCountInString(mt.ID), 15, false))
 	}
-	if err2 := goa.ValidateFormat(goa.FormatEmail, mt.Mail); err2 != nil {
-		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.mail`, mt.Mail, goa.FormatEmail, err2))
+	if mt.Mail != nil {
+		if err2 := mt.Mail.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	if utf8.RuneCountInString(mt.Name) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 1, true))

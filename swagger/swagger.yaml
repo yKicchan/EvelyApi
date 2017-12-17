@@ -267,6 +267,30 @@ definitions:
     - password
     title: LoginPayload
     type: object
+  Mail:
+    description: メールアドレスとその状態
+    example:
+      email: yKicchanApp@gmail.com
+      state: OK
+    properties:
+      email:
+        description: メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+      state:
+        description: メールアドレスの状態
+        enum:
+        - Pending
+        - OK
+        - BAN
+        example: OK
+        type: string
+    required:
+    - email
+    - state
+    title: Mail
+    type: object
   SignupPayload:
     description: 新規登録時のメール送信
     example:
@@ -346,10 +370,7 @@ definitions:
         minLength: 4
         type: string
       mail:
-        description: メールアドレス
-        example: yKicchanApp@gmail.com
-        format: email
-        type: string
+        $ref: '#/definitions/Mail'
       name:
         description: 名前
         example: きっちゃそ

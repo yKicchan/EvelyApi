@@ -2,6 +2,7 @@ package api
 
 import (
 	"EvelyApi/app"
+    . "EvelyApi/config"
 	"EvelyApi/controller/mailer"
 	"EvelyApi/model"
 	"context"
@@ -170,7 +171,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		Name:     p.Name,
 		Mail: model.Mail{
 			Email:  p.Mail,
-			Status: 1,
+			State:  STATE_OK,
 		},
 		Tel: p.Tel,
 	}

@@ -67,7 +67,7 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 	Attributes(func() {
 		Attribute("id")
 		Attribute("name")
-		Attribute("mail")
+		Attribute("mail", Mail)
 		Attribute("tel")
 	})
 	Required("id", "name", "mail", "tel")
