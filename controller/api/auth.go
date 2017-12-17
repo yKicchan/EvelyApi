@@ -97,7 +97,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	}
     token := newToken(claims)
     // メール送信
-    subject := "[Evely] 仮登録完了"
+    subject := "仮登録完了"
     url := "http://localhost:8888/verify_email?token=" + token
     body := "登録用URL: " + url
     err := mailer.SendMail(email, subject, body)
