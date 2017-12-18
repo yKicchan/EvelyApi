@@ -1,8 +1,8 @@
 package model
 
 import (
-    . "EvelyApi/config"
-    "labix.org/v2/mgo"
+	. "EvelyApi/config"
+	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"strconv"
 	"time"
@@ -63,13 +63,13 @@ func (db *EventDB) NewEvent(userID string, upcomingDate time.Time) (eventID stri
 			bson.M{"host.id": userID},
 		},
 	}
-	n, _ := db.C("events").Find(query).Count()
+	n, _ := db.C(EVENT_COLLECTION).Find(query).Count()
 	eventID = date + "-" + strconv.Itoa(n+1)
 	event := &EventModel{
 		ID:   eventID,
 		Host: Host{ID: userID},
 	}
-	err = db.C("events").Insert(event)
+	err = db.C(EVENT_COLLECTION).Insert(event)
 	return
 }
 
@@ -112,7 +112,7 @@ func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (eve
 			query = bson.M{"host.id": opt.userID}
 		}
 	}
-	err = db.C("events").Find(query).Select(EVENT_TINY_SELECTOR).Skip(offset).Limit(limit).All(&events)
+	err = db.C(EVENT_COLLECTION).Find(query).Select(EVENT_TINY_SELECTOR).Skip(offset).Limit(limit).All(&events)
 	return
 }
 
@@ -130,7 +130,7 @@ func (db *EventDB) GetEvent(userID, eventID string) (event *EventModel, err erro
 			bson.M{"host.id": userID},
 		},
 	}
-	err = db.C("events").Find(query).Select(FULL_SELECTOR).One(&event)
+	err = db.C(EVENT_COLLECTION).Find(query).Select(FULL_SELECTOR).One(&event)
 	return
 }
 
@@ -147,7 +147,7 @@ func (db *EventDB) SaveEvent(event *EventModel) error {
 		},
 	}
 	update := bson.M{"$set": event}
-	return db.C("events").Update(selector, update)
+	return db.C(EVENT_COLLECTION).Update(selector, update)
 }
 
 /**
@@ -163,5 +163,5 @@ func (db *EventDB) DeleteEvent(userID, eventID string) error {
 			bson.M{"host.id": userID},
 		},
 	}
-	return db.C("events").Remove(selector)
+	return db.C(EVENT_COLLECTION).Remove(selector)
 }

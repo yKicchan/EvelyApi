@@ -1,7 +1,7 @@
 package model
 
 import (
-    . "EvelyApi/config"
+	. "EvelyApi/config"
 	"labix.org/v2/mgo/bson"
 	"log"
 )
@@ -14,7 +14,7 @@ import (
 func (db *UserDB) VerifyEmail(email string) bool {
 	query := bson.M{"mail": email}
 	user := &UserModel{}
-	err := db.C("users").Find(query).One(user)
+	err := db.C(USER_COLLECTION).Find(query).One(user)
 	log.Printf("[EvelyApi] user: %v", user)
 	return err != nil
 }
@@ -26,7 +26,7 @@ func (db *UserDB) VerifyEmail(email string) bool {
  */
 func (db *UserDB) CreatePendingUser(pendingUser *PendingUserModel) error {
 	selector := bson.M{"email": pendingUser.Email}
-	info, err := db.C("PendingUsers").Upsert(selector, pendingUser)
+	info, err := db.C(PENDING_USER_COLLECTION).Upsert(selector, pendingUser)
 	log.Printf("[EvelyApi] upsert info: %v", info)
 	return err
 }
@@ -38,7 +38,7 @@ func (db *UserDB) CreatePendingUser(pendingUser *PendingUserModel) error {
  */
 func (db *UserDB) DeletePendingUser(email string) error {
 	selector := bson.M{"email": email}
-	return db.C("PendingUsers").Remove(selector)
+	return db.C(PENDING_USER_COLLECTION).Remove(selector)
 }
 
 /**
@@ -49,6 +49,6 @@ func (db *UserDB) DeletePendingUser(email string) error {
 func (db *UserDB) GetTokenState(token string) string {
 	query := bson.M{"token": token}
 	pendingUser := &PendingUserModel{}
-	err := db.C("PendingUsers").Find(query).One(&pendingUser)
+	err := db.C(PENDING_USER_COLLECTION).Find(query).One(&pendingUser)
 	return map[bool]string{true: STATE_AVAILABLE, false: STATE_UNAVAILABLE}[err == nil]
 }

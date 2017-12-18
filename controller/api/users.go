@@ -18,10 +18,10 @@ func ToUserMedia(u *model.UserModel) *app.User {
 		ID:   u.ID,
 		Name: u.Name,
 		Mail: &app.Mail{
-            Email: u.Mail.Email,
-            State: u.Mail.State,
-        },
-		Tel:  u.Tel,
+			Email: u.Mail.Email,
+			State: u.Mail.State,
+		},
+		Tel: u.Tel,
 	}
 }
 

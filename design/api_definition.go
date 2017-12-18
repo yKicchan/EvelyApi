@@ -1,6 +1,7 @@
 package design
 
 import (
+	. "EvelyApi/config"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 )
@@ -25,14 +26,14 @@ var _ = API("EvelyApi", func() {
 	})
 
 	// ホスト設定
-	Scheme("http")
-	Host("localhost:8888")
+	Scheme(SCHEME)
+	Host(HOST)
 
 	// 全エンドポイントのBasePath
 	BasePath("/api/develop/v1")
 
 	// CORSポリシーの定義
-	Origin("http://localhost:8888/swaggerui", func() {
+	Origin(URL+"/swaggerui", func() {
 		// クライアントに公開された1つ以上のヘッダー
 		Expose("X-Time")
 		// 許可されたHTTPメソッド

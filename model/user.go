@@ -1,7 +1,7 @@
 package model
 
 import (
-    . "EvelyApi/config"
+	. "EvelyApi/config"
 	"fmt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
@@ -28,7 +28,7 @@ func NewUserDB(db *mgo.Database) *UserDB {
  */
 func (db *UserDB) GetUser(id string) (user *UserModel, err error) {
 	query := bson.M{"id": id}
-	err = db.C("users").Find(query).Select(FULL_SELECTOR).One(&user)
+	err = db.C(USER_COLLECTION).Find(query).Select(FULL_SELECTOR).One(&user)
 	return
 }
 
@@ -43,7 +43,7 @@ func (db *UserDB) NewUser(id string) error {
 		return fmt.Errorf("\"%s\" has already been taken", id)
 	}
 	user := &UserModel{ID: id}
-	return db.C("users").Insert(user)
+	return db.C(USER_COLLECTION).Insert(user)
 }
 
 /**
@@ -54,5 +54,5 @@ func (db *UserDB) NewUser(id string) error {
 func (db *UserDB) SaveUser(user *UserModel) error {
 	selector := bson.M{"id": user.ID}
 	update := bson.M{"$set": user}
-	return db.C("users").Update(selector, update)
+	return db.C(USER_COLLECTION).Update(selector, update)
 }

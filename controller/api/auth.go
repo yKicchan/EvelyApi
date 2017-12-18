@@ -2,7 +2,7 @@ package api
 
 import (
 	"EvelyApi/app"
-    . "EvelyApi/config"
+	. "EvelyApi/config"
 	"EvelyApi/controller/mailer"
 	"EvelyApi/model"
 	"context"
@@ -10,8 +10,8 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 	"golang.org/x/crypto/bcrypt"
-	"labix.org/v2/mgo"
 	"io/ioutil"
+	"labix.org/v2/mgo"
 	"log"
 	"time"
 )
@@ -170,8 +170,8 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		Password: string(pass),
 		Name:     p.Name,
 		Mail: model.Mail{
-			Email:  p.Mail,
-			State:  STATE_OK,
+			Email: p.Mail,
+			State: STATE_OK,
 		},
 		Tel: p.Tel,
 	}

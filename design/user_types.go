@@ -114,14 +114,14 @@ var SignupPayload = Type("SignupPayload", func() {
 })
 
 var Mail = Type("Mail", func() {
-    Description("メールアドレスとその状態")
-    Attribute("email", String, "メールアドレス", func() {
-        Format("email")
-        Example("yKicchanApp@gmail.com")
-    })
-    Attribute("state", String, "メールアドレスの状態", func() {
-        Enum("Pending", "OK", "BAN")
-        Example("OK")
-    })
-    Required("email", "state")
+	Description("メールアドレスとその状態")
+	Attribute("email", String, "メールアドレス", func() {
+		Format("email")
+		Example("yKicchanApp@gmail.com")
+	})
+	Attribute("state", String, "メールアドレスの状態", func() {
+		Enum("Pending", "OK", "BAN")
+		Example("OK")
+	})
+	Required("email", "state")
 })
