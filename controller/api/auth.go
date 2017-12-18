@@ -17,13 +17,13 @@ import (
 )
 
 /**
- * トークンの状態メッセージをレスポンス形式に変換する
- * @param  msg        トークンの状態を示すメッセージ
- * @return TokenState レスポンス形式に変換した情報
+ * メールアドレスをレスポンス形式に変換する
+ * @param  email メールアドレス
+ * @return Email レスポンス形式に変換したメールアドレス
  */
-func ToTokenStateMedia(msg string) *app.TokenState {
-	return &app.TokenState{
-		State: msg,
+func ToEmailMedia(email string) *app.Email {
+	return &app.Email{
+		Email: email,
 	}
 }
 
@@ -196,8 +196,11 @@ func (c *AuthController) VerifyToken(ctx *app.VerifyTokenAuthContext) error {
 	// AuthController_VerifyToken: start_implement
 
 	// Put your logic here
-	msg := c.db.GetTokenState(ctx.Token)
-
-	return ctx.OK(ToTokenStateMedia(msg))
+	email, err := c.db.VerifyToken(ctx.Token)
+	if err != nil {
+		log.Printf("[EvelyApi] faild to verify email: %s", err)
+		return ctx.NotFound()
+	}
+	return ctx.OK(ToEmailMedia(email))
 	// AuthController_VerifyToken: end_implement
 }

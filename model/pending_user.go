@@ -42,13 +42,14 @@ func (db *UserDB) DeletePendingUser(email string) error {
 }
 
 /**
- * 認証待ちユーザーのトークン状態を確認する
+ * 認証待ちユーザーのトークンが有効か確認する
  * @param  token  トークン
- * @return string トークン状態を示すメッセージ["Available", "UnAvailable"]
+ * @return string メールアドレス
+ * @return error  クエリ実行時のエラー
  */
-func (db *UserDB) GetTokenState(token string) string {
+func (db *UserDB) VerifyToken(token string) (string, error) {
 	query := bson.M{"token": token}
-	pendingUser := &PendingUserModel{}
-	err := db.C(PENDING_USER_COLLECTION).Find(query).One(&pendingUser)
-	return map[bool]string{true: STATE_AVAILABLE, false: STATE_UNAVAILABLE}[err == nil]
+	pu := &PendingUserModel{}
+	err := db.C(PENDING_USER_COLLECTION).Find(query).One(&pu)
+	return pu.Email, err
 }

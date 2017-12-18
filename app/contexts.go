@@ -150,9 +150,9 @@ func NewVerifyTokenAuthContext(ctx context.Context, r *http.Request, service *go
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *VerifyTokenAuthContext) OK(r *TokenState) error {
+func (ctx *VerifyTokenAuthContext) OK(r *Email) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.token_state+json")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.email+json")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

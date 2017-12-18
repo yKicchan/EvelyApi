@@ -592,7 +592,7 @@ func VerifyTokenAuthNotFound(t goatest.TInterface, ctx context.Context, service 
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func VerifyTokenAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, token string) (http.ResponseWriter, *app.TokenState) {
+func VerifyTokenAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, token string) (http.ResponseWriter, *app.Email) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -649,12 +649,12 @@ func VerifyTokenAuthOK(t goatest.TInterface, ctx context.Context, service *goa.S
 	if rw.Code != 200 {
 		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
 	}
-	var mt *app.TokenState
+	var mt *app.Email
 	if resp != nil {
 		var ok bool
-		mt, ok = resp.(*app.TokenState)
+		mt, ok = resp.(*app.Email)
 		if !ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.TokenState", resp, resp)
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.Email", resp, resp)
 		}
 		_err = mt.Validate()
 		if _err != nil {

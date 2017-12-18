@@ -3,13 +3,14 @@
 package main
 
 import (
-	"log"
 	"EvelyApi/app"
-    "EvelyApi/controller/api"
+	. "EvelyApi/config"
+	"EvelyApi/controller/api"
 	. "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"labix.org/v2/mgo"
+	"log"
 )
 
 func main() {
@@ -26,13 +27,13 @@ func main() {
 	app.UseJWTMiddleware(service, NewJWTMiddleware())
 
 	// DB接続
-	session, err := mgo.Dial("mongo")
+	session, err := mgo.Dial(DB_HOST)
 	if err != nil {
 		log.Fatalf("Database initialization failed: %s", err)
 	}
 	// DB切断
 	defer session.Close()
-	db := session.DB("develop")
+	db := session.DB(DB_NAME)
 
 	// Mount "auth" controller
 	c := api.NewAuthController(service, db)

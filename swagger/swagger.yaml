@@ -5,6 +5,20 @@ consumes:
 - application/gob
 - application/x-gob
 definitions:
+  Email:
+    description: メールアドレス (default view)
+    example:
+      email: yKicchanApp@gmail.com
+    properties:
+      email:
+        description: メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+    required:
+    - email
+    title: 'Mediatype identifier: application/vnd.email+json; view=default'
+    type: object
   Event:
     description: イベント情報 (default view)
     example:
@@ -91,25 +105,6 @@ definitions:
     description: EventCollection is the media type for an array of Event (default
       view)
     example:
-    - body: |-
-        初心者でもGitを扱えるようになる勉強会を開催します！
-        ノートPCを各自持参してください。
-      host:
-        id: yKicchan
-        name: きっちゃそ
-      id: 20170225-2
-      mail: yKicchanApp@gmail.com
-      place:
-        lat: 34.706425
-        lng: 135.50124
-        name: ECCコンピュータ専門学校2303教室
-      tel: 090-1234-5678
-      title: Git勉強会
-      upcomingDate:
-        endDate: 1974-02-03T21:26:56Z
-        startDate: 2003-06-21T02:17:51Z
-      updateDate: 2011-05-25T02:41:20Z
-      url: http://comp.ecc.ac.jp/
     - body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
@@ -317,22 +312,6 @@ definitions:
     required:
     - token
     title: 'Mediatype identifier: application/vnd.token+json; view=default'
-    type: object
-  Token_state:
-    description: トークンの状態を返す (default view)
-    example:
-      state: Available
-    properties:
-      state:
-        description: 状態
-        enum:
-        - Available
-        - Unavailable
-        example: Available
-        type: string
-    required:
-    - state
-    title: 'Mediatype identifier: application/vnd.token_state+json; view=default'
     type: object
   UpcomingDate:
     description: イベントの開催予定日
@@ -552,12 +531,12 @@ paths:
         required: true
         type: string
       produces:
-      - application/vnd.token_state+json
+      - application/vnd.email+json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/Token_state'
+            $ref: '#/definitions/Email'
         "400":
           description: Bad Request
         "404":

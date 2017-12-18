@@ -46,7 +46,7 @@ var _ = Resource("auth", func() {
 			})
 			Required("token")
 		})
-		Response(OK, TokenStateMedia)
+		Response(OK, EmailMedia)
 		Response(NotFound)
 		Response(BadRequest)
 	})

@@ -17,6 +17,32 @@ import (
 	"unicode/utf8"
 )
 
+// メールアドレス (default view)
+//
+// Identifier: application/vnd.email+json; view=default
+type Email struct {
+	// メールアドレス
+	Email string `form:"email" json:"email" xml:"email"`
+}
+
+// Validate validates the Email media type instance.
+func (mt *Email) Validate() (err error) {
+	if mt.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "email"))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatEmail, mt.Email); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.email`, mt.Email, goa.FormatEmail, err2))
+	}
+	return
+}
+
+// DecodeEmail decodes the Email instance encoded in resp body.
+func (c *Client) DecodeEmail(resp *http.Response) (*Email, error) {
+	var decoded Email
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
 // イベント情報 (default view)
 //
 // Identifier: application/vnd.event+json; view=default
@@ -235,32 +261,6 @@ func (mt *Token) Validate() (err error) {
 // DecodeToken decodes the Token instance encoded in resp body.
 func (c *Client) DecodeToken(resp *http.Response) (*Token, error) {
 	var decoded Token
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
-// トークンの状態を返す (default view)
-//
-// Identifier: application/vnd.token_state+json; view=default
-type TokenState struct {
-	// 状態
-	State string `form:"state" json:"state" xml:"state"`
-}
-
-// Validate validates the TokenState media type instance.
-func (mt *TokenState) Validate() (err error) {
-	if mt.State == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "state"))
-	}
-	if !(mt.State == "Available" || mt.State == "Unavailable") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.state`, mt.State, []interface{}{"Available", "Unavailable"}))
-	}
-	return
-}
-
-// DecodeTokenState decodes the TokenState instance encoded in resp body.
-func (c *Client) DecodeTokenState(resp *http.Response) (*TokenState, error) {
-	var decoded TokenState
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
