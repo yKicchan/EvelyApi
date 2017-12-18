@@ -12,7 +12,7 @@ import (
  * @return bool  true: 使用可能, false: 使用不可(すでに使われている)
  */
 func (db *UserDB) VerifyEmail(email string) bool {
-	query := bson.M{"mail": email}
+	query := bson.M{"mail.email": email}
 	user := &UserModel{}
 	err := db.C(USER_COLLECTION).Find(query).One(user)
 	log.Printf("[EvelyApi] user: %v", user)
