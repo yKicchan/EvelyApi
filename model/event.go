@@ -90,7 +90,7 @@ func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (eve
 	// 検索オプションの内容からクエリを作成
 	query := bson.M{}
 	if len(opt.keyword) > 0 {
-		regex := bson.M{"$regex": bson.RegEx{Pattern: `.*` + opt.keyword + `.*`, Options: "m"}}
+		regex := bson.M{"$regex": bson.RegEx{Pattern: `.*` + opt.keyword + `.*`, Options: "im"}}
 		query = bson.M{
 			"$or": []interface{}{
 				bson.M{"title": regex},
