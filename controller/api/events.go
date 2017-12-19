@@ -3,96 +3,11 @@ package api
 import (
 	"EvelyApi/app"
 	"EvelyApi/model"
+    "EvelyApi/controller/parser"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo"
 	"log"
-	"time"
 )
-
-// 緯度経度の配列番号を定数化
-const (
-	Lng = 0
-	Lat = 1
-)
-
-/**
- * イベント情報をAPIのレスポンス形式に変換する
- * @param e イベント情報
- * @return  レスポンス形式に変換したイベント情報
- */
-func ToEventMedia(e *model.EventModel) *app.Event {
-	return &app.Event{
-		ID:    e.ID,
-		Title: e.Title,
-		Host: &app.UserTiny{
-			ID:   e.Host.ID,
-			Name: e.Host.Name,
-		},
-		Body: e.Body,
-		Place: &app.Location{
-			Name: e.Place.Name,
-			Lat:  e.Place.LngLat[Lat],
-			Lng:  e.Place.LngLat[Lng],
-		},
-		UpdateDate: e.UpdateDate,
-		UpcomingDate: &app.UpcomingDate{
-			StartDate: e.UpcomingDate.StartDate,
-			EndDate:   e.UpcomingDate.EndDate,
-		},
-		URL:  e.URL,
-		Mail: e.Mail,
-		Tel:  e.Tel,
-	}
-}
-
-/**
- * イベント情報をAPIのレスポンス形式に変換する
- * @param e イベント情報
- * @return  レスポンス形式に変換したイベント情報
- */
-func ToEventTinyMedia(e *model.EventModel) *app.EventTiny {
-	return &app.EventTiny{
-		ID:    e.ID,
-		Title: e.Title,
-		Host: &app.UserTiny{
-			ID:   e.Host.ID,
-			Name: e.Host.Name,
-		},
-		Place: &app.Location{
-			Name: e.Place.Name,
-			Lat:  e.Place.LngLat[Lat],
-			Lng:  e.Place.LngLat[Lng],
-		},
-		UpcomingDate: &app.UpcomingDate{
-			StartDate: e.UpcomingDate.StartDate,
-			EndDate:   e.UpcomingDate.EndDate,
-		},
-	}
-}
-
-func ToEventModel(p *app.EventPayload, id string, user *model.UserModel) *model.EventModel {
-	return &model.EventModel{
-		ID:    id,
-		Title: p.Title,
-		Host: model.Host{
-			ID:   user.ID,
-			Name: user.Name,
-		},
-		Body: p.Body,
-		Place: model.Location{
-			Name:   p.Place.Name,
-			LngLat: [2]float64{p.Place.Lng, p.Place.Lat},
-		},
-		UpdateDate: time.Now(),
-		UpcomingDate: model.UpcomingDate{
-			StartDate: p.UpcomingDate.StartDate,
-			EndDate:   p.UpcomingDate.EndDate,
-		},
-		URL:  p.URL,
-		Mail: p.Mail,
-		Tel:  p.Tel,
-	}
-}
 
 // EventsController implements the events resource.
 type EventsController struct {
@@ -125,7 +40,7 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 		log.Printf("[EvelyApi] failed to create event: %s", err)
 	}
 
-	event := ToEventModel(payload, eventID, user)
+	event := parser.ToEventModel(payload, eventID, user)
 
 	err = c.db.SaveEvent(event)
 	if err != nil {
@@ -133,7 +48,7 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 		return ctx.BadRequest()
 	}
 
-	return ctx.Created(ToEventMedia(event))
+	return ctx.Created(parser.ToEventMedia(event))
 	// EventsController_Create: end_implement
 }
 
@@ -172,7 +87,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 
 	res := make(app.EventTinyCollection, len(events))
 	for i := range events {
-		res[i] = ToEventTinyMedia(events[i])
+		res[i] = parser.ToEventTinyMedia(events[i])
 	}
 	return ctx.OKTiny(res)
 	// EventsController_List: end_implement
@@ -188,7 +103,7 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 		log.Printf("[EvelyApi] faild to find event: %s", err)
 		return ctx.NotFound()
 	}
-	return ctx.OK(ToEventMedia(event))
+	return ctx.OK(parser.ToEventMedia(event))
 	// EventsController_Show: end_implement
 }
 
@@ -207,12 +122,12 @@ func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
 		return ctx.Forbidden()
 	}
 
-	event := ToEventModel(ctx.Payload, ctx.EventID, user)
+	event := parser.ToEventModel(ctx.Payload, ctx.EventID, user)
 	err := c.db.SaveEvent(event)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save event: %s", err)
 		return ctx.NotFound()
 	}
-	return ctx.OK(ToEventMedia(event))
+	return ctx.OK(parser.ToEventMedia(event))
 	// EventsController_Update: end_implement
 }

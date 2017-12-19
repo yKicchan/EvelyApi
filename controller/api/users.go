@@ -3,27 +3,11 @@ package api
 import (
 	"EvelyApi/app"
 	"EvelyApi/model"
+    "EvelyApi/controller/parser"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo"
 	"log"
 )
-
-/**
- * ユーザー情報をAPIのレスポンス形式に変換する
- * @param  u ユーザー情報
- * @return   レスポンス形式に変換したユーザー情報
- */
-func ToUserMedia(u *model.UserModel) *app.User {
-	return &app.User{
-		ID:   u.ID,
-		Name: u.Name,
-		Mail: &app.Mail{
-			Email: u.Mail.Email,
-			State: u.Mail.State,
-		},
-		Tel: u.Tel,
-	}
-}
 
 // UsersController implements the users resource.
 type UsersController struct {
@@ -49,6 +33,6 @@ func (c *UsersController) Show(ctx *app.ShowUsersContext) error {
 		log.Printf("[EvelyApi] %s", err)
 		return ctx.NotFound()
 	}
-	return ctx.OK(ToUserMedia(user))
+	return ctx.OK(parser.ToUserMedia(user))
 	// UsersController_Show: end_implement
 }

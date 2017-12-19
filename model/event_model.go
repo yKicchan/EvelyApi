@@ -7,16 +7,16 @@ import (
 
 // イベントのDBモデル
 type EventModel struct {
-	ID           string       `bson:id`
-	Title        string       `bson:title`
-	Host         Host         `bson:host`
-	Body         string       `bson:body`
-	Place        Location     `bson:place`
-	UpdateDate   time.Time    `bson:update_date`
-	UpcomingDate UpcomingDate `bson:upcoming_date`
-	URL          string       `bson:url`
-	Mail         string       `bson:mail`
-	Tel          string       `bson:tel`
+	ID            string       `bson:id`
+	Title         string       `bson:title`
+	Host          Host         `bson:host`
+	Body          string       `bson:body`
+	Place         Location     `bson:place`
+	Update_Date   time.Time    `bson:update_date`
+	Upcoming_Date UpcomingDate `bson:upcoming_date`
+	URL           string       `bson:url`
+	Mail          string       `bson:mail`
+	Tel           string       `bson:tel`
 }
 
 // イベント主催者のDBモデル
@@ -27,14 +27,14 @@ type Host struct {
 
 // イベントの開催場所のDBモデル
 type Location struct {
-	Name   string     `bson:name`
-	LngLat [2]float64 `bson:lng_lat`
+	Name    string     `bson:name`
+	Lng_Lat [2]float64 `bson:lng_lat`
 }
 
 // イベントの開催予定期間のDBモデル
 type UpcomingDate struct {
-	StartDate time.Time `bson:start_date`
-	EndDate   time.Time `bson:end_date`
+	Start_Date time.Time `bson:start_date`
+	End_Date   time.Time `bson:end_date`
 }
 
 // イベントの一部情報のみを取得するセレクタ

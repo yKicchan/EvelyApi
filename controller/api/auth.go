@@ -110,7 +110,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	pendingUser := &model.PendingUserModel{
 		Email:     email,
 		Token:     token,
-		CreatedAt: claims["created_at"].(time.Time),
+		Created_At: claims["created_at"].(time.Time),
 	}
 	err = c.db.CreatePendingUser(pendingUser)
 	if err != nil {
