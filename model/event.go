@@ -5,6 +5,7 @@ import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"strconv"
+    "strings"
 	"time"
 )
 
@@ -90,15 +91,23 @@ func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (eve
 	// 検索オプションの内容からクエリを作成
 	query := bson.M{}
 	if len(opt.keyword) > 0 {
-		regex := bson.M{"$regex": bson.RegEx{Pattern: `.*` + opt.keyword + `.*`, Options: "im"}}
-		query = bson.M{
-			"$or": []interface{}{
-				bson.M{"title": regex},
-				bson.M{"body": regex},
-				bson.M{"place.name": regex},
-				bson.M{"host.name": regex},
-			},
-		}
+        keywords := strings.Split(opt.keyword, " ")
+        for _, keyword := range keywords {
+    		regex := bson.M{"$regex": bson.RegEx{Pattern: `.*` + keyword + `.*`, Options: "im"}}
+    		query = bson.M{
+                "$and": []interface{}{
+                    query,
+                    bson.M{
+                        "$or": []interface{}{
+        				bson.M{"title": regex},
+        				bson.M{"body": regex},
+        				bson.M{"place.name": regex},
+        				bson.M{"host.name": regex},
+        			    },
+                    },
+                },
+    		}
+        }
 	}
 	if len(opt.userID) != 0 {
 		if len(opt.keyword) > 0 {
