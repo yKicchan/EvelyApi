@@ -8,8 +8,8 @@ func SendMail(to, subject, body string) error {
 	// Set up authentication information.
 	auth := smtp.PlainAuth(
 		"",
-		"ykicchanapp@gmail.com",
-		"Rathalos2",
+		"evely.ecc@gmail.com",
+		"123qwEcc",
 		"smtp.gmail.com",
 	)
 	// Connect to the server, authenticate, set the sender and recipient,
@@ -17,7 +17,7 @@ func SendMail(to, subject, body string) error {
 	err := smtp.SendMail(
 		"smtp.gmail.com:587",
 		auth,
-		"ykicchanapp@gmail.com", //foo@gmail.com
+		"evely.ecc@gmail.com", //foo@gmail.com
 		[]string{to},
 		[]byte(
 			"To: "+to+"\r\n"+
