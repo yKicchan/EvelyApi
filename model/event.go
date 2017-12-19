@@ -95,7 +95,7 @@ func (db *EventDB) GetEvents(limit, offset int, options ...GetEventsOption) (eve
 			"$or": []interface{}{
 				bson.M{"title": regex},
 				bson.M{"body": regex},
-				bson.M{"place": regex},
+				bson.M{"place.name": regex},
 				bson.M{"host.name": regex},
 			},
 		}
