@@ -24,12 +24,12 @@ func ToEventModel(p *app.EventPayload, id string, user *model.UserModel) *model.
 		Body: p.Body,
 		Place: model.Location{
 			Name:   p.Place.Name,
-			Lng_Lat: [2]float64{p.Place.Lng, p.Place.Lat},
+			LngLat: [2]float64{p.Place.Lng, p.Place.Lat},
 		},
-		Update_Date: time.Now(),
-		Upcoming_Date: model.UpcomingDate{
-			Start_Date: p.UpcomingDate.StartDate,
-			End_Date:   p.UpcomingDate.EndDate,
+		UpdateDate: time.Now(),
+		UpcomingDate: model.UpcomingDate{
+			StartDate: p.UpcomingDate.StartDate,
+			EndDate:   p.UpcomingDate.EndDate,
 		},
 		URL:  p.URL,
 		Mail: p.Mail,

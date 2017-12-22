@@ -27,13 +27,13 @@ func ToEventMedia(e *model.EventModel) *app.Event {
 		Body: e.Body,
 		Place: &app.Location{
 			Name: e.Place.Name,
-			Lat:  e.Place.Lng_Lat[Lat],
-			Lng:  e.Place.Lng_Lat[Lng],
+			Lat:  e.Place.LngLat[Lat],
+			Lng:  e.Place.LngLat[Lng],
 		},
-		UpdateDate: e.Update_Date,
+		UpdateDate: e.UpdateDate,
 		UpcomingDate: &app.UpcomingDate{
-			StartDate: e.Upcoming_Date.Start_Date,
-			EndDate:   e.Upcoming_Date.End_Date,
+			StartDate: e.UpcomingDate.StartDate,
+			EndDate:   e.UpcomingDate.EndDate,
 		},
 		URL:  e.URL,
 		Mail: e.Mail,
@@ -56,12 +56,12 @@ func ToEventTinyMedia(e *model.EventModel) *app.EventTiny {
 		},
 		Place: &app.Location{
 			Name: e.Place.Name,
-			Lat:  e.Place.Lng_Lat[Lat],
-			Lng:  e.Place.Lng_Lat[Lng],
+			Lat:  e.Place.LngLat[Lat],
+			Lng:  e.Place.LngLat[Lng],
 		},
 		UpcomingDate: &app.UpcomingDate{
-			StartDate: e.Upcoming_Date.Start_Date,
-			EndDate:   e.Upcoming_Date.End_Date,
+			StartDate: e.UpcomingDate.StartDate,
+			EndDate:   e.UpcomingDate.EndDate,
 		},
 	}
 }

@@ -6,16 +6,16 @@ import (
 
 // ユーザーのDBモデル
 type UserModel struct {
-	ID       string `bson:id`
-	Password string `bson:password`
-	Name     string `bson:name`
-	Mail     Mail   `bson:mail`
-	Tel      string `bson:tel`
+	ID       string `bson:"id"`
+	Password string `bson:"password"`
+	Name     string `bson:"name"`
+	Mail     Mail   `bson:"mail"`
+	Tel      string `bson:"tel"`
 }
 
 type Mail struct {
-	Email string `bson:email`
-	State string `bson:state`
+	Email string `bson:"email"`
+	State string `bson:"state"`
 }
 
 // ユーザーの一部情報のみ抽出するセレクタ
