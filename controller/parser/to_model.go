@@ -1,9 +1,9 @@
 package parser
 
 import (
-    "EvelyApi/app"
-    "EvelyApi/model"
-    "time"
+	"EvelyApi/app"
+	"EvelyApi/model"
+	"time"
 )
 
 /**

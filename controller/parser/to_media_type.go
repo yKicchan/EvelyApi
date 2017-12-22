@@ -1,8 +1,8 @@
 package parser
 
 import (
-    "EvelyApi/app"
-    "EvelyApi/model"
+	"EvelyApi/app"
+	"EvelyApi/model"
 )
 
 // 緯度経度の配列番号を定数化

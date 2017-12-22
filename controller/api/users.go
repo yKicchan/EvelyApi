@@ -2,8 +2,8 @@ package api
 
 import (
 	"EvelyApi/app"
+	"EvelyApi/controller/parser"
 	"EvelyApi/model"
-    "EvelyApi/controller/parser"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo"
 	"log"
