@@ -25,21 +25,26 @@ definitions:
       body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
+      createdAt: Totam quis non libero nihil quasi ut.
       host:
         id: yKicchan
         name: きっちゃそ
       id: 20170225-2
       mail: yKicchanApp@gmail.com
-      place:
-        lat: 34.706425
-        lng: 135.50124
-        name: ECCコンピュータ専門学校2303教室
+      noticeRange: 500
+      openFlg: false
+      plans:
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1991-12-12T12:50:07Z
+          startDate: 1971-12-01T10:31:39Z
+      scope: public
       tel: 090-1234-5678
       title: Git勉強会
-      upcomingDate:
-        endDate: 1974-02-03T21:26:56Z
-        startDate: 2003-06-21T02:17:51Z
-      updateDate: 2011-05-25T02:41:20Z
+      updateDate: 1981-12-28T11:54:46Z
       url: http://comp.ecc.ac.jp/
     properties:
       body:
@@ -49,6 +54,9 @@ definitions:
           ノートPCを各自持参してください。
         maxLength: 1000
         minLength: 1
+        type: string
+      createdAt:
+        example: Totam quis non libero nihil quasi ut.
         type: string
       host:
         $ref: '#/definitions/UserTiny'
@@ -62,8 +70,39 @@ definitions:
         example: yKicchanApp@gmail.com
         format: email
         type: string
-      place:
-        $ref: '#/definitions/Location'
+      noticeRange:
+        default: 500
+        description: 通知範囲(m)
+        example: 500
+        maximum: 5000
+        minimum: 100
+        type: integer
+      openFlg:
+        default: false
+        description: 開催中かどうか
+        example: false
+        type: boolean
+      plans:
+        description: イベントの開催予定一覧
+        example:
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1991-12-12T12:50:07Z
+            startDate: 1971-12-01T10:31:39Z
+        items:
+          $ref: '#/definitions/Plan'
+        type: array
+      scope:
+        default: public
+        description: 公開範囲
+        enum:
+        - public
+        - private
+        example: public
+        type: string
       tel:
         default: ""
         description: 連絡先電話番号
@@ -75,11 +114,9 @@ definitions:
         maxLength: 30
         minLength: 1
         type: string
-      upcomingDate:
-        $ref: '#/definitions/UpcomingDate'
       updateDate:
         description: 最終更新日時
-        example: 2011-05-25T02:41:20Z
+        example: 1981-12-28T11:54:46Z
         format: date-time
         type: string
       url:
@@ -93,12 +130,15 @@ definitions:
     - title
     - body
     - host
-    - place
-    - updateDate
-    - upcomingDate
-    - url
     - mail
     - tel
+    - url
+    - plans
+    - noticeRange
+    - scope
+    - openFlg
+    - updateDate
+    - createdAt
     title: 'Mediatype identifier: application/vnd.event+json; view=default'
     type: object
   EventCollection:
@@ -108,40 +148,26 @@ definitions:
     - body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
+      createdAt: Totam quis non libero nihil quasi ut.
       host:
         id: yKicchan
         name: きっちゃそ
       id: 20170225-2
       mail: yKicchanApp@gmail.com
-      place:
-        lat: 34.706425
-        lng: 135.50124
-        name: ECCコンピュータ専門学校2303教室
+      noticeRange: 500
+      openFlg: false
+      plans:
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1991-12-12T12:50:07Z
+          startDate: 1971-12-01T10:31:39Z
+      scope: public
       tel: 090-1234-5678
       title: Git勉強会
-      upcomingDate:
-        endDate: 1974-02-03T21:26:56Z
-        startDate: 2003-06-21T02:17:51Z
-      updateDate: 2011-05-25T02:41:20Z
-      url: http://comp.ecc.ac.jp/
-    - body: |-
-        初心者でもGitを扱えるようになる勉強会を開催します！
-        ノートPCを各自持参してください。
-      host:
-        id: yKicchan
-        name: きっちゃそ
-      id: 20170225-2
-      mail: yKicchanApp@gmail.com
-      place:
-        lat: 34.706425
-        lng: 135.50124
-        name: ECCコンピュータ専門学校2303教室
-      tel: 090-1234-5678
-      title: Git勉強会
-      upcomingDate:
-        endDate: 1974-02-03T21:26:56Z
-        startDate: 2003-06-21T02:17:51Z
-      updateDate: 2011-05-25T02:41:20Z
+      updateDate: 1981-12-28T11:54:46Z
       url: http://comp.ecc.ac.jp/
     items:
       $ref: '#/definitions/Event'
@@ -154,15 +180,26 @@ definitions:
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
       mail: yKicchanApp@gmail.com
-      place:
-        lat: 34.706425
-        lng: 135.50124
-        name: ECCコンピュータ専門学校2303教室
+      noticeRange: 500
+      openFlg: false
+      plans:
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1991-12-12T12:50:07Z
+          startDate: 1971-12-01T10:31:39Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1991-12-12T12:50:07Z
+          startDate: 1971-12-01T10:31:39Z
+      scope: public
       tel: 090-1234-5678
       title: Git勉強会
-      upcomingDate:
-        endDate: 1974-02-03T21:26:56Z
-        startDate: 2003-06-21T02:17:51Z
       url: http://comp.ecc.ac.jp/
     properties:
       body:
@@ -179,8 +216,46 @@ definitions:
         example: yKicchanApp@gmail.com
         format: email
         type: string
-      place:
-        $ref: '#/definitions/Location'
+      noticeRange:
+        default: 500
+        description: 通知範囲(m)
+        example: 500
+        maximum: 5000
+        minimum: 100
+        type: integer
+      openFlg:
+        default: false
+        description: 開催中かどうか
+        example: false
+        type: boolean
+      plans:
+        description: イベントの開催予定一覧
+        example:
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1991-12-12T12:50:07Z
+            startDate: 1971-12-01T10:31:39Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1991-12-12T12:50:07Z
+            startDate: 1971-12-01T10:31:39Z
+        items:
+          $ref: '#/definitions/Plan'
+        type: array
+      scope:
+        default: public
+        description: 公開範囲
+        enum:
+        - public
+        - private
+        example: public
+        type: string
       tel:
         default: ""
         description: 連絡先電話番号
@@ -192,8 +267,6 @@ definitions:
         maxLength: 30
         minLength: 1
         type: string
-      upcomingDate:
-        $ref: '#/definitions/UpcomingDate'
       url:
         default: ""
         description: URL
@@ -203,11 +276,13 @@ definitions:
     required:
     - title
     - body
-    - place
-    - upcomingDate
-    - url
     - mail
     - tel
+    - url
+    - plans
+    - noticeRange
+    - scope
+    - openFlg
     title: EventPayload
     type: object
   Location:
@@ -286,6 +361,26 @@ definitions:
     - state
     title: Mail
     type: object
+  Plan:
+    description: イベントの開催予定情報
+    example:
+      location:
+        lat: 34.706425
+        lng: 135.50124
+        name: ECCコンピュータ専門学校2303教室
+      upcomingDate:
+        endDate: 1991-12-12T12:50:07Z
+        startDate: 1971-12-01T10:31:39Z
+    properties:
+      location:
+        $ref: '#/definitions/Location'
+      upcomingDate:
+        $ref: '#/definitions/UpcomingDate'
+    required:
+    - location
+    - upcomingDate
+    title: Plan
+    type: object
   SignupPayload:
     description: 新規登録時のメール送信
     example:
@@ -316,17 +411,17 @@ definitions:
   UpcomingDate:
     description: イベントの開催予定日
     example:
-      endDate: 1974-02-03T21:26:56Z
-      startDate: 2003-06-21T02:17:51Z
+      endDate: 1991-12-12T12:50:07Z
+      startDate: 1971-12-01T10:31:39Z
     properties:
       endDate:
         description: 終了日時
-        example: 1974-02-03T21:26:56Z
+        example: 1991-12-12T12:50:07Z
         format: date-time
         type: string
       startDate:
         description: 開始日時
-        example: 2003-06-21T02:17:51Z
+        example: 1971-12-01T10:31:39Z
         format: date-time
         type: string
     required:
@@ -749,7 +844,7 @@ paths:
 
         Required security scopes:
           * `api:access`
-      operationId: events#update
+      operationId: events#modify
       parameters:
       - description: イベントID
         in: path
@@ -788,6 +883,20 @@ paths:
       security:
       - jwt:
         - api:access
+      summary: modify events
+      tags:
+      - events
+  /events/update:
+    get:
+      description: イベントの開催フラグを更新する
+      operationId: events#update
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+      schemes:
+      - http
       summary: update events
       tags:
       - events

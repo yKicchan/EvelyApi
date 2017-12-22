@@ -22,14 +22,18 @@ type eventPayload struct {
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
 	// 連絡先メールアドレス
 	Mail *string `form:"mail,omitempty" json:"mail,omitempty" xml:"mail,omitempty"`
-	// 開催場所
-	Place *location `form:"place,omitempty" json:"place,omitempty" xml:"place,omitempty"`
+	// 通知範囲(m)
+	NoticeRange *int `form:"noticeRange,omitempty" json:"noticeRange,omitempty" xml:"noticeRange,omitempty"`
+	// 開催中かどうか
+	OpenFlg *bool `form:"openFlg,omitempty" json:"openFlg,omitempty" xml:"openFlg,omitempty"`
+	// イベントの開催予定一覧
+	Plans []*plan `form:"plans,omitempty" json:"plans,omitempty" xml:"plans,omitempty"`
+	// 公開範囲
+	Scope *string `form:"scope,omitempty" json:"scope,omitempty" xml:"scope,omitempty"`
 	// 連絡先電話番号
 	Tel *string `form:"tel,omitempty" json:"tel,omitempty" xml:"tel,omitempty"`
 	// イベントの名前
 	Title *string `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
-	// 開催予定日
-	UpcomingDate *upcomingDate `form:"upcomingDate,omitempty" json:"upcomingDate,omitempty" xml:"upcomingDate,omitempty"`
 	// URL
 	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 }
@@ -39,6 +43,18 @@ func (ut *eventPayload) Finalize() {
 	var defaultMail = ""
 	if ut.Mail == nil {
 		ut.Mail = &defaultMail
+	}
+	var defaultNoticeRange = 500
+	if ut.NoticeRange == nil {
+		ut.NoticeRange = &defaultNoticeRange
+	}
+	var defaultOpenFlg = false
+	if ut.OpenFlg == nil {
+		ut.OpenFlg = &defaultOpenFlg
+	}
+	var defaultScope = "public"
+	if ut.Scope == nil {
+		ut.Scope = &defaultScope
 	}
 	var defaultTel = ""
 	if ut.Tel == nil {
@@ -58,20 +74,26 @@ func (ut *eventPayload) Validate() (err error) {
 	if ut.Body == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "body"))
 	}
-	if ut.Place == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "place"))
-	}
-	if ut.UpcomingDate == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "upcomingDate"))
-	}
-	if ut.URL == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "url"))
-	}
 	if ut.Mail == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "mail"))
 	}
 	if ut.Tel == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "tel"))
+	}
+	if ut.URL == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "url"))
+	}
+	if ut.Plans == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "plans"))
+	}
+	if ut.NoticeRange == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "noticeRange"))
+	}
+	if ut.Scope == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "scope"))
+	}
+	if ut.OpenFlg == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "openFlg"))
 	}
 	if ut.Body != nil {
 		if utf8.RuneCountInString(*ut.Body) < 1 {
@@ -88,9 +110,26 @@ func (ut *eventPayload) Validate() (err error) {
 			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.mail`, *ut.Mail, goa.FormatEmail, err2))
 		}
 	}
-	if ut.Place != nil {
-		if err2 := ut.Place.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	if ut.NoticeRange != nil {
+		if *ut.NoticeRange < 100 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.noticeRange`, *ut.NoticeRange, 100, true))
+		}
+	}
+	if ut.NoticeRange != nil {
+		if *ut.NoticeRange > 5000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.noticeRange`, *ut.NoticeRange, 5000, false))
+		}
+	}
+	for _, e := range ut.Plans {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	if ut.Scope != nil {
+		if !(*ut.Scope == "public" || *ut.Scope == "private") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`request.scope`, *ut.Scope, []interface{}{"public", "private"}))
 		}
 	}
 	if ut.Title != nil {
@@ -101,11 +140,6 @@ func (ut *eventPayload) Validate() (err error) {
 	if ut.Title != nil {
 		if utf8.RuneCountInString(*ut.Title) > 30 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.title`, *ut.Title, utf8.RuneCountInString(*ut.Title), 30, false))
-		}
-	}
-	if ut.UpcomingDate != nil {
-		if err2 := ut.UpcomingDate.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
 		}
 	}
 	if ut.URL != nil {
@@ -125,17 +159,26 @@ func (ut *eventPayload) Publicize() *EventPayload {
 	if ut.Mail != nil {
 		pub.Mail = *ut.Mail
 	}
-	if ut.Place != nil {
-		pub.Place = ut.Place.Publicize()
+	if ut.NoticeRange != nil {
+		pub.NoticeRange = *ut.NoticeRange
+	}
+	if ut.OpenFlg != nil {
+		pub.OpenFlg = *ut.OpenFlg
+	}
+	if ut.Plans != nil {
+		pub.Plans = make([]*Plan, len(ut.Plans))
+		for i2, elem2 := range ut.Plans {
+			pub.Plans[i2] = elem2.Publicize()
+		}
+	}
+	if ut.Scope != nil {
+		pub.Scope = *ut.Scope
 	}
 	if ut.Tel != nil {
 		pub.Tel = *ut.Tel
 	}
 	if ut.Title != nil {
 		pub.Title = *ut.Title
-	}
-	if ut.UpcomingDate != nil {
-		pub.UpcomingDate = ut.UpcomingDate.Publicize()
 	}
 	if ut.URL != nil {
 		pub.URL = *ut.URL
@@ -149,14 +192,18 @@ type EventPayload struct {
 	Body string `form:"body" json:"body" xml:"body"`
 	// 連絡先メールアドレス
 	Mail string `form:"mail" json:"mail" xml:"mail"`
-	// 開催場所
-	Place *Location `form:"place" json:"place" xml:"place"`
+	// 通知範囲(m)
+	NoticeRange int `form:"noticeRange" json:"noticeRange" xml:"noticeRange"`
+	// 開催中かどうか
+	OpenFlg bool `form:"openFlg" json:"openFlg" xml:"openFlg"`
+	// イベントの開催予定一覧
+	Plans []*Plan `form:"plans" json:"plans" xml:"plans"`
+	// 公開範囲
+	Scope string `form:"scope" json:"scope" xml:"scope"`
 	// 連絡先電話番号
 	Tel string `form:"tel" json:"tel" xml:"tel"`
 	// イベントの名前
 	Title string `form:"title" json:"title" xml:"title"`
-	// 開催予定日
-	UpcomingDate *UpcomingDate `form:"upcomingDate" json:"upcomingDate" xml:"upcomingDate"`
 	// URL
 	URL string `form:"url" json:"url" xml:"url"`
 }
@@ -169,21 +216,23 @@ func (ut *EventPayload) Validate() (err error) {
 	if ut.Body == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "body"))
 	}
-	if ut.Place == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "place"))
-	}
-	if ut.UpcomingDate == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "upcomingDate"))
-	}
-	if ut.URL == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "url"))
-	}
 	if ut.Mail == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "mail"))
 	}
 	if ut.Tel == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "tel"))
 	}
+	if ut.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "url"))
+	}
+	if ut.Plans == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "plans"))
+	}
+
+	if ut.Scope == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "scope"))
+	}
+
 	if utf8.RuneCountInString(ut.Body) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.body`, ut.Body, utf8.RuneCountInString(ut.Body), 1, true))
 	}
@@ -193,10 +242,21 @@ func (ut *EventPayload) Validate() (err error) {
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Mail); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, ut.Mail, goa.FormatEmail, err2))
 	}
-	if ut.Place != nil {
-		if err2 := ut.Place.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	if ut.NoticeRange < 100 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.noticeRange`, ut.NoticeRange, 100, true))
+	}
+	if ut.NoticeRange > 5000 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.noticeRange`, ut.NoticeRange, 5000, false))
+	}
+	for _, e := range ut.Plans {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
+	}
+	if !(ut.Scope == "public" || ut.Scope == "private") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`type.scope`, ut.Scope, []interface{}{"public", "private"}))
 	}
 	if utf8.RuneCountInString(ut.Title) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.title`, ut.Title, utf8.RuneCountInString(ut.Title), 1, true))
@@ -444,6 +504,67 @@ func (ut *Mail) Validate() (err error) {
 	}
 	if !(ut.State == "Pending" || ut.State == "OK" || ut.State == "BAN") {
 		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`type.state`, ut.State, []interface{}{"Pending", "OK", "BAN"}))
+	}
+	return
+}
+
+// イベントの開催予定情報
+type plan struct {
+	Location     *location     `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	UpcomingDate *upcomingDate `form:"upcomingDate,omitempty" json:"upcomingDate,omitempty" xml:"upcomingDate,omitempty"`
+}
+
+// Validate validates the plan type instance.
+func (ut *plan) Validate() (err error) {
+	if ut.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "location"))
+	}
+	if ut.UpcomingDate == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "upcomingDate"))
+	}
+	if ut.Location != nil {
+		if err2 := ut.Location.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if ut.UpcomingDate != nil {
+		if err2 := ut.UpcomingDate.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// Publicize creates Plan from plan
+func (ut *plan) Publicize() *Plan {
+	var pub Plan
+	if ut.Location != nil {
+		pub.Location = ut.Location.Publicize()
+	}
+	if ut.UpcomingDate != nil {
+		pub.UpcomingDate = ut.UpcomingDate.Publicize()
+	}
+	return &pub
+}
+
+// イベントの開催予定情報
+type Plan struct {
+	Location     *Location     `form:"location" json:"location" xml:"location"`
+	UpcomingDate *UpcomingDate `form:"upcomingDate" json:"upcomingDate" xml:"upcomingDate"`
+}
+
+// Validate validates the Plan type instance.
+func (ut *Plan) Validate() (err error) {
+	if ut.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "location"))
+	}
+	if ut.UpcomingDate == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "upcomingDate"))
+	}
+	if ut.Location != nil {
+		if err2 := ut.Location.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

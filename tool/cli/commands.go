@@ -84,6 +84,17 @@ type (
 		PrettyPrint bool
 	}
 
+	// ModifyEventsCommand is the command line data structure for the modify action of events
+	ModifyEventsCommand struct {
+		Payload     string
+		ContentType string
+		// イベントID
+		EventID string
+		// ユーザーID
+		UserID      string
+		PrettyPrint bool
+	}
+
 	// ShowEventsCommand is the command line data structure for the show action of events
 	ShowEventsCommand struct {
 		// イベントID
@@ -95,12 +106,6 @@ type (
 
 	// UpdateEventsCommand is the command line data structure for the update action of events
 	UpdateEventsCommand struct {
-		Payload     string
-		ContentType string
-		// イベントID
-		EventID string
-		// ユーザーID
-		UserID      string
 		PrettyPrint bool
 	}
 
@@ -136,17 +141,35 @@ Payload example:
 {
    "body": "初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。",
    "mail": "yKicchanApp@gmail.com",
-   "place": {
-      "lat": 34.706424,
-      "lng": 135.50123,
-      "name": "ECCコンピュータ専門学校2303教室"
-   },
+   "noticeRange": 500,
+   "openFlg": false,
+   "plans": [
+      {
+         "location": {
+            "lat": 34.706424,
+            "lng": 135.50123,
+            "name": "ECCコンピュータ専門学校2303教室"
+         },
+         "upcomingDate": {
+            "endDate": "1991-12-12T12:50:07Z",
+            "startDate": "1971-12-01T10:31:39Z"
+         }
+      },
+      {
+         "location": {
+            "lat": 34.706424,
+            "lng": 135.50123,
+            "name": "ECCコンピュータ専門学校2303教室"
+         },
+         "upcomingDate": {
+            "endDate": "1991-12-12T12:50:07Z",
+            "startDate": "1971-12-01T10:31:39Z"
+         }
+      }
+   ],
+   "scope": "public",
    "tel": "090-1234-5678",
    "title": "Git勉強会",
-   "upcomingDate": {
-      "endDate": "1974-02-03T21:26:56Z",
-      "startDate": "2003-06-21T02:17:51Z"
-   },
    "url": "http://comp.ecc.ac.jp/"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp1.Run(c, args) },
@@ -184,10 +207,62 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
+		Use:   "modify",
+		Short: `イベント編集`,
+	}
+	tmp4 := new(ModifyEventsCommand)
+	sub = &cobra.Command{
+		Use:   `events ["/api/develop/v1/events/USER_ID/EVENT_ID"]`,
+		Short: ``,
+		Long: `
+
+Payload example:
+
+{
+   "body": "初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。",
+   "mail": "yKicchanApp@gmail.com",
+   "noticeRange": 500,
+   "openFlg": false,
+   "plans": [
+      {
+         "location": {
+            "lat": 34.706424,
+            "lng": 135.50123,
+            "name": "ECCコンピュータ専門学校2303教室"
+         },
+         "upcomingDate": {
+            "endDate": "1991-12-12T12:50:07Z",
+            "startDate": "1971-12-01T10:31:39Z"
+         }
+      },
+      {
+         "location": {
+            "lat": 34.706424,
+            "lng": 135.50123,
+            "name": "ECCコンピュータ専門学校2303教室"
+         },
+         "upcomingDate": {
+            "endDate": "1991-12-12T12:50:07Z",
+            "startDate": "1971-12-01T10:31:39Z"
+         }
+      }
+   ],
+   "scope": "public",
+   "tel": "090-1234-5678",
+   "title": "Git勉強会",
+   "url": "http://comp.ecc.ac.jp/"
+}`,
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp4.Run(c, args) },
+	}
+	tmp4.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp4.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
 		Use:   "send-mail",
 		Short: `新規登録用のメール送信`,
 	}
-	tmp4 := new(SendMailAuthCommand)
+	tmp5 := new(SendMailAuthCommand)
 	sub = &cobra.Command{
 		Use:   `auth ["/api/develop/v1/auth/signup/send_mail"]`,
 		Short: ``,
@@ -198,40 +273,40 @@ Payload example:
 {
    "email": "yKicchanApp@gmail.com"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp4.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp5.Run(c, args) },
 	}
-	tmp4.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp4.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp5.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp5.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "show",
 		Short: `show action`,
 	}
-	tmp5 := new(ShowEventsCommand)
+	tmp6 := new(ShowEventsCommand)
 	sub = &cobra.Command{
 		Use:   `events ["/api/develop/v1/events/USER_ID/EVENT_ID"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp5.Run(c, args) },
-	}
-	tmp5.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp5.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	tmp6 := new(ShowUsersCommand)
-	sub = &cobra.Command{
-		Use:   `users ["/api/develop/v1/users/USER_ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp6.Run(c, args) },
 	}
 	tmp6.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp6.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
+	tmp7 := new(ShowUsersCommand)
+	sub = &cobra.Command{
+		Use:   `users ["/api/develop/v1/users/USER_ID"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
+	}
+	tmp7.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp7.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "signin",
 		Short: `ログイン`,
 	}
-	tmp7 := new(SigninAuthCommand)
+	tmp8 := new(SigninAuthCommand)
 	sub = &cobra.Command{
 		Use:   `auth ["/api/develop/v1/auth/signin"]`,
 		Short: ``,
@@ -243,17 +318,17 @@ Payload example:
    "id": "yKicchan",
    "password": "password"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp8.Run(c, args) },
 	}
-	tmp7.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp7.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp8.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp8.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "signup",
 		Short: `新規登録`,
 	}
-	tmp8 := new(SignupAuthCommand)
+	tmp9 := new(SignupAuthCommand)
 	sub = &cobra.Command{
 		Use:   `auth ["/api/develop/v1/auth/signup"]`,
 		Short: ``,
@@ -268,40 +343,6 @@ Payload example:
    "password": "password",
    "tel": "090-1234-5678"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp8.Run(c, args) },
-	}
-	tmp8.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp8.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "update",
-		Short: `イベント編集`,
-	}
-	tmp9 := new(UpdateEventsCommand)
-	sub = &cobra.Command{
-		Use:   `events ["/api/develop/v1/events/USER_ID/EVENT_ID"]`,
-		Short: ``,
-		Long: `
-
-Payload example:
-
-{
-   "body": "初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。",
-   "mail": "yKicchanApp@gmail.com",
-   "place": {
-      "lat": 34.706424,
-      "lng": 135.50123,
-      "name": "ECCコンピュータ専門学校2303教室"
-   },
-   "tel": "090-1234-5678",
-   "title": "Git勉強会",
-   "upcomingDate": {
-      "endDate": "1974-02-03T21:26:56Z",
-      "startDate": "2003-06-21T02:17:51Z"
-   },
-   "url": "http://comp.ecc.ac.jp/"
-}`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp9.Run(c, args) },
 	}
 	tmp9.RegisterFlags(sub, c)
@@ -309,17 +350,31 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "verify-token",
-		Short: `新規登録時のトークンのチェック`,
+		Use:   "update",
+		Short: `イベントの開催フラグを更新する`,
 	}
-	tmp10 := new(VerifyTokenAuthCommand)
+	tmp10 := new(UpdateEventsCommand)
 	sub = &cobra.Command{
-		Use:   `auth ["/api/develop/v1/auth/signup/verify_token"]`,
+		Use:   `events ["/api/develop/v1/events/update"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp10.Run(c, args) },
 	}
 	tmp10.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp10.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "verify-token",
+		Short: `新規登録時のトークンのチェック`,
+	}
+	tmp11 := new(VerifyTokenAuthCommand)
+	sub = &cobra.Command{
+		Use:   `auth ["/api/develop/v1/auth/signup/verify_token"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp11.Run(c, args) },
+	}
+	tmp11.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp11.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -750,6 +805,43 @@ func (cmd *ListEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client)
 	cc.Flags().IntVar(&cmd.Offset, "offset", offset, `除外件数`)
 }
 
+// Run makes the HTTP request corresponding to the ModifyEventsCommand command.
+func (cmd *ModifyEventsCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/api/develop/v1/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
+	}
+	var payload client.EventPayload
+	if cmd.Payload != "" {
+		err := json.Unmarshal([]byte(cmd.Payload), &payload)
+		if err != nil {
+			return fmt.Errorf("failed to deserialize payload: %s", err)
+		}
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.ModifyEvents(ctx, path, &payload, cmd.ContentType)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *ModifyEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
+	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
+	var eventID string
+	cc.Flags().StringVar(&cmd.EventID, "event_id", eventID, `イベントID`)
+	var userID string
+	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
+}
+
 // Run makes the HTTP request corresponding to the ShowEventsCommand command.
 func (cmd *ShowEventsCommand) Run(c *client.Client, args []string) error {
 	var path string
@@ -784,18 +876,11 @@ func (cmd *UpdateEventsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/api/develop/v1/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
-	}
-	var payload client.EventPayload
-	if cmd.Payload != "" {
-		err := json.Unmarshal([]byte(cmd.Payload), &payload)
-		if err != nil {
-			return fmt.Errorf("failed to deserialize payload: %s", err)
-		}
+		path = "/api/develop/v1/events/update"
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.UpdateEvents(ctx, path, &payload, cmd.ContentType)
+	resp, err := c.UpdateEvents(ctx, path)
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -807,12 +892,6 @@ func (cmd *UpdateEventsCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *UpdateEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
-	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
-	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
-	var eventID string
-	cc.Flags().StringVar(&cmd.EventID, "event_id", eventID, `イベントID`)
-	var userID string
-	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
 }
 
 // Run makes the HTTP request corresponding to the ShowUsersCommand command.

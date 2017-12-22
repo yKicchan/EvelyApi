@@ -113,7 +113,7 @@ var _ = Resource("events", func() {
 		Response(Unauthorized)
 	})
 
-	Action("update", func() {
+	Action("modify", func() {
 		Description("イベント編集")
 		Routing(PUT("/:user_id/:event_id"))
 		Params(func() {
@@ -150,6 +150,13 @@ var _ = Resource("events", func() {
 		Response(Forbidden)
 		Response(NotFound)
 	})
+
+    Action("update", func() {
+        Description("イベントの開催フラグを更新する")
+        NoSecurity()
+        Routing(GET("/update"))
+        Response(OK)
+    })
 })
 
 // アカウントに対するアクション

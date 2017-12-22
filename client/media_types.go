@@ -48,20 +48,25 @@ func (c *Client) DecodeEmail(resp *http.Response) (*Email, error) {
 // Identifier: application/vnd.event+json; view=default
 type Event struct {
 	// イベントの詳細
-	Body string    `form:"body" json:"body" xml:"body"`
-	Host *UserTiny `form:"host" json:"host" xml:"host"`
+	Body      string    `form:"body" json:"body" xml:"body"`
+	CreatedAt string    `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	Host      *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
 	// 連絡先メールアドレス
 	Mail string `form:"mail" json:"mail" xml:"mail"`
-	// 開催場所
-	Place *Location `form:"place" json:"place" xml:"place"`
+	// 通知範囲(m)
+	NoticeRange int `form:"noticeRange" json:"noticeRange" xml:"noticeRange"`
+	// 開催中かどうか
+	OpenFlg bool `form:"openFlg" json:"openFlg" xml:"openFlg"`
+	// イベントの開催予定一覧
+	Plans []*Plan `form:"plans" json:"plans" xml:"plans"`
+	// 公開範囲
+	Scope string `form:"scope" json:"scope" xml:"scope"`
 	// 連絡先電話番号
 	Tel string `form:"tel" json:"tel" xml:"tel"`
 	// イベントの名前
 	Title string `form:"title" json:"title" xml:"title"`
-	// 開催予定日
-	UpcomingDate *UpcomingDate `form:"upcomingDate" json:"upcomingDate" xml:"upcomingDate"`
 	// 最終更新日時
 	UpdateDate time.Time `form:"updateDate" json:"updateDate" xml:"updateDate"`
 	// URL
@@ -82,21 +87,25 @@ func (mt *Event) Validate() (err error) {
 	if mt.Host == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "host"))
 	}
-	if mt.Place == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "place"))
-	}
-
-	if mt.UpcomingDate == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "upcomingDate"))
-	}
-	if mt.URL == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
-	}
 	if mt.Mail == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mail"))
 	}
 	if mt.Tel == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "tel"))
+	}
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	if mt.Plans == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "plans"))
+	}
+
+	if mt.Scope == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "scope"))
+	}
+
+	if mt.CreatedAt == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "createdAt"))
 	}
 	if utf8.RuneCountInString(mt.Body) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1, true))
@@ -112,10 +121,21 @@ func (mt *Event) Validate() (err error) {
 	if err2 := goa.ValidateFormat(goa.FormatEmail, mt.Mail); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.mail`, mt.Mail, goa.FormatEmail, err2))
 	}
-	if mt.Place != nil {
-		if err2 := mt.Place.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	if mt.NoticeRange < 100 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`response.noticeRange`, mt.NoticeRange, 100, true))
+	}
+	if mt.NoticeRange > 5000 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`response.noticeRange`, mt.NoticeRange, 5000, false))
+	}
+	for _, e := range mt.Plans {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
+	}
+	if !(mt.Scope == "public" || mt.Scope == "private") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.scope`, mt.Scope, []interface{}{"public", "private"}))
 	}
 	if utf8.RuneCountInString(mt.Title) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.title`, mt.Title, utf8.RuneCountInString(mt.Title), 1, true))
@@ -136,12 +156,18 @@ type EventTiny struct {
 	Host *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
-	// 開催場所
-	Place *Location `form:"place" json:"place" xml:"place"`
+	// 通知範囲(m)
+	NoticeRange int `form:"noticeRange" json:"noticeRange" xml:"noticeRange"`
+	// 開催中かどうか
+	OpenFlg bool `form:"openFlg" json:"openFlg" xml:"openFlg"`
+	// イベントの開催予定一覧
+	Plans []*Plan `form:"plans" json:"plans" xml:"plans"`
+	// 公開範囲
+	Scope string `form:"scope" json:"scope" xml:"scope"`
 	// イベントの名前
 	Title string `form:"title" json:"title" xml:"title"`
-	// 開催予定日
-	UpcomingDate *UpcomingDate `form:"upcomingDate" json:"upcomingDate" xml:"upcomingDate"`
+	// 最終更新日時
+	UpdateDate time.Time `form:"updateDate" json:"updateDate" xml:"updateDate"`
 }
 
 // Validate validates the EventTiny media type instance.
@@ -155,21 +181,34 @@ func (mt *EventTiny) Validate() (err error) {
 	if mt.Host == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "host"))
 	}
-	if mt.Place == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "place"))
+	if mt.Plans == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "plans"))
 	}
-	if mt.UpcomingDate == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "upcomingDate"))
+
+	if mt.Scope == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "scope"))
 	}
+
 	if mt.Host != nil {
 		if err2 := mt.Host.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if mt.Place != nil {
-		if err2 := mt.Place.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
+	if mt.NoticeRange < 100 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`response.noticeRange`, mt.NoticeRange, 100, true))
+	}
+	if mt.NoticeRange > 5000 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`response.noticeRange`, mt.NoticeRange, 5000, false))
+	}
+	for _, e := range mt.Plans {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
 		}
+	}
+	if !(mt.Scope == "public" || mt.Scope == "private") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.scope`, mt.Scope, []interface{}{"public", "private"}))
 	}
 	if utf8.RuneCountInString(mt.Title) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.title`, mt.Title, utf8.RuneCountInString(mt.Title), 1, true))

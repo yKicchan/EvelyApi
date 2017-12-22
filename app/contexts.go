@@ -382,6 +382,81 @@ func (ctx *ListEventsContext) NotFound() error {
 	return nil
 }
 
+// ModifyEventsContext provides the events modify action context.
+type ModifyEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	EventID string
+	UserID  string
+	Payload *EventPayload
+}
+
+// NewModifyEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller modify action.
+func NewModifyEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*ModifyEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ModifyEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramEventID := req.Params["event_id"]
+	if len(paramEventID) > 0 {
+		rawEventID := paramEventID[0]
+		rctx.EventID = rawEventID
+		if ok := goa.ValidatePattern(`^[0-9]{6,8}-[0-9]+$`, rctx.EventID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{6,8}-[0-9]+$`))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		rctx.UserID = rawUserID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ModifyEventsContext) OK(r *Event) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKTiny sends a HTTP response with status code 200.
+func (ctx *ModifyEventsContext) OKTiny(r *EventTiny) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ModifyEventsContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *ModifyEventsContext) Unauthorized() error {
+	ctx.ResponseData.WriteHeader(401)
+	return nil
+}
+
+// Forbidden sends a HTTP response with status code 403.
+func (ctx *ModifyEventsContext) Forbidden() error {
+	ctx.ResponseData.WriteHeader(403)
+	return nil
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *ModifyEventsContext) NotFound() error {
+	ctx.ResponseData.WriteHeader(404)
+	return nil
+}
+
 // ShowEventsContext provides the events show action context.
 type ShowEventsContext struct {
 	context.Context
@@ -443,9 +518,6 @@ type UpdateEventsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	EventID string
-	UserID  string
-	Payload *EventPayload
 }
 
 // NewUpdateEventsContext parses the incoming request URL and body, performs validations and creates the
@@ -457,60 +529,17 @@ func NewUpdateEventsContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := UpdateEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramEventID := req.Params["event_id"]
-	if len(paramEventID) > 0 {
-		rawEventID := paramEventID[0]
-		rctx.EventID = rawEventID
-		if ok := goa.ValidatePattern(`^[0-9]{6,8}-[0-9]+$`, rctx.EventID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{6,8}-[0-9]+$`))
-		}
-	}
-	paramUserID := req.Params["user_id"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		rctx.UserID = rawUserID
-	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *UpdateEventsContext) OK(r *Event) error {
+func (ctx *UpdateEventsContext) OK(resp []byte) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// OKTiny sends a HTTP response with status code 200.
-func (ctx *UpdateEventsContext) OKTiny(r *EventTiny) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *UpdateEventsContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
-}
-
-// Unauthorized sends a HTTP response with status code 401.
-func (ctx *UpdateEventsContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
-}
-
-// Forbidden sends a HTTP response with status code 403.
-func (ctx *UpdateEventsContext) Forbidden() error {
-	ctx.ResponseData.WriteHeader(403)
-	return nil
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *UpdateEventsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
 }
 
 // ShowUsersContext provides the users show action context.

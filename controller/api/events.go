@@ -107,9 +107,9 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 	// EventsController_Show: end_implement
 }
 
-// Update runs the update action.
-func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
-	// EventsController_Update: start_implement
+// Modify runs the modify action.
+func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
+	// EventsController_Modify: start_implement
 
 	// Put your logic here
 	claims := GetJWTClaims(ctx)
@@ -129,5 +129,15 @@ func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
 		return ctx.NotFound()
 	}
 	return ctx.OK(parser.ToEventMedia(event))
+	// EventsController_Modify: end_implement
+}
+
+// Update runs the update action.
+func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
+	// EventsController_Update: start_implement
+
+	// Put your logic here
+
+	return nil
 	// EventsController_Update: end_implement
 }

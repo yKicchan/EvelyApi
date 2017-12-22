@@ -212,6 +212,7 @@ type EventsController interface {
 	Create(*CreateEventsContext) error
 	Delete(*DeleteEventsContext) error
 	List(*ListEventsContext) error
+	Modify(*ModifyEventsContext) error
 	Show(*ShowEventsContext) error
 	Update(*UpdateEventsContext) error
 }
@@ -223,6 +224,7 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/events", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/events/:user_id/:event_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v1/events/:user_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v1/events/update", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -288,6 +290,29 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 			return err
 		}
 		// Build the context
+		rctx, err := NewModifyEventsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*EventPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Modify(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleEventsOrigin(h)
+	service.Mux.Handle("PUT", "/api/develop/v1/events/:user_id/:event_id", ctrl.MuxHandler("modify", h, unmarshalModifyEventsPayload))
+	service.LogInfo("mount", "ctrl", "Events", "action", "Modify", "route", "PUT /api/develop/v1/events/:user_id/:event_id", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
 		rctx, err := NewShowEventsContext(ctx, req, service)
 		if err != nil {
 			return err
@@ -308,18 +333,11 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 		if err != nil {
 			return err
 		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*EventPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
 		return ctrl.Update(rctx)
 	}
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleEventsOrigin(h)
-	service.Mux.Handle("PUT", "/api/develop/v1/events/:user_id/:event_id", ctrl.MuxHandler("update", h, unmarshalUpdateEventsPayload))
-	service.LogInfo("mount", "ctrl", "Events", "action", "Update", "route", "PUT /api/develop/v1/events/:user_id/:event_id", "security", "jwt")
+	service.Mux.Handle("GET", "/api/develop/v1/events/update", ctrl.MuxHandler("update", h, nil))
+	service.LogInfo("mount", "ctrl", "Events", "action", "Update", "route", "GET /api/develop/v1/events/update")
 }
 
 // handleEventsOrigin applies the CORS response headers corresponding to the origin.
@@ -365,8 +383,8 @@ func unmarshalCreateEventsPayload(ctx context.Context, service *goa.Service, req
 	return nil
 }
 
-// unmarshalUpdateEventsPayload unmarshals the request body into the context request data Payload field.
-func unmarshalUpdateEventsPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+// unmarshalModifyEventsPayload unmarshals the request body into the context request data Payload field.
+func unmarshalModifyEventsPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &eventPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err

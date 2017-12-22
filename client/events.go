@@ -133,10 +133,10 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit in
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	tmp11 := strconv.Itoa(limit)
-	values.Set("limit", tmp11)
-	tmp12 := strconv.Itoa(offset)
-	values.Set("offset", tmp12)
+	tmp12 := strconv.Itoa(limit)
+	values.Set("limit", tmp12)
+	tmp13 := strconv.Itoa(offset)
+	values.Set("offset", tmp13)
 	if keyword != nil {
 		values.Set("keyword", *keyword)
 	}
@@ -144,6 +144,56 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit in
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+	return req, nil
+}
+
+// ModifyEventsPath computes a request path to the modify action of events.
+func ModifyEventsPath(userID string, eventID string) string {
+	param0 := userID
+	param1 := eventID
+
+	return fmt.Sprintf("/api/develop/v1/events/%s/%s", param0, param1)
+}
+
+// イベント編集
+func (c *Client) ModifyEvents(ctx context.Context, path string, payload *EventPayload, contentType string) (*http.Response, error) {
+	req, err := c.NewModifyEventsRequest(ctx, path, payload, contentType)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewModifyEventsRequest create the request corresponding to the modify action endpoint of the events resource.
+func (c *Client) NewModifyEventsRequest(ctx context.Context, path string, payload *EventPayload, contentType string) (*http.Request, error) {
+	var body bytes.Buffer
+	if contentType == "" {
+		contentType = "*/*" // Use default encoder
+	}
+	err := c.Encoder.Encode(payload, &body, contentType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("PUT", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	if contentType == "*/*" {
+		header.Set("Content-Type", "application/json")
+	} else {
+		header.Set("Content-Type", contentType)
+	}
+	if c.JWTSigner != nil {
+		if err := c.JWTSigner.Sign(req); err != nil {
+			return nil, err
+		}
 	}
 	return req, nil
 }
@@ -180,16 +230,14 @@ func (c *Client) NewShowEventsRequest(ctx context.Context, path string) (*http.R
 }
 
 // UpdateEventsPath computes a request path to the update action of events.
-func UpdateEventsPath(userID string, eventID string) string {
-	param0 := userID
-	param1 := eventID
+func UpdateEventsPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/events/%s/%s", param0, param1)
+	return fmt.Sprintf("/api/develop/v1/events/update")
 }
 
-// イベント編集
-func (c *Client) UpdateEvents(ctx context.Context, path string, payload *EventPayload, contentType string) (*http.Response, error) {
-	req, err := c.NewUpdateEventsRequest(ctx, path, payload, contentType)
+// イベントの開催フラグを更新する
+func (c *Client) UpdateEvents(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewUpdateEventsRequest(ctx, path)
 	if err != nil {
 		return nil, err
 	}
@@ -197,34 +245,15 @@ func (c *Client) UpdateEvents(ctx context.Context, path string, payload *EventPa
 }
 
 // NewUpdateEventsRequest create the request corresponding to the update action endpoint of the events resource.
-func (c *Client) NewUpdateEventsRequest(ctx context.Context, path string, payload *EventPayload, contentType string) (*http.Request, error) {
-	var body bytes.Buffer
-	if contentType == "" {
-		contentType = "*/*" // Use default encoder
-	}
-	err := c.Encoder.Encode(payload, &body, contentType)
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode body: %s", err)
-	}
+func (c *Client) NewUpdateEventsRequest(ctx context.Context, path string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("PUT", u.String(), &body)
+	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
-	}
-	header := req.Header
-	if contentType == "*/*" {
-		header.Set("Content-Type", "application/json")
-	} else {
-		header.Set("Content-Type", contentType)
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
-			return nil, err
-		}
 	}
 	return req, nil
 }
