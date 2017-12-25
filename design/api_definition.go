@@ -29,7 +29,7 @@ var _ = API("EvelyApi", func() {
 	Host("localhost:8888")
 
 	// 全エンドポイントのBasePath
-	BasePath("/api/develop/v1")
+	BasePath("/api/develop/v2")
 
 	// CORSポリシーの定義
 	Origin("http://localhost:8888/swaggerui", func() {

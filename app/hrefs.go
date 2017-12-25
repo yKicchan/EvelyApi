@@ -19,11 +19,11 @@ import (
 func EventsHref(userID, eventID interface{}) string {
 	paramuserID := strings.TrimLeftFunc(fmt.Sprintf("%v", userID), func(r rune) bool { return r == '/' })
 	parameventID := strings.TrimLeftFunc(fmt.Sprintf("%v", eventID), func(r rune) bool { return r == '/' })
-	return fmt.Sprintf("/api/develop/v1/events/%v/%v", paramuserID, parameventID)
+	return fmt.Sprintf("/api/develop/v2/events/%v/%v", paramuserID, parameventID)
 }
 
 // UsersHref returns the resource href.
 func UsersHref(userID interface{}) string {
 	paramuserID := strings.TrimLeftFunc(fmt.Sprintf("%v", userID), func(r rune) bool { return r == '/' })
-	return fmt.Sprintf("/api/develop/v1/users/%v", paramuserID)
+	return fmt.Sprintf("/api/develop/v2/users/%v", paramuserID)
 }

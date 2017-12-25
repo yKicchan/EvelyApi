@@ -59,7 +59,7 @@ func (c *Client) DownloadFiles(ctx context.Context, filename, dest string) (int6
 // UploadFilesPath computes a request path to the upload action of files.
 func UploadFilesPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/files/upload")
+	return fmt.Sprintf("/api/develop/v2/files/upload")
 }
 
 // ファイルアップロード

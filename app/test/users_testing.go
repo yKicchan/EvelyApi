@@ -49,7 +49,7 @@ func ShowUsersBadRequest(t goatest.TInterface, ctx context.Context, service *goa
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/users/%v", userID),
+		Path: fmt.Sprintf("/api/develop/v2/users/%v", userID),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -106,7 +106,7 @@ func ShowUsersNotFound(t goatest.TInterface, ctx context.Context, service *goa.S
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/users/%v", userID),
+		Path: fmt.Sprintf("/api/develop/v2/users/%v", userID),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -163,7 +163,7 @@ func ShowUsersOK(t goatest.TInterface, ctx context.Context, service *goa.Service
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/users/%v", userID),
+		Path: fmt.Sprintf("/api/develop/v2/users/%v", userID),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -232,7 +232,7 @@ func ShowUsersOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Ser
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/users/%v", userID),
+		Path: fmt.Sprintf("/api/develop/v2/users/%v", userID),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {

@@ -49,7 +49,7 @@ func UploadFilesBadRequest(t goatest.TInterface, ctx context.Context, service *g
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/files/upload"),
+		Path: fmt.Sprintf("/api/develop/v2/files/upload"),
 	}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
@@ -105,7 +105,7 @@ func UploadFilesOK(t goatest.TInterface, ctx context.Context, service *goa.Servi
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/files/upload"),
+		Path: fmt.Sprintf("/api/develop/v2/files/upload"),
 	}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {

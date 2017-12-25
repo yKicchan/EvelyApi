@@ -21,7 +21,7 @@ import (
 // SendMailAuthPath computes a request path to the send_mail action of auth.
 func SendMailAuthPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/auth/signup/send_mail")
+	return fmt.Sprintf("/api/develop/v2/auth/signup/send_mail")
 }
 
 // 新規登録用のメール送信
@@ -64,7 +64,7 @@ func (c *Client) NewSendMailAuthRequest(ctx context.Context, path string, payloa
 // SigninAuthPath computes a request path to the signin action of auth.
 func SigninAuthPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/auth/signin")
+	return fmt.Sprintf("/api/develop/v2/auth/signin")
 }
 
 // ログイン
@@ -107,7 +107,7 @@ func (c *Client) NewSigninAuthRequest(ctx context.Context, path string, payload 
 // SignupAuthPath computes a request path to the signup action of auth.
 func SignupAuthPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/auth/signup")
+	return fmt.Sprintf("/api/develop/v2/auth/signup")
 }
 
 // 新規登録
@@ -150,7 +150,7 @@ func (c *Client) NewSignupAuthRequest(ctx context.Context, path string, payload 
 // VerifyTokenAuthPath computes a request path to the verify_token action of auth.
 func VerifyTokenAuthPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/auth/signup/verify_token")
+	return fmt.Sprintf("/api/develop/v2/auth/signup/verify_token")
 }
 
 // 新規登録時のトークンのチェック

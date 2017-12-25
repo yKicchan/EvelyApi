@@ -22,7 +22,7 @@ import (
 // CreateEventsPath computes a request path to the create action of events.
 func CreateEventsPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/events")
+	return fmt.Sprintf("/api/develop/v2/events")
 }
 
 // イベント作成
@@ -72,7 +72,7 @@ func DeleteEventsPath(userID string, eventID string) string {
 	param0 := userID
 	param1 := eventID
 
-	return fmt.Sprintf("/api/develop/v1/events/%s/%s", param0, param1)
+	return fmt.Sprintf("/api/develop/v2/events/%s/%s", param0, param1)
 }
 
 // イベント削除
@@ -106,14 +106,14 @@ func (c *Client) NewDeleteEventsRequest(ctx context.Context, path string) (*http
 // ListEventsPath computes a request path to the list action of events.
 func ListEventsPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/events")
+	return fmt.Sprintf("/api/develop/v2/events")
 }
 
 // ListEventsPath2 computes a request path to the list action of events.
 func ListEventsPath2(userID string) string {
 	param0 := userID
 
-	return fmt.Sprintf("/api/develop/v1/events/%s", param0)
+	return fmt.Sprintf("/api/develop/v2/events/%s", param0)
 }
 
 // イベント複数取得
@@ -153,7 +153,7 @@ func ModifyEventsPath(userID string, eventID string) string {
 	param0 := userID
 	param1 := eventID
 
-	return fmt.Sprintf("/api/develop/v1/events/%s/%s", param0, param1)
+	return fmt.Sprintf("/api/develop/v2/events/%s/%s", param0, param1)
 }
 
 // イベント編集
@@ -203,7 +203,7 @@ func ShowEventsPath(userID string, eventID string) string {
 	param0 := userID
 	param1 := eventID
 
-	return fmt.Sprintf("/api/develop/v1/events/%s/%s", param0, param1)
+	return fmt.Sprintf("/api/develop/v2/events/%s/%s", param0, param1)
 }
 
 // イベント情報取得
@@ -232,7 +232,7 @@ func (c *Client) NewShowEventsRequest(ctx context.Context, path string) (*http.R
 // UpdateEventsPath computes a request path to the update action of events.
 func UpdateEventsPath() string {
 
-	return fmt.Sprintf("/api/develop/v1/events/update")
+	return fmt.Sprintf("/api/develop/v2/events/update")
 }
 
 // イベントの開催フラグを更新する

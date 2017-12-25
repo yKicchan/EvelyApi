@@ -653,7 +653,7 @@ info:
   title: EvelyApi
   version: ""
 paths:
-  /api/develop/v1/auth/signin:
+  /api/develop/v2/auth/signin:
     post:
       description: ログイン
       operationId: auth#signin
@@ -678,7 +678,7 @@ paths:
       summary: signin auth
       tags:
       - auth
-  /api/develop/v1/auth/signup:
+  /api/develop/v2/auth/signup:
     post:
       description: 新規登録
       operationId: auth#signup
@@ -703,7 +703,7 @@ paths:
       summary: signup auth
       tags:
       - auth
-  /api/develop/v1/auth/signup/send_mail:
+  /api/develop/v2/auth/signup/send_mail:
     post:
       description: 新規登録用のメール送信
       operationId: auth#send_mail
@@ -726,7 +726,7 @@ paths:
       summary: send_mail auth
       tags:
       - auth
-  /api/develop/v1/auth/signup/verify_token:
+  /api/develop/v2/auth/signup/verify_token:
     get:
       description: 新規登録時のトークンのチェック
       operationId: auth#verify_token
@@ -752,7 +752,7 @@ paths:
       summary: verify_token auth
       tags:
       - auth
-  /api/develop/v1/events:
+  /api/develop/v2/events:
     get:
       description: イベント複数取得
       operationId: events#list
@@ -833,7 +833,7 @@ paths:
       summary: create events
       tags:
       - events
-  /api/develop/v1/events/{user_id}:
+  /api/develop/v2/events/{user_id}:
     get:
       description: イベント複数取得
       operationId: events#list#1
@@ -881,7 +881,7 @@ paths:
       summary: list events
       tags:
       - events
-  /api/develop/v1/events/{user_id}/{event_id}:
+  /api/develop/v2/events/{user_id}/{event_id}:
     delete:
       description: |-
         イベント削除
@@ -997,7 +997,7 @@ paths:
       summary: modify events
       tags:
       - events
-  /api/develop/v1/events/update:
+  /api/develop/v2/events/update:
     get:
       description: イベントの開催フラグを更新する
       operationId: events#update
@@ -1011,7 +1011,7 @@ paths:
       summary: update events
       tags:
       - events
-  /api/develop/v1/files/upload:
+  /api/develop/v2/files/upload:
     post:
       description: |-
         ファイルアップロード
@@ -1036,7 +1036,7 @@ paths:
       summary: upload files
       tags:
       - files
-  /api/develop/v1/users/{user_id}:
+  /api/develop/v2/users/{user_id}:
     get:
       description: アカウント情報取得
       operationId: users#show

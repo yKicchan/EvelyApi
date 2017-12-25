@@ -60,7 +60,7 @@ func SendMailAuthBadRequest(t goatest.TInterface, ctx context.Context, service *
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/auth/signup/send_mail"),
+		Path: fmt.Sprintf("/api/develop/v2/auth/signup/send_mail"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -128,7 +128,7 @@ func SendMailAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/auth/signup/send_mail"),
+		Path: fmt.Sprintf("/api/develop/v2/auth/signup/send_mail"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -196,7 +196,7 @@ func SigninAuthBadRequest(t goatest.TInterface, ctx context.Context, service *go
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/auth/signin"),
+		Path: fmt.Sprintf("/api/develop/v2/auth/signin"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -264,7 +264,7 @@ func SigninAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/auth/signin"),
+		Path: fmt.Sprintf("/api/develop/v2/auth/signin"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -344,7 +344,7 @@ func SignupAuthBadRequest(t goatest.TInterface, ctx context.Context, service *go
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/auth/signup"),
+		Path: fmt.Sprintf("/api/develop/v2/auth/signup"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -412,7 +412,7 @@ func SignupAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v1/auth/signup"),
+		Path: fmt.Sprintf("/api/develop/v2/auth/signup"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -486,7 +486,7 @@ func VerifyTokenAuthBadRequest(t goatest.TInterface, ctx context.Context, servic
 		query["token"] = sliceVal
 	}
 	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v1/auth/signup/verify_token"),
+		Path:     fmt.Sprintf("/api/develop/v2/auth/signup/verify_token"),
 		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -552,7 +552,7 @@ func VerifyTokenAuthNotFound(t goatest.TInterface, ctx context.Context, service 
 		query["token"] = sliceVal
 	}
 	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v1/auth/signup/verify_token"),
+		Path:     fmt.Sprintf("/api/develop/v2/auth/signup/verify_token"),
 		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -618,7 +618,7 @@ func VerifyTokenAuthOK(t goatest.TInterface, ctx context.Context, service *goa.S
 		query["token"] = sliceVal
 	}
 	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v1/auth/signup/verify_token"),
+		Path:     fmt.Sprintf("/api/develop/v2/auth/signup/verify_token"),
 		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
