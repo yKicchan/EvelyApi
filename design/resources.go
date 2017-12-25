@@ -151,12 +151,12 @@ var _ = Resource("events", func() {
 		Response(NotFound)
 	})
 
-    Action("update", func() {
-        Description("イベントの開催フラグを更新する")
-        NoSecurity()
-        Routing(GET("/update"))
-        Response(OK)
-    })
+	Action("update", func() {
+		Description("イベントの開催フラグを更新する")
+		NoSecurity()
+		Routing(GET("/update"))
+		Response(OK)
+	})
 })
 
 // アカウントに対するアクション
@@ -177,6 +177,19 @@ var _ = Resource("users", func() {
 	})
 })
 
+var _ = Resource("files", func() {
+	BasePath("/files")
+
+	Action("upload", func() {
+		Description("ファイルアップロード")
+		Routing(POST("/upload"))
+		Response(OK, CollectionOf(FilePathMedia))
+		Response(BadRequest)
+	})
+
+	Files("/files/*filename", "public/files/")
+})
+
 var _ = Resource("swagger", func() {
 	NoSecurity()
 	Origin("*", func() {
@@ -184,5 +197,5 @@ var _ = Resource("swagger", func() {
 	})
 	Metadata("swagger:generate", "false")
 	Files("/swagger.json", "swagger/swagger.json")
-	Files("/swaggerui/*filepath", "public/swaggerui")
+	Files("/swaggerui/*filepath", "public/swaggerui/")
 })

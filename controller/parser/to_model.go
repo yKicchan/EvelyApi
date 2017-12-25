@@ -17,22 +17,35 @@ func ToEventModel(p *app.EventPayload, id string, user *model.UserModel) *model.
 	return &model.EventModel{
 		ID:    id,
 		Title: p.Title,
+		Body:  p.Body,
 		Host: model.Host{
 			ID:   user.ID,
 			Name: user.Name,
 		},
-		Body: p.Body,
-		Place: model.Location{
-			Name:   p.Place.Name,
-			LngLat: [2]float64{p.Place.Lng, p.Place.Lat},
-		},
-		UpdateDate: time.Now(),
-		UpcomingDate: model.UpcomingDate{
-			StartDate: p.UpcomingDate.StartDate,
-			EndDate:   p.UpcomingDate.EndDate,
-		},
-		URL:  p.URL,
-		Mail: p.Mail,
-		Tel:  p.Tel,
+		Mail:        p.Mail,
+		Tel:         p.Tel,
+		URL:         p.URL,
+		Plans:       toPlansModel(p.Plans),
+		NoticeRange: p.NoticeRange,
+		Scope:       p.Scope,
+		OpenFlg:     p.OpenFlg,
+		UpdateDate:  time.Now(),
 	}
+}
+
+func toPlansModel(oldPlans []*app.Plan) (newPlans []model.Plan) {
+	for _, old := range oldPlans {
+		plan := model.Plan{
+			Location: model.Location{
+				Name:   old.Location.Name,
+				LngLat: [2]float64{old.Location.Lng, old.Location.Lat},
+			},
+			UpcomingDate: model.UpcomingDate{
+				StartDate: old.UpcomingDate.StartDate,
+				EndDate:   old.UpcomingDate.EndDate,
+			},
+		}
+		newPlans = append(newPlans, plan)
+	}
+	return newPlans
 }

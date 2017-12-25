@@ -48,8 +48,9 @@ func (c *Client) DecodeEmail(resp *http.Response) (*Email, error) {
 // Identifier: application/vnd.event+json; view=default
 type Event struct {
 	// イベントの詳細
-	Body      string    `form:"body" json:"body" xml:"body"`
-	CreatedAt string    `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	Body string `form:"body" json:"body" xml:"body"`
+	// 作成日時
+	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	Host      *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
@@ -104,9 +105,6 @@ func (mt *Event) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "scope"))
 	}
 
-	if mt.CreatedAt == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "createdAt"))
-	}
 	if utf8.RuneCountInString(mt.Body) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1, true))
 	}
@@ -281,6 +279,53 @@ func (c *Client) DecodeEventTinyCollection(resp *http.Response) (EventTinyCollec
 	return decoded, err
 }
 
+// アップロード済みのファイルのパス (default view)
+//
+// Identifier: application/vnd.file_path+json; view=default
+type FilePath struct {
+	// ファイルのパス
+	Path string `form:"path" json:"path" xml:"path"`
+}
+
+// Validate validates the FilePath media type instance.
+func (mt *FilePath) Validate() (err error) {
+	if mt.Path == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "path"))
+	}
+	return
+}
+
+// DecodeFilePath decodes the FilePath instance encoded in resp body.
+func (c *Client) DecodeFilePath(resp *http.Response) (*FilePath, error) {
+	var decoded FilePath
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// File_pathCollection is the media type for an array of File_path (default view)
+//
+// Identifier: application/vnd.file_path+json; type=collection; view=default
+type FilePathCollection []*FilePath
+
+// Validate validates the FilePathCollection media type instance.
+func (mt FilePathCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeFilePathCollection decodes the FilePathCollection instance encoded in resp body.
+func (c *Client) DecodeFilePathCollection(resp *http.Response) (FilePathCollection, error) {
+	var decoded FilePathCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // アクセストークン (default view)
 //
 // Identifier: application/vnd.token+json; view=default
@@ -308,6 +353,8 @@ func (c *Client) DecodeToken(resp *http.Response) (*Token, error) {
 //
 // Identifier: application/vnd.user+json; view=default
 type User struct {
+	// 作成日時
+	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
 	// メールアドレス
@@ -332,6 +379,7 @@ func (mt *User) Validate() (err error) {
 	if mt.Tel == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "tel"))
 	}
+
 	if utf8.RuneCountInString(mt.ID) < 4 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.id`, mt.ID, utf8.RuneCountInString(mt.ID), 4, true))
 	}

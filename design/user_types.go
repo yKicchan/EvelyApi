@@ -45,30 +45,30 @@ var EventPayload = Type("EventPayload", func() {
 		Default("")
 		Example("http://comp.ecc.ac.jp/")
 	})
-    Attribute("plans", ArrayOf(Plan), "イベントの開催予定一覧")
-    Attribute("noticeRange", Integer, "通知範囲(m)", func() {
-        Minimum(100)
-        Maximum(5000)
-        Default(500)
-        Example(500)
-    })
-    Attribute("scope", String, "公開範囲", func() {
-        Enum("public", "private")
-        Default("public")
-        Example("public")
-    })
-    Attribute("openFlg", Boolean, "開催中かどうか", func() {
-        Default(false)
-        Example(false)
-    })
+	Attribute("plans", ArrayOf(Plan), "イベントの開催予定一覧")
+	Attribute("noticeRange", Integer, "通知範囲(m)", func() {
+		Minimum(100)
+		Maximum(5000)
+		Default(500)
+		Example(500)
+	})
+	Attribute("scope", String, "公開範囲", func() {
+		Enum("public", "private")
+		Default("public")
+		Example("public")
+	})
+	Attribute("openFlg", Boolean, "開催中かどうか", func() {
+		Default(false)
+		Example(false)
+	})
 	Required("title", "body", "mail", "tel", "url", "plans", "noticeRange", "scope", "openFlg")
 })
 
 var Plan = Type("Plan", func() {
-    Description("イベントの開催予定情報")
-    Attribute("location", Location)
-    Attribute("upcomingDate", UpcomingDate)
-    Required("location", "upcomingDate")
+	Description("イベントの開催予定情報")
+	Attribute("location", Location)
+	Attribute("upcomingDate", UpcomingDate)
+	Required("location", "upcomingDate")
 })
 
 var Location = Type("Location", func() {

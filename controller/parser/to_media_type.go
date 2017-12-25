@@ -20,24 +20,20 @@ func ToEventMedia(e *model.EventModel) *app.Event {
 	return &app.Event{
 		ID:    e.ID,
 		Title: e.Title,
+		Body:  e.Body,
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
 			Name: e.Host.Name,
 		},
-		Body: e.Body,
-		Place: &app.Location{
-			Name: e.Place.Name,
-			Lat:  e.Place.LngLat[Lat],
-			Lng:  e.Place.LngLat[Lng],
-		},
-		UpdateDate: e.UpdateDate,
-		UpcomingDate: &app.UpcomingDate{
-			StartDate: e.UpcomingDate.StartDate,
-			EndDate:   e.UpcomingDate.EndDate,
-		},
-		URL:  e.URL,
-		Mail: e.Mail,
-		Tel:  e.Tel,
+		Mail:        e.Mail,
+		Tel:         e.Tel,
+		URL:         e.URL,
+		Plans:       toPlansMedia(e.Plans),
+		NoticeRange: e.NoticeRange,
+		Scope:       e.Scope,
+		OpenFlg:     e.OpenFlg,
+		UpdateDate:  e.UpdateDate,
+		CreatedAt:   e.CreatedAt,
 	}
 }
 
@@ -54,16 +50,30 @@ func ToEventTinyMedia(e *model.EventModel) *app.EventTiny {
 			ID:   e.Host.ID,
 			Name: e.Host.Name,
 		},
-		Place: &app.Location{
-			Name: e.Place.Name,
-			Lat:  e.Place.LngLat[Lat],
-			Lng:  e.Place.LngLat[Lng],
-		},
-		UpcomingDate: &app.UpcomingDate{
-			StartDate: e.UpcomingDate.StartDate,
-			EndDate:   e.UpcomingDate.EndDate,
-		},
+		Plans:       toPlansMedia(e.Plans),
+		NoticeRange: e.NoticeRange,
+		Scope:       e.Scope,
+		OpenFlg:     e.OpenFlg,
+		UpdateDate:  e.UpdateDate,
 	}
+}
+
+func toPlansMedia(oldPlans []model.Plan) (newPlans []*app.Plan) {
+	for _, old := range oldPlans {
+		plan := &app.Plan{
+			Location: &app.Location{
+				Name: old.Location.Name,
+				Lng:  old.Location.LngLat[Lng],
+				Lat:  old.Location.LngLat[Lat],
+			},
+			UpcomingDate: &app.UpcomingDate{
+				StartDate: old.UpcomingDate.StartDate,
+				EndDate:   old.UpcomingDate.EndDate,
+			},
+		}
+		newPlans = append(newPlans, plan)
+	}
+	return newPlans
 }
 
 /**
@@ -79,6 +89,7 @@ func ToUserMedia(u *model.UserModel) *app.User {
 			Email: u.Mail.Email,
 			State: u.Mail.State,
 		},
-		Tel: u.Tel,
+		Tel:       u.Tel,
+		CreatedAt: u.CreatedAt,
 	}
 }

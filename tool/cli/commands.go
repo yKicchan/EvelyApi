@@ -109,6 +109,11 @@ type (
 		PrettyPrint bool
 	}
 
+	// UploadFilesCommand is the command line data structure for the upload action of files
+	UploadFilesCommand struct {
+		PrettyPrint bool
+	}
+
 	// ShowUsersCommand is the command line data structure for the show action of users
 	ShowUsersCommand struct {
 		// ユーザーID
@@ -151,8 +156,8 @@ Payload example:
             "name": "ECCコンピュータ専門学校2303教室"
          },
          "upcomingDate": {
-            "endDate": "1991-12-12T12:50:07Z",
-            "startDate": "1971-12-01T10:31:39Z"
+            "endDate": "1990-02-18T14:03:59Z",
+            "startDate": "1975-07-28T07:45:40Z"
          }
       },
       {
@@ -162,8 +167,8 @@ Payload example:
             "name": "ECCコンピュータ専門学校2303教室"
          },
          "upcomingDate": {
-            "endDate": "1991-12-12T12:50:07Z",
-            "startDate": "1971-12-01T10:31:39Z"
+            "endDate": "1990-02-18T14:03:59Z",
+            "startDate": "1975-07-28T07:45:40Z"
          }
       }
    ],
@@ -231,8 +236,8 @@ Payload example:
             "name": "ECCコンピュータ専門学校2303教室"
          },
          "upcomingDate": {
-            "endDate": "1991-12-12T12:50:07Z",
-            "startDate": "1971-12-01T10:31:39Z"
+            "endDate": "1990-02-18T14:03:59Z",
+            "startDate": "1975-07-28T07:45:40Z"
          }
       },
       {
@@ -242,8 +247,8 @@ Payload example:
             "name": "ECCコンピュータ専門学校2303教室"
          },
          "upcomingDate": {
-            "endDate": "1991-12-12T12:50:07Z",
-            "startDate": "1971-12-01T10:31:39Z"
+            "endDate": "1990-02-18T14:03:59Z",
+            "startDate": "1975-07-28T07:45:40Z"
          }
       }
    ],
@@ -364,17 +369,31 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "verify-token",
-		Short: `新規登録時のトークンのチェック`,
+		Use:   "upload",
+		Short: `ファイルアップロード`,
 	}
-	tmp11 := new(VerifyTokenAuthCommand)
+	tmp11 := new(UploadFilesCommand)
 	sub = &cobra.Command{
-		Use:   `auth ["/api/develop/v1/auth/signup/verify_token"]`,
+		Use:   `files ["/api/develop/v1/files/upload"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp11.Run(c, args) },
 	}
 	tmp11.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp11.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "verify-token",
+		Short: `新規登録時のトークンのチェック`,
+	}
+	tmp12 := new(VerifyTokenAuthCommand)
+	sub = &cobra.Command{
+		Use:   `auth ["/api/develop/v1/auth/signup/verify_token"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp12.Run(c, args) },
+	}
+	tmp12.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp12.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -563,6 +582,14 @@ func (cmd *DownloadCommand) Run(c *client.Client, args []string) error {
 		fnf = c.DownloadSwaggerJSON
 		if outfile == "" {
 			outfile = "swagger.json"
+		}
+		goto found
+	}
+	if strings.HasPrefix(rpath, "/files/") {
+		fnd = c.DownloadFiles
+		rpath = rpath[7:]
+		if outfile == "" {
+			_, outfile = path.Split(rpath)
 		}
 		goto found
 	}
@@ -892,6 +919,30 @@ func (cmd *UpdateEventsCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *UpdateEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+}
+
+// Run makes the HTTP request corresponding to the UploadFilesCommand command.
+func (cmd *UploadFilesCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/api/develop/v1/files/upload"
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.UploadFiles(ctx, path)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *UploadFilesCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 }
 
 // Run makes the HTTP request corresponding to the ShowUsersCommand command.

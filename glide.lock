@@ -1,5 +1,5 @@
-hash: a96f5fe52cec0e8f244017bc4c6f7ef628273110a8e39c6de60275bc01f7e768
-updated: 2017-12-17T07:32:52.202774473Z
+hash: 2bb85f3979774298303f0df3dae59299cd63c0b88bb310a01a3cecd54f06eb93
+updated: 2017-12-22T13:49:10.552374608Z
 imports:
 - name: github.com/armon/go-metrics
   version: 7aa49fde808223f8dadfdbfd3a20ff6c19e5f9ec
@@ -33,6 +33,8 @@ imports:
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/manveru/faker
   version: 9fbc68a78c4dbc7914e1a23f88f126bea4383b97
+- name: github.com/NaySoftware/go-fcm
+  version: 2a6c4f48b49f0d5dbfe621589da4c5405157d7c9
 - name: github.com/satori/go.uuid
   version: 5bf94b69c6b68ee1b541973bb8e1144db23a194b
 - name: github.com/spf13/cobra
@@ -42,7 +44,7 @@ imports:
 - name: github.com/zach-klippenstein/goregen
   version: 795b5e3961ea1912fde60af417ad85e86acc0d6a
 - name: golang.org/x/crypto
-  version: 94eea52f7b742c7cbe0b03b22f0c4c8631ece122
+  version: d585fd2cc9195196078f516b69daff6744ef5e84
   subpackages:
   - bcrypt
   - blowfish
@@ -52,7 +54,7 @@ imports:
   subpackages:
   - websocket
 - name: golang.org/x/tools
-  version: 64890f4e2b733655fee5077a5435a8812404c3a3
+  version: ae8cc594552814363a7aeeb4f2825515a771fa38
   subpackages:
   - go/ast/astutil
 - name: gopkg.in/yaml.v2

@@ -40,8 +40,9 @@ func (mt *Email) Validate() (err error) {
 // Identifier: application/vnd.event+json; view=default
 type Event struct {
 	// イベントの詳細
-	Body      string    `form:"body" json:"body" xml:"body"`
-	CreatedAt string    `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	Body string `form:"body" json:"body" xml:"body"`
+	// 作成日時
+	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	Host      *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
@@ -96,9 +97,6 @@ func (mt *Event) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "scope"))
 	}
 
-	if mt.CreatedAt == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "createdAt"))
-	}
 	if utf8.RuneCountInString(mt.Body) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1, true))
 	}
@@ -245,6 +243,39 @@ func (mt EventTinyCollection) Validate() (err error) {
 	return
 }
 
+// アップロード済みのファイルのパス (default view)
+//
+// Identifier: application/vnd.file_path+json; view=default
+type FilePath struct {
+	// ファイルのパス
+	Path string `form:"path" json:"path" xml:"path"`
+}
+
+// Validate validates the FilePath media type instance.
+func (mt *FilePath) Validate() (err error) {
+	if mt.Path == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "path"))
+	}
+	return
+}
+
+// File_pathCollection is the media type for an array of File_path (default view)
+//
+// Identifier: application/vnd.file_path+json; type=collection; view=default
+type FilePathCollection []*FilePath
+
+// Validate validates the FilePathCollection media type instance.
+func (mt FilePathCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // アクセストークン (default view)
 //
 // Identifier: application/vnd.token+json; view=default
@@ -265,6 +296,8 @@ func (mt *Token) Validate() (err error) {
 //
 // Identifier: application/vnd.user+json; view=default
 type User struct {
+	// 作成日時
+	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
 	// メールアドレス
@@ -289,6 +322,7 @@ func (mt *User) Validate() (err error) {
 	if mt.Tel == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "tel"))
 	}
+
 	if utf8.RuneCountInString(mt.ID) < 4 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.id`, mt.ID, utf8.RuneCountInString(mt.ID), 4, true))
 	}

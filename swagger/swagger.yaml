@@ -1,4 +1,3 @@
-basePath: /api/develop/v1
 consumes:
 - application/json
 - application/xml
@@ -25,7 +24,7 @@ definitions:
       body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
-      createdAt: Totam quis non libero nihil quasi ut.
+      createdAt: 1974-02-03T21:26:56Z
       host:
         id: yKicchan
         name: きっちゃそ
@@ -39,12 +38,26 @@ definitions:
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1991-12-12T12:50:07Z
-          startDate: 1971-12-01T10:31:39Z
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
       scope: public
       tel: 090-1234-5678
       title: Git勉強会
-      updateDate: 1981-12-28T11:54:46Z
+      updateDate: 2005-04-23T09:00:35Z
       url: http://comp.ecc.ac.jp/
     properties:
       body:
@@ -56,7 +69,9 @@ definitions:
         minLength: 1
         type: string
       createdAt:
-        example: Totam quis non libero nihil quasi ut.
+        description: 作成日時
+        example: 1974-02-03T21:26:56Z
+        format: date-time
         type: string
       host:
         $ref: '#/definitions/UserTiny'
@@ -90,8 +105,22 @@ definitions:
             lng: 135.50124
             name: ECCコンピュータ専門学校2303教室
           upcomingDate:
-            endDate: 1991-12-12T12:50:07Z
-            startDate: 1971-12-01T10:31:39Z
+            endDate: 1990-02-18T14:03:59Z
+            startDate: 1975-07-28T07:45:40Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1990-02-18T14:03:59Z
+            startDate: 1975-07-28T07:45:40Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1990-02-18T14:03:59Z
+            startDate: 1975-07-28T07:45:40Z
         items:
           $ref: '#/definitions/Plan'
         type: array
@@ -116,7 +145,7 @@ definitions:
         type: string
       updateDate:
         description: 最終更新日時
-        example: 1981-12-28T11:54:46Z
+        example: 2005-04-23T09:00:35Z
         format: date-time
         type: string
       url:
@@ -148,7 +177,7 @@ definitions:
     - body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
-      createdAt: Totam quis non libero nihil quasi ut.
+      createdAt: 1974-02-03T21:26:56Z
       host:
         id: yKicchan
         name: きっちゃそ
@@ -162,12 +191,26 @@ definitions:
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1991-12-12T12:50:07Z
-          startDate: 1971-12-01T10:31:39Z
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
       scope: public
       tel: 090-1234-5678
       title: Git勉強会
-      updateDate: 1981-12-28T11:54:46Z
+      updateDate: 2005-04-23T09:00:35Z
       url: http://comp.ecc.ac.jp/
     items:
       $ref: '#/definitions/Event'
@@ -188,15 +231,15 @@ definitions:
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1991-12-12T12:50:07Z
-          startDate: 1971-12-01T10:31:39Z
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1991-12-12T12:50:07Z
-          startDate: 1971-12-01T10:31:39Z
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
       scope: public
       tel: 090-1234-5678
       title: Git勉強会
@@ -236,15 +279,15 @@ definitions:
             lng: 135.50124
             name: ECCコンピュータ専門学校2303教室
           upcomingDate:
-            endDate: 1991-12-12T12:50:07Z
-            startDate: 1971-12-01T10:31:39Z
+            endDate: 1990-02-18T14:03:59Z
+            startDate: 1975-07-28T07:45:40Z
         - location:
             lat: 34.706425
             lng: 135.50124
             name: ECCコンピュータ専門学校2303教室
           upcomingDate:
-            endDate: 1991-12-12T12:50:07Z
-            startDate: 1971-12-01T10:31:39Z
+            endDate: 1990-02-18T14:03:59Z
+            startDate: 1975-07-28T07:45:40Z
         items:
           $ref: '#/definitions/Plan'
         type: array
@@ -285,6 +328,30 @@ definitions:
     - openFlg
     title: EventPayload
     type: object
+  File_path:
+    description: アップロード済みのファイルのパス (default view)
+    example:
+      path: /files/image.png
+    properties:
+      path:
+        description: ファイルのパス
+        example: /files/image.png
+        type: string
+    required:
+    - path
+    title: 'Mediatype identifier: application/vnd.file_path+json; view=default'
+    type: object
+  File_pathCollection:
+    description: File_pathCollection is the media type for an array of File_path (default
+      view)
+    example:
+    - path: /files/image.png
+    - path: /files/image.png
+    items:
+      $ref: '#/definitions/File_path'
+    title: 'Mediatype identifier: application/vnd.file_path+json; type=collection;
+      view=default'
+    type: array
   Location:
     description: イベントの開催場所
     example:
@@ -369,8 +436,8 @@ definitions:
         lng: 135.50124
         name: ECCコンピュータ専門学校2303教室
       upcomingDate:
-        endDate: 1991-12-12T12:50:07Z
-        startDate: 1971-12-01T10:31:39Z
+        endDate: 1990-02-18T14:03:59Z
+        startDate: 1975-07-28T07:45:40Z
     properties:
       location:
         $ref: '#/definitions/Location'
@@ -411,17 +478,17 @@ definitions:
   UpcomingDate:
     description: イベントの開催予定日
     example:
-      endDate: 1991-12-12T12:50:07Z
-      startDate: 1971-12-01T10:31:39Z
+      endDate: 1990-02-18T14:03:59Z
+      startDate: 1975-07-28T07:45:40Z
     properties:
       endDate:
         description: 終了日時
-        example: 1991-12-12T12:50:07Z
+        example: 1990-02-18T14:03:59Z
         format: date-time
         type: string
       startDate:
         description: 開始日時
-        example: 1971-12-01T10:31:39Z
+        example: 1975-07-28T07:45:40Z
         format: date-time
         type: string
     required:
@@ -432,11 +499,17 @@ definitions:
   User:
     description: ユーザー情報 (default view)
     example:
+      createdAt: 2003-06-21T02:17:51Z
       id: yKicchan
       mail: yKicchanApp@gmail.com
       name: きっちゃそ
       tel: 090-1234-5678
     properties:
+      createdAt:
+        description: 作成日時
+        example: 2003-06-21T02:17:51Z
+        format: date-time
+        type: string
       id:
         description: ユーザーID
         example: yKicchan
@@ -461,6 +534,7 @@ definitions:
     - name
     - mail
     - tel
+    - createdAt
     title: 'Mediatype identifier: application/vnd.user+json; view=default'
     type: object
   UserPayload:
@@ -530,6 +604,43 @@ definitions:
     - name
     title: 'Mediatype identifier: application/vnd.user+json; view=tiny'
     type: object
+  error:
+    description: Error response media type (default view)
+    example:
+      code: invalid_value
+      detail: Value of ID must be an integer
+      id: 3F1FKVRR
+      meta:
+        timestamp: 1.458609e+09
+      status: "400"
+    properties:
+      code:
+        description: an application-specific error code, expressed as a string value.
+        example: invalid_value
+        type: string
+      detail:
+        description: a human-readable explanation specific to this occurrence of the
+          problem.
+        example: Value of ID must be an integer
+        type: string
+      id:
+        description: a unique identifier for this particular occurrence of the problem.
+        example: 3F1FKVRR
+        type: string
+      meta:
+        additionalProperties: true
+        description: a meta object containing non-standard meta-information about
+          the error.
+        example:
+          timestamp: 1.458609e+09
+        type: object
+      status:
+        description: the HTTP status code applicable to this problem, expressed as
+          a string value.
+        example: "400"
+        type: string
+    title: 'Mediatype identifier: application/vnd.goa.error; view=default'
+    type: object
 host: localhost:8888
 info:
   contact:
@@ -542,7 +653,7 @@ info:
   title: EvelyApi
   version: ""
 paths:
-  /auth/signin:
+  /api/develop/v1/auth/signin:
     post:
       description: ログイン
       operationId: auth#signin
@@ -567,7 +678,7 @@ paths:
       summary: signin auth
       tags:
       - auth
-  /auth/signup:
+  /api/develop/v1/auth/signup:
     post:
       description: 新規登録
       operationId: auth#signup
@@ -592,7 +703,7 @@ paths:
       summary: signup auth
       tags:
       - auth
-  /auth/signup/send_mail:
+  /api/develop/v1/auth/signup/send_mail:
     post:
       description: 新規登録用のメール送信
       operationId: auth#send_mail
@@ -615,7 +726,7 @@ paths:
       summary: send_mail auth
       tags:
       - auth
-  /auth/signup/verify_token:
+  /api/develop/v1/auth/signup/verify_token:
     get:
       description: 新規登録時のトークンのチェック
       operationId: auth#verify_token
@@ -641,7 +752,7 @@ paths:
       summary: verify_token auth
       tags:
       - auth
-  /events:
+  /api/develop/v1/events:
     get:
       description: イベント複数取得
       operationId: events#list
@@ -722,7 +833,7 @@ paths:
       summary: create events
       tags:
       - events
-  /events/{user_id}:
+  /api/develop/v1/events/{user_id}:
     get:
       description: イベント複数取得
       operationId: events#list#1
@@ -770,7 +881,7 @@ paths:
       summary: list events
       tags:
       - events
-  /events/{user_id}/{event_id}:
+  /api/develop/v1/events/{user_id}/{event_id}:
     delete:
       description: |-
         イベント削除
@@ -886,7 +997,7 @@ paths:
       summary: modify events
       tags:
       - events
-  /events/update:
+  /api/develop/v1/events/update:
     get:
       description: イベントの開催フラグを更新する
       operationId: events#update
@@ -900,7 +1011,32 @@ paths:
       summary: update events
       tags:
       - events
-  /users/{user_id}:
+  /api/develop/v1/files/upload:
+    post:
+      description: |-
+        ファイルアップロード
+
+        Required security scopes:
+          * `api:access`
+      operationId: files#upload
+      produces:
+      - application/vnd.file_path+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/File_pathCollection'
+        "400":
+          description: Bad Request
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: upload files
+      tags:
+      - files
+  /api/develop/v1/users/{user_id}:
     get:
       description: アカウント情報取得
       operationId: users#show
@@ -926,6 +1062,33 @@ paths:
       summary: show users
       tags:
       - users
+  /files/{filename}:
+    get:
+      description: |-
+        Required security scopes:
+          * `api:access`
+      operationId: files#/files/*filename
+      parameters:
+      - description: Relative file path
+        in: path
+        name: filename
+        required: true
+        type: string
+      responses:
+        "200":
+          description: File downloaded
+          schema:
+            type: file
+        "404":
+          description: File not found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: Download public/files/
 produces:
 - application/json
 - application/xml

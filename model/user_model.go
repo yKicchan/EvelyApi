@@ -2,15 +2,17 @@ package model
 
 import (
 	"labix.org/v2/mgo/bson"
+    "time"
 )
 
 // ユーザーのDBモデル
 type UserModel struct {
-	ID       string `bson:"id"`
-	Password string `bson:"password"`
-	Name     string `bson:"name"`
-	Mail     Mail   `bson:"mail"`
-	Tel      string `bson:"tel"`
+	ID        string    `bson:"id"`
+	Password  string    `bson:"password"`
+	Name      string    `bson:"name"`
+	Mail      Mail      `bson:"mail"`
+	Tel       string    `bson:"tel"`
+	CreatedAt time.Time `bson:"created_at"`
 }
 
 type Mail struct {

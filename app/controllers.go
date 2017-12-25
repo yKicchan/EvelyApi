@@ -399,6 +399,77 @@ func unmarshalModifyEventsPayload(ctx context.Context, service *goa.Service, req
 	return nil
 }
 
+// FilesController is the controller interface for the Files actions.
+type FilesController interface {
+	goa.Muxer
+	goa.FileServer
+	Upload(*UploadFilesContext) error
+}
+
+// MountFilesController "mounts" a Files resource controller on the given service.
+func MountFilesController(service *goa.Service, ctrl FilesController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/api/develop/v1/files/upload", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/files/*filename", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUploadFilesContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Upload(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFilesOrigin(h)
+	service.Mux.Handle("POST", "/api/develop/v1/files/upload", ctrl.MuxHandler("upload", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "action", "Upload", "route", "POST /api/develop/v1/files/upload", "security", "jwt")
+
+	h = ctrl.FileHandler("/files/*filename", "public/files/")
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFilesOrigin(h)
+	service.Mux.Handle("GET", "/files/*filename", ctrl.MuxHandler("serve", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/", "route", "GET /files/*filename", "security", "jwt")
+
+	h = ctrl.FileHandler("/files/", "public/files/index.html")
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleFilesOrigin(h)
+	service.Mux.Handle("GET", "/files/", ctrl.MuxHandler("serve", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/index.html", "route", "GET /files/", "security", "jwt")
+}
+
+// handleFilesOrigin applies the CORS response headers corresponding to the origin.
+func handleFilesOrigin(h goa.Handler) goa.Handler {
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "X-Time")
+			rw.Header().Set("Access-Control-Max-Age", "600")
+			rw.Header().Set("Access-Control-Allow-Credentials", "true")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
+}
+
 // SwaggerController is the controller interface for the Swagger actions.
 type SwaggerController interface {
 	goa.Muxer
@@ -412,10 +483,10 @@ func MountSwaggerController(service *goa.Service, ctrl SwaggerController) {
 	service.Mux.Handle("OPTIONS", "/swaggerui/*filepath", ctrl.MuxHandler("preflight", handleSwaggerOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/swagger.json", ctrl.MuxHandler("preflight", handleSwaggerOrigin(cors.HandlePreflight()), nil))
 
-	h = ctrl.FileHandler("/swaggerui/*filepath", "public/swaggerui")
+	h = ctrl.FileHandler("/swaggerui/*filepath", "public/swaggerui/")
 	h = handleSwaggerOrigin(h)
 	service.Mux.Handle("GET", "/swaggerui/*filepath", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Swagger", "files", "public/swaggerui", "route", "GET /swaggerui/*filepath")
+	service.LogInfo("mount", "ctrl", "Swagger", "files", "public/swaggerui/", "route", "GET /swaggerui/*filepath")
 
 	h = ctrl.FileHandler("/swagger.json", "swagger/swagger.json")
 	h = handleSwaggerOrigin(h)

@@ -47,6 +47,10 @@ func main() {
 	// Mount "users" controller
 	c4 := api.NewUsersController(service, db)
 	app.MountUsersController(service, c4)
+	// Mount "files" controller
+    c5 := api.NewFilesController(service)
+	// c5 := api.NewFilesController(service, db)
+	app.MountFilesController(service, c5)
 
 	// Start service
 	if err := service.ListenAndServe(":8888"); err != nil {
