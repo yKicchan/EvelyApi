@@ -2,7 +2,8 @@ package parser
 
 import (
 	"EvelyApi/app"
-	"EvelyApi/model"
+	. "EvelyApi/model/document"
+    "labix.org/v2/mgo/bson"
 	"time"
 )
 
@@ -13,12 +14,12 @@ import (
  * @param  user        イベントのホスト情報
  * @return *EventModel DBモデルに変換したイベント情報
  */
-func ToEventModel(p *app.EventPayload, id string, user *model.UserModel) *model.EventModel {
-	return &model.EventModel{
+func ToEventModel(p *app.EventPayload, id bson.ObjectId, user *UserModel) *EventModel {
+	return &EventModel{
 		ID:    id,
 		Title: p.Title,
 		Body:  p.Body,
-		Host: model.Host{
+		Host: &Host{
 			ID:   user.ID,
 			Name: user.Name,
 		},
@@ -33,14 +34,14 @@ func ToEventModel(p *app.EventPayload, id string, user *model.UserModel) *model.
 	}
 }
 
-func toPlansModel(oldPlans []*app.Plan) (newPlans []model.Plan) {
+func toPlansModel(oldPlans []*app.Plan) (newPlans []*Plan) {
 	for _, old := range oldPlans {
-		plan := model.Plan{
-			Location: model.Location{
+		plan := &Plan{
+			Location: &Location{
 				Name:   old.Location.Name,
 				LngLat: [2]float64{old.Location.Lng, old.Location.Lat},
 			},
-			UpcomingDate: model.UpcomingDate{
+			UpcomingDate: &UpcomingDate{
 				StartDate: old.UpcomingDate.StartDate,
 				EndDate:   old.UpcomingDate.EndDate,
 			},

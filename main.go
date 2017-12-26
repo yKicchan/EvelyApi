@@ -6,6 +6,7 @@ import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
 	"EvelyApi/controller/api"
+    . "EvelyApi/model"
 	. "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
@@ -33,7 +34,7 @@ func main() {
 	}
 	// DB切断
 	defer session.Close()
-	db := session.DB(DB_NAME)
+	db := NewEvelyDB(session.DB(DB_NAME))
 
 	// Mount "auth" controller
 	c := api.NewAuthController(service, db)

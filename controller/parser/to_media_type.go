@@ -2,7 +2,7 @@ package parser
 
 import (
 	"EvelyApi/app"
-	"EvelyApi/model"
+	. "EvelyApi/model/document"
 )
 
 // 緯度経度の配列番号を定数化
@@ -16,9 +16,9 @@ const (
  * @param e イベント情報
  * @return  レスポンス形式に変換したイベント情報
  */
-func ToEventMedia(e *model.EventModel) *app.Event {
+func ToEventMedia(e *EventModel) *app.Event {
 	return &app.Event{
-		ID:    e.ID,
+		ID:    e.ID.String(),
 		Title: e.Title,
 		Body:  e.Body,
 		Host: &app.UserTiny{
@@ -42,9 +42,9 @@ func ToEventMedia(e *model.EventModel) *app.Event {
  * @param e イベント情報
  * @return  レスポンス形式に変換したイベント情報
  */
-func ToEventTinyMedia(e *model.EventModel) *app.EventTiny {
+func ToEventTinyMedia(e *EventModel) *app.EventTiny {
 	return &app.EventTiny{
-		ID:    e.ID,
+		ID:    e.ID.String(),
 		Title: e.Title,
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
@@ -58,7 +58,7 @@ func ToEventTinyMedia(e *model.EventModel) *app.EventTiny {
 	}
 }
 
-func toPlansMedia(oldPlans []model.Plan) (newPlans []*app.Plan) {
+func toPlansMedia(oldPlans []*Plan) (newPlans []*app.Plan) {
 	for _, old := range oldPlans {
 		plan := &app.Plan{
 			Location: &app.Location{
@@ -81,7 +81,7 @@ func toPlansMedia(oldPlans []model.Plan) (newPlans []*app.Plan) {
  * @param  u ユーザー情報
  * @return   レスポンス形式に変換したユーザー情報
  */
-func ToUserMedia(u *model.UserModel) *app.User {
+func ToUserMedia(u *UserModel) *app.User {
 	return &app.User{
 		ID:   u.ID,
 		Name: u.Name,

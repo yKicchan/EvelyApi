@@ -4,140 +4,131 @@ import (
 	"EvelyApi/app"
 	"EvelyApi/controller/parser"
 	"EvelyApi/model"
+	. "EvelyApi/model/collection"
+	. "EvelyApi/model/document"
 	"github.com/goadesign/goa"
-	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 	"log"
 )
 
 // EventsController implements the events resource.
 type EventsController struct {
 	*goa.Controller
-	db *model.EventDB
+	db *model.EvelyDB
 }
 
 // NewEventsController creates a events controller.
-func NewEventsController(service *goa.Service, db *mgo.Database) *EventsController {
+func NewEventsController(service *goa.Service, db *model.EvelyDB) *EventsController {
 	return &EventsController{
 		Controller: service.NewController("EventsController"),
-		db:         model.NewEventDB(db),
+		db:         db,
 	}
 }
 
 // Create runs the create action.
 func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
-	// EventsController_Create: start_implement
 
-	// Put your logic here
+	// JWTからユーザー情報を取得
 	claims := GetJWTClaims(ctx)
-	user := &model.UserModel{
+	user := &UserModel{
 		ID:   claims["id"].(string),
 		Name: claims["name"].(string),
 	}
-	payload := ctx.Payload
 
-	eventID, err := c.db.NewEvent(user.ID, payload.Plans[0].UpcomingDate.StartDate)
-	if err != nil {
-		log.Printf("[EvelyApi] failed to create event: %s", err)
-	}
-
-	event := parser.ToEventModel(payload, eventID, user)
-
-	err = c.db.SaveEvent(event)
+	// イベントを作成
+	p := ctx.Payload
+	event := parser.ToEventModel(p, bson.NewObjectId(), user)
+    keys := Keys{"_id": event.ID}
+	err := c.db.Events().Save(Event(event), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save event: %s", err)
 		return ctx.BadRequest()
 	}
 
 	return ctx.Created(parser.ToEventMedia(event))
-	// EventsController_Create: end_implement
 }
 
 // Delete runs the delete action.
 func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
-	// EventsController_Delete: start_implement
 
-	// Put your logic here
+	// JWTからユーザーIDを取得、削除権限があるかを検査
 	claims := GetJWTClaims(ctx)
 	userID := claims["id"].(string)
-
 	if userID != ctx.UserID {
 		log.Printf("[EvelyApi] permission error")
 		return ctx.Forbidden()
 	}
 
-	err := c.db.DeleteEvent(ctx.UserID, ctx.EventID)
+	// イベントを削除する
+	err := c.db.Events().Delete(Keys{"_id": ctx.EventID})
 	if err != nil {
 		log.Printf("[EvelyApi] failed to delete event: %s", err)
 		return ctx.NotFound()
 	}
 	return ctx.OK([]byte("Seccess!!"))
-	// EventsController_Delete: end_implement
 }
 
 // List runs the list action.
 func (c *EventsController) List(ctx *app.ListEventsContext) error {
-	// EventsController_List: start_implement
 
-	// Put your logic here
-	events, err := c.db.GetEvents(ctx.Limit, ctx.Offset, model.WithKeyword(ctx.Keyword), model.WithUserID(ctx.UserID))
+	// 条件と一致するイベントを複数検索
+	events, err := c.db.Events().FindEvents(
+		ctx.Limit,
+		ctx.Offset,
+		WithKeyword(ctx.Keyword),
+		WithUserID(ctx.UserID),
+	)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to search events: %s", err)
 		return ctx.NotFound()
 	}
 
+	// イベント情報をレスポンス形式に変換して返す
 	res := make(app.EventTinyCollection, len(events))
 	for i := range events {
 		res[i] = parser.ToEventTinyMedia(events[i])
 	}
 	return ctx.OKTiny(res)
-	// EventsController_List: end_implement
 }
 
 // Show runs the show action.
 func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
-	// EventsController_Show: start_implement
-
-	// Put your logic here
-	event, err := c.db.GetEvent(ctx.UserID, ctx.EventID)
+	// IDと一致するイベントを検索
+	model, err := c.db.Events().FindDoc(Keys{"_id": ctx.EventID})
+    event := model.Make().Event
 	if err != nil {
 		log.Printf("[EvelyApi] faild to find event: %s", err)
 		return ctx.NotFound()
 	}
 	return ctx.OK(parser.ToEventMedia(event))
-	// EventsController_Show: end_implement
 }
 
 // Modify runs the modify action.
 func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
-	// EventsController_Modify: start_implement
-
-	// Put your logic here
+	// JWTからユーザー情報を取得する
 	claims := GetJWTClaims(ctx)
-	user := &model.UserModel{
+	user := &UserModel{
 		ID:   claims["id"].(string),
 		Name: claims["name"].(string),
 	}
+	// 編集権限があるかを判定
 	if user.ID != ctx.UserID {
 		log.Printf("[EvelyApi] permission error")
 		return ctx.Forbidden()
 	}
 
-	event := parser.ToEventModel(ctx.Payload, ctx.EventID, user)
-	err := c.db.SaveEvent(event)
+	// DBのイベント情報を更新
+	event := parser.ToEventModel(ctx.Payload, bson.ObjectIdHex(ctx.EventID), user)
+    keys := Keys{"_id": event.ID}
+	err := c.db.Events().Save(Event(event), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save event: %s", err)
 		return ctx.NotFound()
 	}
 	return ctx.OK(parser.ToEventMedia(event))
-	// EventsController_Modify: end_implement
 }
 
 // Update runs the update action.
 func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
-	// EventsController_Update: start_implement
-
-	// Put your logic here
-
-	return nil
-	// EventsController_Update: end_implement
+	return ctx.OK([]byte("現在実装中！\n完成までしばし待たれよ。"))
 }

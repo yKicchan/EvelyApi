@@ -1,9 +1,5 @@
 package config
 
-import (
-	"labix.org/v2/mgo/bson"
-)
-
 const (
 
 	// DB設定
@@ -20,6 +16,3 @@ const (
 	STATE_OK      = "OK"
 	STATE_BAN     = "BAN"
 )
-
-// 全情報を取得するセレクタ
-var FULL_SELECTOR = bson.M{"_id": 0}

@@ -2,11 +2,10 @@ package api
 
 import (
 	"EvelyApi/app"
-    // "EvelyApi/model"
+	"fmt"
 	"github.com/goadesign/goa"
-    "io"
-    "os"
-    "fmt"
+	"io"
+	"os"
 )
 
 // FilesController implements the files resource.

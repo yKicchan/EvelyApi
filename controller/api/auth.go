@@ -5,13 +5,14 @@ import (
 	. "EvelyApi/config"
 	"EvelyApi/controller/mailer"
 	"EvelyApi/model"
+	. "EvelyApi/model/document"
+    . "EvelyApi/model/collection"
 	"context"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
-	"labix.org/v2/mgo"
 	"log"
 	"time"
 )
@@ -30,7 +31,7 @@ func ToEmailMedia(email string) *app.Email {
 // AuthController implements the auth resource.
 type AuthController struct {
 	*goa.Controller
-	db *model.UserDB
+	db *model.EvelyDB
 }
 
 /**
@@ -74,22 +75,23 @@ func GetJWTClaims(ctx context.Context) (claims jwtgo.MapClaims) {
 }
 
 // NewAuthController creates a auth controller.
-func NewAuthController(service *goa.Service, db *mgo.Database) *AuthController {
+func NewAuthController(service *goa.Service, db *model.EvelyDB) *AuthController {
 	return &AuthController{
 		Controller: service.NewController("AuthController"),
-		db:         model.NewUserDB(db),
+		db:         db,
 	}
 }
 
 // SendMail runs the send_mail action.
 func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
-	// AuthController_SendMail: start_implement
+
 	// メールアドレスが使用可能か検査
 	email := ctx.Payload.Email
-	res := c.db.VerifyEmail(email)
+	res := c.db.Users().VerifyEmail(email)
 	if !res {
 		return ctx.BadRequest()
 	}
+
 	// トークンを発行する
 	claims := jwtgo.MapClaims{
 		"scopes":     "api:access",
@@ -97,6 +99,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 		"created_at": time.Now(),
 	}
 	token := newToken(claims)
+
 	// メール送信
 	subject := "仮登録完了"
 	url := "http://localhost:8888/verify_email?token=" + token
@@ -106,37 +109,41 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 		log.Printf("[EvelyApi] faild to send email: %s", err)
 		return ctx.BadRequest()
 	}
-	// 認証待ちユーザーとしてDBに登録
-	pendingUser := &model.PendingUserModel{
+
+	// 認証待ちユーザーをDBに保存
+	pu := &PendingUserModel{
 		Email:     email,
 		Token:     token,
 		CreatedAt: claims["created_at"].(time.Time),
 	}
-	err = c.db.CreatePendingUser(pendingUser)
+    keys := Keys{"email": pu.Email}
+	err = c.db.PendingUsers().Save(PendingUser(pu), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to create pending user: %s", err)
 		return ctx.BadRequest()
 	}
 	return ctx.OK([]byte("Success!!"))
-	// AuthController_SendMail: end_implement
 }
 
 // Signin runs the signin action.
 func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
-	// AuthController_Signin: start_implement
 
-	// Put your logic here
-	// ログイン認証
+	// ユーザーが存在するか検索
 	p := ctx.Payload
-	user, err := c.db.GetUser(p.ID)
+	m, err := c.db.Users().FindDoc(Keys{"id": p.ID})
+    user := m.Make().User
 	if err != nil {
 		return ctx.BadRequest()
 	}
+
+	// IDとパスワードが一致するかを検査
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(p.Password))
 	if err != nil {
 		log.Printf("[EvelyApi] %s", err)
 		return ctx.BadRequest()
 	}
+
+	// JWTを生成して返す
 	claims := jwtgo.MapClaims{
 		"scopes": "api:access",
 		"id":     user.ID,
@@ -144,43 +151,51 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	}
 	token := newToken(claims)
 	return ctx.OK(&app.Token{Token: "Bearer " + token})
-	// AuthController_Signin: end_implement
 }
 
 // Signup runs the signup action.
 func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
-	// AuthController_Signup: start_implement
 
-	// Put your logic here
+	// ユーザーIDが使用可能かを検査
 	p := ctx.Payload
-	err := c.db.NewUser(p.ID)
-	if err != nil {
-		log.Printf("[EvelyApi] faild to create user: %s", err)
+	uc := c.db.Users()
+	if !uc.VerifyID(p.ID) {
+		log.Printf("[EvelyApi] faild to create user: \"" + p.ID + "\" is already in use.")
 		return ctx.BadRequest()
 	}
 
+	// パスワードを暗号化
 	pass, err := bcrypt.GenerateFromPassword([]byte(p.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to generate hash: %s", err)
 		return ctx.BadRequest()
 	}
-	log.Print("[Password]%s", string(pass))
-	user := &model.UserModel{
+
+	// ユーザーをDBに保存
+	user := &UserModel{
 		ID:       p.ID,
 		Password: string(pass),
 		Name:     p.Name,
-		Mail: model.Mail{
+		Mail: &Mail{
 			Email: p.Mail,
 			State: STATE_OK,
 		},
 		Tel: p.Tel,
 	}
-	err = c.db.SaveUser(user)
+    keys := Keys{"id": user.ID}
+	err = uc.Save(User(user), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save user: %s", err)
 		return ctx.BadRequest()
 	}
-	_ = c.db.DeletePendingUser(user.Mail.Email)
+
+	// 一時ユーザーを削除する
+	err = c.db.PendingUsers().Delete(Keys{"email": user.Mail.Email})
+	if err != nil {
+		log.Printf("[EvelyApi] faild to delete pending user: %s", err)
+	}
+
+	// JWTを生成して返す
 	claims := jwtgo.MapClaims{
 		"scopes": "api:access",
 		"id":     user.ID,
@@ -188,19 +203,16 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 	}
 	token := newToken(claims)
 	return ctx.OK(&app.Token{Token: "Bearer " + token})
-	// AuthController_Signup: end_implement
 }
 
 // VerifyToken runs the verify_token action.
 func (c *AuthController) VerifyToken(ctx *app.VerifyTokenAuthContext) error {
-	// AuthController_VerifyToken: start_implement
-
-	// Put your logic here
-	email, err := c.db.VerifyToken(ctx.Token)
+	// トークンが使用可能か検査
+	model, err := c.db.PendingUsers().FindDoc(Keys{"token": ctx.Token})
+    pu := model.Make().PendingUser
 	if err != nil {
 		log.Printf("[EvelyApi] faild to verify email: %s", err)
 		return ctx.NotFound()
 	}
-	return ctx.OK(ToEmailMedia(email))
-	// AuthController_VerifyToken: end_implement
+	return ctx.OK(ToEmailMedia(pu.Email))
 }
