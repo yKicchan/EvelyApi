@@ -15,7 +15,7 @@ type PendingUsersCollection struct {
 }
 
 func NewPendingUsersCollection(c *mgo.Collection) *PendingUsersCollection {
-    return &PendingUsersCollection{c}
+	return &PendingUsersCollection{c}
 }
 
 /**
@@ -25,7 +25,7 @@ func NewPendingUsersCollection(c *mgo.Collection) *PendingUsersCollection {
  * @return error エラー
  */
 func (this *PendingUsersCollection) Save(model EvelyModel, keys Keys) error {
-    pu := model.Make().PendingUser
+	pu := model.Make().PendingUser
 	update := bson.M{"$set": pu}
 	_, err := this.Upsert(keys.ToQuery(), update)
 	return err
@@ -38,7 +38,7 @@ func (this *PendingUsersCollection) Save(model EvelyModel, keys Keys) error {
  * @return err   エラー
  */
 func (this *PendingUsersCollection) FindDoc(keys Keys) (EvelyModel, error) {
-    pu := &PendingUserModel{}
+	pu := &PendingUserModel{}
 	err := this.Find(keys.ToQuery()).One(&pu)
 	return PendingUser(pu), err
 }

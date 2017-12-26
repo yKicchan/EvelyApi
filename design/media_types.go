@@ -78,7 +78,7 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 		Attribute("name")
 		Attribute("mail", Mail)
 		Attribute("tel")
-        Attribute("createdAt", DateTime, "作成日時")
+		Attribute("createdAt", DateTime, "作成日時")
 	})
 	Required("id", "name", "mail", "tel", "createdAt")
 	View("default", func() {
@@ -86,7 +86,7 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 		Attribute("name")
 		Attribute("mail")
 		Attribute("tel")
-        Attribute("createdAt")
+		Attribute("createdAt")
 	})
 	View("tiny", func() {
 		Attribute("id")

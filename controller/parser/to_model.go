@@ -3,7 +3,7 @@ package parser
 import (
 	"EvelyApi/app"
 	. "EvelyApi/model/document"
-    "labix.org/v2/mgo/bson"
+	"labix.org/v2/mgo/bson"
 	"time"
 )
 

@@ -38,7 +38,7 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 	// イベントを作成
 	p := ctx.Payload
 	event := parser.ToEventModel(p, bson.NewObjectId(), user)
-    keys := Keys{"_id": event.ID}
+	keys := Keys{"_id": event.ID}
 	err := c.db.Events().Save(Event(event), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save event: %s", err)
@@ -95,7 +95,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 	// IDと一致するイベントを検索
 	model, err := c.db.Events().FindDoc(Keys{"_id": ctx.EventID})
-    event := model.Make().Event
+	event := model.Make().Event
 	if err != nil {
 		log.Printf("[EvelyApi] faild to find event: %s", err)
 		return ctx.NotFound()
@@ -119,7 +119,7 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 
 	// DBのイベント情報を更新
 	event := parser.ToEventModel(ctx.Payload, bson.ObjectIdHex(ctx.EventID), user)
-    keys := Keys{"_id": event.ID}
+	keys := Keys{"_id": event.ID}
 	err := c.db.Events().Save(Event(event), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save event: %s", err)

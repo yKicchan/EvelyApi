@@ -15,7 +15,7 @@ type UsersCollection struct {
 }
 
 func NewUsersCollection(c *mgo.Collection) *UsersCollection {
-    return &UsersCollection{c}
+	return &UsersCollection{c}
 }
 
 /**
@@ -25,7 +25,7 @@ func NewUsersCollection(c *mgo.Collection) *UsersCollection {
  * @return error エラー
  */
 func (this *UsersCollection) Save(model EvelyModel, keys Keys) error {
-    u := model.Make().User
+	u := model.Make().User
 	update := bson.M{"$set": u}
 	_, err := this.Upsert(keys.ToQuery(), update)
 	return err
@@ -38,7 +38,7 @@ func (this *UsersCollection) Save(model EvelyModel, keys Keys) error {
  * @return err   エラー
  */
 func (this *UsersCollection) FindDoc(keys Keys) (EvelyModel, error) {
-    u := &UserModel{}
+	u := &UserModel{}
 	err := this.Find(keys.ToQuery()).One(&u)
 	return User(u), err
 }

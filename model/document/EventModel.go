@@ -20,19 +20,19 @@ var EVENT_TINY_SELECTOR = bson.M{
 
 // イベントのDBモデル
 type EventModel struct {
-	ID          bson.ObjectId    `bson:"_id"`
-	Title       string    `bson:"title"`
-	Body        string    `bson:"body"`
-	Host        *Host     `bson:"host"`
-	Mail        string    `bson:"mail"`
-	Tel         string    `bson:"tel"`
-	URL         string    `bson:"url"`
-	Plans       []*Plan   `bson:"plans"`
-	NoticeRange int       `bson:"notice_range"`
-	Scope       string    `bson:"scope"`
-	OpenFlg     bool      `bson:"open_flg"`
-	UpdateDate  time.Time `bson:"update_date"`
-	CreatedAt   time.Time `bson:"created_at"`
+	ID          bson.ObjectId `bson:"_id"`
+	Title       string        `bson:"title"`
+	Body        string        `bson:"body"`
+	Host        *Host         `bson:"host"`
+	Mail        string        `bson:"mail"`
+	Tel         string        `bson:"tel"`
+	URL         string        `bson:"url"`
+	Plans       []*Plan       `bson:"plans"`
+	NoticeRange int           `bson:"notice_range"`
+	Scope       string        `bson:"scope"`
+	OpenFlg     bool          `bson:"open_flg"`
+	UpdateDate  time.Time     `bson:"update_date"`
+	CreatedAt   time.Time     `bson:"created_at"`
 }
 
 // イベント主催者のDBモデル

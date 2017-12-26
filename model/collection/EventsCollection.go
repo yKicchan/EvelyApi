@@ -16,7 +16,7 @@ type EventsCollection struct {
 }
 
 func NewEventsCollection(c *mgo.Collection) *EventsCollection {
-    return &EventsCollection{c}
+	return &EventsCollection{c}
 }
 
 /**
@@ -26,7 +26,7 @@ func NewEventsCollection(c *mgo.Collection) *EventsCollection {
  * @return error エラー
  */
 func (this *EventsCollection) Save(model EvelyModel, keys Keys) error {
-    e := model.Make().Event
+	e := model.Make().Event
 	update := bson.M{"$set": e}
 	_, err := this.Upsert(keys.ToQuery(), update)
 	return err
@@ -39,7 +39,7 @@ func (this *EventsCollection) Save(model EvelyModel, keys Keys) error {
  * @return err   エラー
  */
 func (this *EventsCollection) FindDoc(keys Keys) (EvelyModel, error) {
-    e := &EventModel{}
+	e := &EventModel{}
 	err := this.Find(keys.ToQuery()).One(&e)
 	return Event(e), err
 }

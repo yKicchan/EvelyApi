@@ -5,8 +5,8 @@ import (
 	. "EvelyApi/config"
 	"EvelyApi/controller/mailer"
 	"EvelyApi/model"
+	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
-    . "EvelyApi/model/collection"
 	"context"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
@@ -116,7 +116,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 		Token:     token,
 		CreatedAt: claims["created_at"].(time.Time),
 	}
-    keys := Keys{"email": pu.Email}
+	keys := Keys{"email": pu.Email}
 	err = c.db.PendingUsers().Save(PendingUser(pu), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to create pending user: %s", err)
@@ -131,7 +131,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	// ユーザーが存在するか検索
 	p := ctx.Payload
 	m, err := c.db.Users().FindDoc(Keys{"id": p.ID})
-    user := m.Make().User
+	user := m.Make().User
 	if err != nil {
 		return ctx.BadRequest()
 	}
@@ -182,7 +182,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		},
 		Tel: p.Tel,
 	}
-    keys := Keys{"id": user.ID}
+	keys := Keys{"id": user.ID}
 	err = uc.Save(User(user), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save user: %s", err)
@@ -209,7 +209,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 func (c *AuthController) VerifyToken(ctx *app.VerifyTokenAuthContext) error {
 	// トークンが使用可能か検査
 	model, err := c.db.PendingUsers().FindDoc(Keys{"token": ctx.Token})
-    pu := model.Make().PendingUser
+	pu := model.Make().PendingUser
 	if err != nil {
 		log.Printf("[EvelyApi] faild to verify email: %s", err)
 		return ctx.NotFound()

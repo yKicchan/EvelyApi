@@ -1,8 +1,8 @@
 package model
 
 import (
-    . "EvelyApi/config"
-    . "EvelyApi/model/collection"
+	. "EvelyApi/config"
+	. "EvelyApi/model/collection"
 	"labix.org/v2/mgo"
 )
 
@@ -18,13 +18,13 @@ func NewEvelyDB(db *mgo.Database) *EvelyDB {
 }
 
 func (this *EvelyDB) Events() *EventsCollection {
-    return NewEventsCollection(this.C(EVENT_COLLECTION))
+	return NewEventsCollection(this.C(EVENT_COLLECTION))
 }
 
 func (this *EvelyDB) Users() *UsersCollection {
-    return NewUsersCollection(this.C(USER_COLLECTION))
+	return NewUsersCollection(this.C(USER_COLLECTION))
 }
 
 func (this *EvelyDB) PendingUsers() *PendingUsersCollection {
-    return NewPendingUsersCollection(this.C(PENDING_USER_COLLECTION))
+	return NewPendingUsersCollection(this.C(PENDING_USER_COLLECTION))
 }

@@ -1,8 +1,8 @@
 package collection
 
 import (
-    . "EvelyApi/model/document"
-    "labix.org/v2/mgo/bson"
+	. "EvelyApi/model/document"
+	"labix.org/v2/mgo/bson"
 )
 
 /**
@@ -42,16 +42,16 @@ type Keys map[string]interface{}
  * @return query MongoDB用のクエリに変換したマップ
  */
 func (this Keys) ToQuery() (query bson.M) {
-    for key, val := range this {
-        if key == "_id" {
-            val = bson.ObjectIdHex(val.(string))
-        }
-        query = bson.M{
-            "$and": []interface{}{
-                query,
-                bson.M{key: val},
-            },
-        }
-    }
-    return query
+	for key, val := range this {
+		if key == "_id" {
+			val = bson.ObjectIdHex(val.(string))
+		}
+		query = bson.M{
+			"$and": []interface{}{
+				query,
+				bson.M{key: val},
+			},
+		}
+	}
+	return query
 }
