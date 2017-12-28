@@ -26,7 +26,7 @@ func NewEventsCollection(c *mgo.Collection) *EventsCollection {
  * @return error エラー
  */
 func (this *EventsCollection) Save(model EvelyModel, keys Keys) error {
-	e := model.Make().Event
+	e := model.GetEvent()
 	update := bson.M{"$set": e}
 	_, err := this.Upsert(keys.ToQuery(), update)
 	return err

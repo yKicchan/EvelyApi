@@ -25,7 +25,7 @@ func NewPendingUsersCollection(c *mgo.Collection) *PendingUsersCollection {
  * @return error エラー
  */
 func (this *PendingUsersCollection) Save(model EvelyModel, keys Keys) error {
-	pu := model.Make().PendingUser
+	pu := model.GetPendingUser()
 	update := bson.M{"$set": pu}
 	_, err := this.Upsert(keys.ToQuery(), update)
 	return err

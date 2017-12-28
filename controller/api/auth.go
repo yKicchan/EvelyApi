@@ -131,7 +131,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	// ユーザーが存在するか検索
 	p := ctx.Payload
 	m, err := c.db.Users().FindDoc(Keys{"id": p.ID})
-	user := m.Make().User
+	user := m.GetUser()
 	if err != nil {
 		return ctx.BadRequest()
 	}
@@ -208,8 +208,8 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 // VerifyToken runs the verify_token action.
 func (c *AuthController) VerifyToken(ctx *app.VerifyTokenAuthContext) error {
 	// トークンが使用可能か検査
-	model, err := c.db.PendingUsers().FindDoc(Keys{"token": ctx.Token})
-	pu := model.Make().PendingUser
+	m, err := c.db.PendingUsers().FindDoc(Keys{"token": ctx.Token})
+	pu := m.GetPendingUser()
 	if err != nil {
 		log.Printf("[EvelyApi] faild to verify email: %s", err)
 		return ctx.NotFound()

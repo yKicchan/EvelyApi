@@ -30,6 +30,6 @@ func (c *UsersController) Show(ctx *app.ShowUsersContext) error {
 		log.Printf("[EvelyApi] %s", err)
 		return ctx.NotFound()
 	}
-	user := m.Make().User
+	user := m.GetUser()
 	return ctx.OK(parser.ToUserMedia(user))
 }

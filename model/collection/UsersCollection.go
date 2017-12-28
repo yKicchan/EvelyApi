@@ -25,7 +25,7 @@ func NewUsersCollection(c *mgo.Collection) *UsersCollection {
  * @return error エラー
  */
 func (this *UsersCollection) Save(model EvelyModel, keys Keys) error {
-	u := model.Make().User
+	u := model.GetUser()
 	update := bson.M{"$set": u}
 	_, err := this.Upsert(keys.ToQuery(), update)
 	return err

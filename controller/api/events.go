@@ -94,8 +94,8 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 // Show runs the show action.
 func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 	// IDと一致するイベントを検索
-	model, err := c.db.Events().FindDoc(Keys{"_id": ctx.EventID})
-	event := model.Make().Event
+	m, err := c.db.Events().FindDoc(Keys{"_id": ctx.EventID})
+	event := m.GetEvent()
 	if err != nil {
 		log.Printf("[EvelyApi] faild to find event: %s", err)
 		return ctx.NotFound()
