@@ -28,7 +28,7 @@ func (c *UsersController) Show(ctx *app.ShowUsersContext) error {
 	m, err := c.db.Users().FindDoc(Keys{"id": ctx.UserID})
 	if err != nil {
 		log.Printf("[EvelyApi] %s", err)
-		return ctx.NotFound()
+		return ctx.NotFound(err)
 	}
 	user := m.GetUser()
 	return ctx.OK(parser.ToUserMedia(user))

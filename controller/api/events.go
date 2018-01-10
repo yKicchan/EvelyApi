@@ -6,6 +6,7 @@ import (
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
+    "errors"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
 	"log"
@@ -42,7 +43,7 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 	err := c.db.Events().Save(Event(event), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save event: %s", err)
-		return ctx.BadRequest()
+		return ctx.BadRequest(err)
 	}
 
 	return ctx.Created(parser.ToEventMedia(event))
@@ -56,14 +57,14 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 	userID := claims["id"].(string)
 	if userID != ctx.UserID {
 		log.Printf("[EvelyApi] permission error")
-		return ctx.Forbidden()
+		return ctx.Forbidden(errors.New("You do not have permission to delete events."))
 	}
 
 	// イベントを削除する
 	err := c.db.Events().Delete(Keys{"_id": ctx.EventID})
 	if err != nil {
 		log.Printf("[EvelyApi] failed to delete event: %s", err)
-		return ctx.NotFound()
+		return ctx.NotFound(err)
 	}
 	return ctx.OK([]byte("Seccess!!"))
 }
@@ -80,7 +81,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 	)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to search events: %s", err)
-		return ctx.NotFound()
+		return ctx.NotFound(err)
 	}
 
 	// イベント情報をレスポンス形式に変換して返す
@@ -98,7 +99,7 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 	event := m.GetEvent()
 	if err != nil {
 		log.Printf("[EvelyApi] faild to find event: %s", err)
-		return ctx.NotFound()
+		return ctx.NotFound(err)
 	}
 	return ctx.OK(parser.ToEventMedia(event))
 }
@@ -114,7 +115,7 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 	// 編集権限があるかを判定
 	if user.ID != ctx.UserID {
 		log.Printf("[EvelyApi] permission error")
-		return ctx.Forbidden()
+		return ctx.Forbidden(errors.New("You do not have permission to edit events"))
 	}
 
 	// DBのイベント情報を更新
@@ -123,7 +124,7 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 	err := c.db.Events().Save(Event(event), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save event: %s", err)
-		return ctx.NotFound()
+		return ctx.NotFound(err)
 	}
 	return ctx.OK(parser.ToEventMedia(event))
 }

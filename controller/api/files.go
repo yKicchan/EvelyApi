@@ -40,7 +40,7 @@ func (c *FilesController) Upload(ctx *app.UploadFilesContext) error {
 		if err != nil {
 			return goa.ErrBadRequest("failed to load part: %s", err)
 		}
-		f, err := os.OpenFile("./files/"+p.FileName(), os.O_WRONLY|os.O_CREATE, 0666)
+		f, err := os.OpenFile("./public/files/"+p.FileName(), os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			return fmt.Errorf("failed to save file: %s", err) // causes a 500 response
 		}

@@ -25,10 +25,10 @@ import (
 )
 
 // UploadFilesBadRequest runs the method Upload of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func UploadFilesBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.FilesController) http.ResponseWriter {
+func UploadFilesBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.FilesController) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -75,9 +75,17 @@ func UploadFilesBadRequest(t goatest.TInterface, ctx context.Context, service *g
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // UploadFilesOK runs the method Upload of the given controller with the given parameters.

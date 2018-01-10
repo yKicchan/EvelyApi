@@ -25,10 +25,10 @@ import (
 )
 
 // SendMailAuthBadRequest runs the method SendMail of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func SendMailAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.SignupPayload) http.ResponseWriter {
+func SendMailAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.SignupPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -53,8 +53,7 @@ func SendMailAuthBadRequest(t goatest.TInterface, ctx context.Context, service *
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -87,9 +86,17 @@ func SendMailAuthBadRequest(t goatest.TInterface, ctx context.Context, service *
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // SendMailAuthOK runs the method SendMail of the given controller with the given parameters and payload.
@@ -161,10 +168,10 @@ func SendMailAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 }
 
 // SigninAuthBadRequest runs the method Signin of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func SigninAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.LoginPayload) http.ResponseWriter {
+func SigninAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.LoginPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -189,8 +196,7 @@ func SigninAuthBadRequest(t goatest.TInterface, ctx context.Context, service *go
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -223,9 +229,17 @@ func SigninAuthBadRequest(t goatest.TInterface, ctx context.Context, service *go
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // SigninAuthOK runs the method Signin of the given controller with the given parameters and payload.
@@ -309,10 +323,10 @@ func SigninAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 }
 
 // SignupAuthBadRequest runs the method Signup of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func SignupAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.UserPayload) http.ResponseWriter {
+func SignupAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.UserPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -337,8 +351,7 @@ func SignupAuthBadRequest(t goatest.TInterface, ctx context.Context, service *go
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -371,9 +384,17 @@ func SignupAuthBadRequest(t goatest.TInterface, ctx context.Context, service *go
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // SignupAuthOK runs the method Signup of the given controller with the given parameters and payload.
@@ -457,10 +478,10 @@ func SignupAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 }
 
 // VerifyTokenAuthBadRequest runs the method VerifyToken of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func VerifyTokenAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, token string) http.ResponseWriter {
+func VerifyTokenAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, token string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -517,16 +538,24 @@ func VerifyTokenAuthBadRequest(t goatest.TInterface, ctx context.Context, servic
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // VerifyTokenAuthNotFound runs the method VerifyToken of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func VerifyTokenAuthNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, token string) http.ResponseWriter {
+func VerifyTokenAuthNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, token string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -583,9 +612,17 @@ func VerifyTokenAuthNotFound(t goatest.TInterface, ctx context.Context, service 
 	if rw.Code != 404 {
 		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // VerifyTokenAuthOK runs the method VerifyToken of the given controller with the given parameters.

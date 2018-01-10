@@ -665,6 +665,7 @@ paths:
         schema:
           $ref: '#/definitions/LoginPayload'
       produces:
+      - application/vnd.goa.error
       - application/vnd.token+json
       responses:
         "200":
@@ -673,6 +674,8 @@ paths:
             $ref: '#/definitions/Token'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: signin auth
@@ -690,6 +693,7 @@ paths:
         schema:
           $ref: '#/definitions/UserPayload'
       produces:
+      - application/vnd.goa.error
       - application/vnd.token+json
       responses:
         "200":
@@ -698,6 +702,8 @@ paths:
             $ref: '#/definitions/Token'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: signup auth
@@ -715,12 +721,15 @@ paths:
         schema:
           $ref: '#/definitions/SignupPayload'
       produces:
+      - application/vnd.goa.error
       - text/plain
       responses:
         "200":
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: send_mail auth
@@ -738,6 +747,7 @@ paths:
         type: string
       produces:
       - application/vnd.email+json
+      - application/vnd.goa.error
       responses:
         "200":
           description: OK
@@ -745,8 +755,12 @@ paths:
             $ref: '#/definitions/Email'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: verify_token auth
@@ -786,6 +800,7 @@ paths:
         type: string
       produces:
       - application/vnd.event+json; type=collection
+      - application/vnd.goa.error
       responses:
         "200":
           description: OK
@@ -793,8 +808,12 @@ paths:
             $ref: '#/definitions/EventCollection'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: list events
@@ -816,6 +835,7 @@ paths:
           $ref: '#/definitions/EventPayload'
       produces:
       - application/vnd.event+json
+      - application/vnd.goa.error
       responses:
         "201":
           description: Created
@@ -823,8 +843,12 @@ paths:
             $ref: '#/definitions/Event'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       security:
@@ -867,6 +891,7 @@ paths:
         type: string
       produces:
       - application/vnd.event+json; type=collection
+      - application/vnd.goa.error
       responses:
         "200":
           description: OK
@@ -874,8 +899,12 @@ paths:
             $ref: '#/definitions/EventCollection'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: list events
@@ -902,16 +931,23 @@ paths:
         required: true
         type: string
       produces:
+      - application/vnd.goa.error
       - text/plain
       responses:
         "200":
           description: OK
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
         "403":
           description: Forbidden
+          schema:
+            $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       security:
@@ -937,13 +973,20 @@ paths:
         type: string
       produces:
       - application/vnd.event+json
+      - application/vnd.goa.error
       responses:
         "200":
           description: OK
           schema:
             $ref: '#/definitions/Event'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: show events
@@ -976,6 +1019,7 @@ paths:
           $ref: '#/definitions/EventPayload'
       produces:
       - application/vnd.event+json
+      - application/vnd.goa.error
       responses:
         "200":
           description: OK
@@ -983,12 +1027,20 @@ paths:
             $ref: '#/definitions/Event'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
         "401":
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
         "403":
           description: Forbidden
+          schema:
+            $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       security:
@@ -1021,6 +1073,7 @@ paths:
       operationId: files#upload
       produces:
       - application/vnd.file_path+json; type=collection
+      - application/vnd.goa.error
       responses:
         "200":
           description: OK
@@ -1028,6 +1081,8 @@ paths:
             $ref: '#/definitions/File_pathCollection'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       security:
@@ -1047,6 +1102,7 @@ paths:
         required: true
         type: string
       produces:
+      - application/vnd.goa.error
       - application/vnd.user+json
       responses:
         "200":
@@ -1055,8 +1111,12 @@ paths:
             $ref: '#/definitions/User'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: show users
@@ -1095,16 +1155,8 @@ produces:
 - application/gob
 - application/x-gob
 responses:
-  BadRequest:
-    description: Bad Request
-  Forbidden:
-    description: Forbidden
-  NotFound:
-    description: Not Found
   OK:
     description: OK
-  Unauthorized:
-    description: Unauthorized
 schemes:
 - http
 securityDefinitions:

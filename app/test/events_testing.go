@@ -26,10 +26,10 @@ import (
 )
 
 // CreateEventsBadRequest runs the method Create of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func CreateEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.EventPayload) http.ResponseWriter {
+func CreateEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -54,8 +54,7 @@ func CreateEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -88,9 +87,17 @@ func CreateEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // CreateEventsCreated runs the method Create of the given controller with the given parameters and payload.
@@ -254,10 +261,10 @@ func CreateEventsCreatedTiny(t goatest.TInterface, ctx context.Context, service 
 }
 
 // CreateEventsUnauthorized runs the method Create of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func CreateEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.EventPayload) http.ResponseWriter {
+func CreateEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -282,8 +289,7 @@ func CreateEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -316,16 +322,24 @@ func CreateEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 	if rw.Code != 401 {
 		t.Errorf("invalid response status code: got %+v, expected 401", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // DeleteEventsForbidden runs the method Delete of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func DeleteEventsForbidden(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) http.ResponseWriter {
+func DeleteEventsForbidden(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -374,16 +388,24 @@ func DeleteEventsForbidden(t goatest.TInterface, ctx context.Context, service *g
 	if rw.Code != 403 {
 		t.Errorf("invalid response status code: got %+v, expected 403", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // DeleteEventsNotFound runs the method Delete of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func DeleteEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) http.ResponseWriter {
+func DeleteEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -432,9 +454,17 @@ func DeleteEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 	if rw.Code != 404 {
 		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // DeleteEventsOK runs the method Delete of the given controller with the given parameters.
@@ -496,10 +526,10 @@ func DeleteEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 }
 
 // DeleteEventsUnauthorized runs the method Delete of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func DeleteEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) http.ResponseWriter {
+func DeleteEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -548,16 +578,24 @@ func DeleteEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 	if rw.Code != 401 {
 		t.Errorf("invalid response status code: got %+v, expected 401", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ListEventsBadRequest runs the method List of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) http.ResponseWriter {
+func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -630,16 +668,24 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ListEventsBadRequest1 runs the method List of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsBadRequest1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) http.ResponseWriter {
+func ListEventsBadRequest1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -713,16 +759,24 @@ func ListEventsBadRequest1(t goatest.TInterface, ctx context.Context, service *g
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ListEventsNotFound runs the method List of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) http.ResponseWriter {
+func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -795,16 +849,24 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 	if rw.Code != 404 {
 		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ListEventsNotFound1 runs the method List of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsNotFound1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) http.ResponseWriter {
+func ListEventsNotFound1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -878,9 +940,17 @@ func ListEventsNotFound1(t goatest.TInterface, ctx context.Context, service *goa
 	if rw.Code != 404 {
 		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ListEventsOK runs the method List of the given controller with the given parameters.
@@ -1262,10 +1332,10 @@ func ListEventsOK1Tiny(t goatest.TInterface, ctx context.Context, service *goa.S
 }
 
 // ModifyEventsBadRequest runs the method Modify of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) http.ResponseWriter {
+func ModifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1290,8 +1360,7 @@ func ModifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -1326,16 +1395,24 @@ func ModifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ModifyEventsForbidden runs the method Modify of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsForbidden(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) http.ResponseWriter {
+func ModifyEventsForbidden(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1360,8 +1437,7 @@ func ModifyEventsForbidden(t goatest.TInterface, ctx context.Context, service *g
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -1396,16 +1472,24 @@ func ModifyEventsForbidden(t goatest.TInterface, ctx context.Context, service *g
 	if rw.Code != 403 {
 		t.Errorf("invalid response status code: got %+v, expected 403", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ModifyEventsNotFound runs the method Modify of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) http.ResponseWriter {
+func ModifyEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1430,8 +1514,7 @@ func ModifyEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -1466,9 +1549,17 @@ func ModifyEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 	if rw.Code != 404 {
 		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ModifyEventsOK runs the method Modify of the given controller with the given parameters and payload.
@@ -1636,10 +1727,10 @@ func ModifyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.
 }
 
 // ModifyEventsUnauthorized runs the method Modify of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) http.ResponseWriter {
+func ModifyEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1664,8 +1755,7 @@ func ModifyEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -1700,16 +1790,90 @@ func ModifyEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 	if rw.Code != 401 {
 		t.Errorf("invalid response status code: got %+v, expected 401", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
+}
+
+// ShowEventsBadRequest runs the method Show of the given controller with the given parameters.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func ShowEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) (http.ResponseWriter, error) {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	u := &url.URL{
+		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+	}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		panic("invalid test " + err.Error()) // bug
+	}
+	prms := url.Values{}
+	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	showCtx, _err := app.NewShowEventsContext(goaCtx, req, service)
+	if _err != nil {
+		panic("invalid test data " + _err.Error()) // bug
+	}
+
+	// Perform action
+	_err = ctrl.Show(showCtx)
+
+	// Validate response
+	if _err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
+	}
+	if rw.Code != 400 {
+		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
+	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
+
+	// Return results
+	return rw, mt
 }
 
 // ShowEventsNotFound runs the method Show of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ShowEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) http.ResponseWriter {
+func ShowEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1758,9 +1922,17 @@ func ShowEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 	if rw.Code != 404 {
 		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // ShowEventsOK runs the method Show of the given controller with the given parameters.

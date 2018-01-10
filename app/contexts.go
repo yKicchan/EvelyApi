@@ -49,9 +49,11 @@ func (ctx *SendMailAuthContext) OK(resp []byte) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *SendMailAuthContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *SendMailAuthContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // SigninAuthContext provides the auth signin action context.
@@ -83,9 +85,11 @@ func (ctx *SigninAuthContext) OK(r *Token) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *SigninAuthContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *SigninAuthContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // SignupAuthContext provides the auth signup action context.
@@ -117,9 +121,11 @@ func (ctx *SignupAuthContext) OK(r *Token) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *SignupAuthContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *SignupAuthContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // VerifyTokenAuthContext provides the auth verify_token action context.
@@ -158,15 +164,19 @@ func (ctx *VerifyTokenAuthContext) OK(r *Email) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *VerifyTokenAuthContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *VerifyTokenAuthContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *VerifyTokenAuthContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
+func (ctx *VerifyTokenAuthContext) NotFound(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
 }
 
 // CreateEventsContext provides the events create action context.
@@ -206,15 +216,19 @@ func (ctx *CreateEventsContext) CreatedTiny(r *EventTiny) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *CreateEventsContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *CreateEventsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // Unauthorized sends a HTTP response with status code 401.
-func (ctx *CreateEventsContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
+func (ctx *CreateEventsContext) Unauthorized(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
 }
 
 // DeleteEventsContext provides the events delete action context.
@@ -262,21 +276,27 @@ func (ctx *DeleteEventsContext) OK(resp []byte) error {
 }
 
 // Unauthorized sends a HTTP response with status code 401.
-func (ctx *DeleteEventsContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
+func (ctx *DeleteEventsContext) Unauthorized(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
 }
 
 // Forbidden sends a HTTP response with status code 403.
-func (ctx *DeleteEventsContext) Forbidden() error {
-	ctx.ResponseData.WriteHeader(403)
-	return nil
+func (ctx *DeleteEventsContext) Forbidden(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 403, r)
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *DeleteEventsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
+func (ctx *DeleteEventsContext) NotFound(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
 }
 
 // ListEventsContext provides the events list action context.
@@ -371,15 +391,19 @@ func (ctx *ListEventsContext) OKTiny(r EventTinyCollection) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *ListEventsContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *ListEventsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *ListEventsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
+func (ctx *ListEventsContext) NotFound(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
 }
 
 // ModifyEventsContext provides the events modify action context.
@@ -434,27 +458,35 @@ func (ctx *ModifyEventsContext) OKTiny(r *EventTiny) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *ModifyEventsContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *ModifyEventsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // Unauthorized sends a HTTP response with status code 401.
-func (ctx *ModifyEventsContext) Unauthorized() error {
-	ctx.ResponseData.WriteHeader(401)
-	return nil
+func (ctx *ModifyEventsContext) Unauthorized(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
 }
 
 // Forbidden sends a HTTP response with status code 403.
-func (ctx *ModifyEventsContext) Forbidden() error {
-	ctx.ResponseData.WriteHeader(403)
-	return nil
+func (ctx *ModifyEventsContext) Forbidden(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 403, r)
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *ModifyEventsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
+func (ctx *ModifyEventsContext) NotFound(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
 }
 
 // ShowEventsContext provides the events show action context.
@@ -507,10 +539,20 @@ func (ctx *ShowEventsContext) OKTiny(r *EventTiny) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ShowEventsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
 // NotFound sends a HTTP response with status code 404.
-func (ctx *ShowEventsContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
+func (ctx *ShowEventsContext) NotFound(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
 }
 
 // UpdateEventsContext provides the events update action context.
@@ -573,9 +615,11 @@ func (ctx *UploadFilesContext) OK(r FilePathCollection) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *UploadFilesContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *UploadFilesContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // ShowUsersContext provides the users show action context.
@@ -620,13 +664,17 @@ func (ctx *ShowUsersContext) OKTiny(r *UserTiny) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *ShowUsersContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *ShowUsersContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *ShowUsersContext) NotFound() error {
-	ctx.ResponseData.WriteHeader(404)
-	return nil
+func (ctx *ShowUsersContext) NotFound(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
 }

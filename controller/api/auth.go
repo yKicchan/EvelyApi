@@ -8,6 +8,7 @@ import (
 	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
 	"context"
+    "errors"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
@@ -89,7 +90,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	email := ctx.Payload.Email
 	res := c.db.Users().VerifyEmail(email)
 	if !res {
-		return ctx.BadRequest()
+		return ctx.BadRequest(errors.New("\"" + email + "\" is already in use."))
 	}
 
 	// トークンを発行する
@@ -107,7 +108,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	err := mailer.SendMail(email, subject, body)
 	if !res {
 		log.Printf("[EvelyApi] faild to send email: %s", err)
-		return ctx.BadRequest()
+		return ctx.BadRequest(err)
 	}
 
 	// 認証待ちユーザーをDBに保存
@@ -120,7 +121,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	err = c.db.PendingUsers().Save(PendingUser(pu), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to create pending user: %s", err)
-		return ctx.BadRequest()
+		return ctx.BadRequest(err)
 	}
 	return ctx.OK([]byte("Success!!"))
 }
@@ -133,14 +134,14 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	m, err := c.db.Users().FindDoc(Keys{"id": p.ID})
 	user := m.GetUser()
 	if err != nil {
-		return ctx.BadRequest()
+		return ctx.BadRequest(errors.New("The ID and password you entered did not match."))
 	}
 
 	// IDとパスワードが一致するかを検査
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(p.Password))
 	if err != nil {
 		log.Printf("[EvelyApi] %s", err)
-		return ctx.BadRequest()
+    	return ctx.BadRequest(errors.New("The ID and password you entered did not match."))
 	}
 
 	// JWTを生成して返す
@@ -161,14 +162,14 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 	uc := c.db.Users()
 	if !uc.VerifyID(p.ID) {
 		log.Printf("[EvelyApi] faild to create user: \"" + p.ID + "\" is already in use.")
-		return ctx.BadRequest()
+		return ctx.BadRequest(errors.New("\"" + p.ID + "\" is already in use."))
 	}
 
 	// パスワードを暗号化
 	pass, err := bcrypt.GenerateFromPassword([]byte(p.Password), bcrypt.DefaultCost)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to generate hash: %s", err)
-		return ctx.BadRequest()
+		return ctx.BadRequest(err)
 	}
 
 	// ユーザーをDBに保存
@@ -186,7 +187,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 	err = uc.Save(User(user), keys)
 	if err != nil {
 		log.Printf("[EvelyApi] faild to save user: %s", err)
-		return ctx.BadRequest()
+		return ctx.BadRequest(err)
 	}
 
 	// 一時ユーザーを削除する
@@ -212,7 +213,7 @@ func (c *AuthController) VerifyToken(ctx *app.VerifyTokenAuthContext) error {
 	pu := m.GetPendingUser()
 	if err != nil {
 		log.Printf("[EvelyApi] faild to verify email: %s", err)
-		return ctx.NotFound()
+		return ctx.NotFound(err)
 	}
 	return ctx.OK(ToEmailMedia(pu.Email))
 }

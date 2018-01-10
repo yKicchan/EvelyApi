@@ -15,7 +15,7 @@ var _ = Resource("auth", func() {
 		Routing(POST("/signin"))
 		Payload(LoginPayload)
 		Response(OK, TokenMedia)
-		Response(BadRequest)
+		Response(BadRequest, ErrorMedia)
 	})
 
 	Action("signup", func() {
@@ -24,7 +24,7 @@ var _ = Resource("auth", func() {
 		Routing(POST("/signup"))
 		Payload(UserPayload)
 		Response(OK, TokenMedia)
-		Response(BadRequest)
+		Response(BadRequest, ErrorMedia)
 	})
 
 	Action("send_mail", func() {
@@ -33,7 +33,7 @@ var _ = Resource("auth", func() {
 		Routing(POST("/signup/send_mail"))
 		Payload(SignupPayload)
 		Response(OK)
-		Response(BadRequest)
+		Response(BadRequest, ErrorMedia)
 	})
 
 	Action("verify_token", func() {
@@ -47,8 +47,8 @@ var _ = Resource("auth", func() {
 			Required("token")
 		})
 		Response(OK, EmailMedia)
-		Response(NotFound)
-		Response(BadRequest)
+		Response(NotFound, ErrorMedia)
+		Response(BadRequest, ErrorMedia)
 	})
 })
 
@@ -83,8 +83,8 @@ var _ = Resource("events", func() {
 			Required("limit", "offset")
 		})
 		Response(OK, CollectionOf(EventMedia))
-		Response(NotFound)
-		Response(BadRequest)
+		Response(NotFound, ErrorMedia)
+		Response(BadRequest, ErrorMedia)
 	})
 
 	Action("show", func() {
@@ -96,12 +96,12 @@ var _ = Resource("events", func() {
 				Example("yKicchan")
 			})
 			Param("event_id", String, "イベントID", func() {
-				Pattern("^[0-9]{6,8}-[0-9]+$")
-				Example("20170225-2")
+				Example("5a44d5f2775672b659ba00fa")
 			})
 		})
 		Response(OK, EventMedia)
-		Response(NotFound)
+        Response(BadRequest, ErrorMedia)
+		Response(NotFound, ErrorMedia)
 	})
 
 	Action("create", func() {
@@ -109,8 +109,8 @@ var _ = Resource("events", func() {
 		Routing(POST(""))
 		Payload(EventPayload)
 		Response(Created, EventMedia)
-		Response(BadRequest)
-		Response(Unauthorized)
+		Response(BadRequest, ErrorMedia)
+		Response(Unauthorized, ErrorMedia)
 	})
 
 	Action("modify", func() {
@@ -121,16 +121,15 @@ var _ = Resource("events", func() {
 				Example("yKicchan")
 			})
 			Param("event_id", String, "イベントID", func() {
-				Pattern("^[0-9]{6,8}-[0-9]+$")
-				Example("20170225-2")
+				Example("5a44d5f2775672b659ba00fa")
 			})
 		})
 		Payload(EventPayload)
 		Response(OK, EventMedia)
-		Response(BadRequest)
-		Response(Unauthorized)
-		Response(Forbidden)
-		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+		Response(Unauthorized, ErrorMedia)
+		Response(Forbidden, ErrorMedia)
+		Response(NotFound, ErrorMedia)
 	})
 
 	Action("delete", func() {
@@ -141,14 +140,13 @@ var _ = Resource("events", func() {
 				Example("yKicchan")
 			})
 			Param("event_id", String, "イベントID", func() {
-				Pattern("^[0-9]{6,8}-[0-9]+$")
-				Example("20170225-2")
+				Example("5a44d5f2775672b659ba00fa")
 			})
 		})
 		Response(OK)
-		Response(Unauthorized)
-		Response(Forbidden)
-		Response(NotFound)
+		Response(Unauthorized, ErrorMedia)
+		Response(Forbidden, ErrorMedia)
+		Response(NotFound, ErrorMedia)
 	})
 
 	Action("update", func() {
@@ -172,8 +170,8 @@ var _ = Resource("users", func() {
 			})
 		})
 		Response(OK, UserMedia)
-		Response(BadRequest)
-		Response(NotFound)
+		Response(BadRequest, ErrorMedia)
+		Response(NotFound, ErrorMedia)
 	})
 })
 
@@ -184,7 +182,7 @@ var _ = Resource("files", func() {
 		Description("ファイルアップロード")
 		Routing(POST("/upload"))
 		Response(OK, CollectionOf(FilePathMedia))
-		Response(BadRequest)
+		Response(BadRequest, ErrorMedia)
 	})
 
 	Files("/files/*filename", "public/files/")
