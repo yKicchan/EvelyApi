@@ -6,7 +6,7 @@ import (
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
-    "errors"
+	"errors"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
 	"log"
@@ -129,7 +129,28 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 	return ctx.OK(parser.ToEventMedia(event))
 }
 
+// Nearby runs the nearby action.
+func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
+	// EventsController_Nearby: start_implement
+
+	// Put your logic here
+
+	res := app.EventCollection{ID: "現在実装中"}
+	return ctx.OK(res)
+	// EventsController_Nearby: end_implement
+}
+
+// Notify runs the notify action.
+func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
+	// EventsController_Notify: start_implement
+
+	// Put your logic here
+
+	return nil
+	// EventsController_Notify: end_implement
+}
+
 // Update runs the update action.
 func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
-	return ctx.OK([]byte("現在実装中！\n完成までしばし待たれよ。"))
+	return ctx.OK([]byte("現在実装中"))
 }

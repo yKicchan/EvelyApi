@@ -146,3 +146,22 @@ var Mail = Type("Mail", func() {
 	})
 	Required("email", "state")
 })
+
+var NoticePayload = Type("NoticePayload", func() {
+	Description("デバイストークンと現在位置情報")
+	Reference(Location)
+	Attribute("deviceToken", String, "デバイストークン", func() {
+		Example("token")
+	})
+	Attribute("lat")
+	Attribute("lng")
+	Required("deviceToken", "lat", "lng")
+})
+
+var PinPayload = Type("PinPayload", func() {
+	Description("ピンする/外すイベントのID")
+	Attribute("ids", ArrayOf(String), "ピンするイベントのID配列", func() {
+		Example([]string{"5a44d5f2775672b659ba00fa", "2as4d5d27d5612b65cca000b"})
+	})
+	Required("ids")
+})

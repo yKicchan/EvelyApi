@@ -253,9 +253,6 @@ func NewDeleteEventsContext(ctx context.Context, r *http.Request, service *goa.S
 	if len(paramEventID) > 0 {
 		rawEventID := paramEventID[0]
 		rctx.EventID = rawEventID
-		if ok := goa.ValidatePattern(`^[0-9]{6,8}-[0-9]+$`, rctx.EventID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{6,8}-[0-9]+$`))
-		}
 	}
 	paramUserID := req.Params["user_id"]
 	if len(paramUserID) > 0 {
@@ -429,9 +426,6 @@ func NewModifyEventsContext(ctx context.Context, r *http.Request, service *goa.S
 	if len(paramEventID) > 0 {
 		rawEventID := paramEventID[0]
 		rctx.EventID = rawEventID
-		if ok := goa.ValidatePattern(`^[0-9]{6,8}-[0-9]+$`, rctx.EventID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{6,8}-[0-9]+$`))
-		}
 	}
 	paramUserID := req.Params["user_id"]
 	if len(paramUserID) > 0 {
@@ -489,13 +483,181 @@ func (ctx *ModifyEventsContext) NotFound(r error) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
 }
 
+// NearbyEventsContext provides the events nearby action context.
+type NearbyEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Lat    float64
+	Limit  int
+	Lng    float64
+	Offset int
+	Range  int
+}
+
+// NewNearbyEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller nearby action.
+func NewNearbyEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*NearbyEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := NearbyEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramLat := req.Params["lat"]
+	if len(paramLat) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("lat"))
+	} else {
+		rawLat := paramLat[0]
+		if lat, err2 := strconv.ParseFloat(rawLat, 64); err2 == nil {
+			rctx.Lat = lat
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("lat", rawLat, "number"))
+		}
+		if rctx.Lat < -90.000000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`lat`, rctx.Lat, -90.000000, true))
+		}
+		if rctx.Lat > 90.000000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`lat`, rctx.Lat, 90.000000, false))
+		}
+	}
+	paramLimit := req.Params["limit"]
+	if len(paramLimit) == 0 {
+		rctx.Limit = 3
+	} else {
+		rawLimit := paramLimit[0]
+		if limit, err2 := strconv.Atoi(rawLimit); err2 == nil {
+			rctx.Limit = limit
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("limit", rawLimit, "integer"))
+		}
+		if rctx.Limit < 1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`limit`, rctx.Limit, 1, true))
+		}
+		if rctx.Limit > 50 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`limit`, rctx.Limit, 50, false))
+		}
+	}
+	paramLng := req.Params["lng"]
+	if len(paramLng) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("lng"))
+	} else {
+		rawLng := paramLng[0]
+		if lng, err2 := strconv.ParseFloat(rawLng, 64); err2 == nil {
+			rctx.Lng = lng
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("lng", rawLng, "number"))
+		}
+		if rctx.Lng < -180.000000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`lng`, rctx.Lng, -180.000000, true))
+		}
+		if rctx.Lng > 180.000000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`lng`, rctx.Lng, 180.000000, false))
+		}
+	}
+	paramOffset := req.Params["offset"]
+	if len(paramOffset) == 0 {
+		rctx.Offset = 0
+	} else {
+		rawOffset := paramOffset[0]
+		if offset, err2 := strconv.Atoi(rawOffset); err2 == nil {
+			rctx.Offset = offset
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("offset", rawOffset, "integer"))
+		}
+		if rctx.Offset < 0 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`offset`, rctx.Offset, 0, true))
+		}
+	}
+	paramRange := req.Params["range"]
+	if len(paramRange) == 0 {
+		rctx.Range = 500
+	} else {
+		rawRange := paramRange[0]
+		if range_, err2 := strconv.Atoi(rawRange); err2 == nil {
+			rctx.Range = range_
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("range", rawRange, "integer"))
+		}
+		if rctx.Range < 10 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`range`, rctx.Range, 10, true))
+		}
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *NearbyEventsContext) OK(r EventCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKTiny sends a HTTP response with status code 200.
+func (ctx *NearbyEventsContext) OKTiny(r EventTinyCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventTinyCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *NearbyEventsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
+// NotifyEventsContext provides the events notify action context.
+type NotifyEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *NoticePayload
+}
+
+// NewNotifyEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller notify action.
+func NewNotifyEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*NotifyEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := NotifyEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *NotifyEventsContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *NotifyEventsContext) BadRequest() error {
+	ctx.ResponseData.WriteHeader(400)
+	return nil
+}
+
 // ShowEventsContext provides the events show action context.
 type ShowEventsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	EventID string
-	UserID  string
+	Ids []string
 }
 
 // NewShowEventsContext parses the incoming request URL and body, performs validations and creates the
@@ -507,34 +669,32 @@ func NewShowEventsContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ShowEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
-	paramEventID := req.Params["event_id"]
-	if len(paramEventID) > 0 {
-		rawEventID := paramEventID[0]
-		rctx.EventID = rawEventID
-		if ok := goa.ValidatePattern(`^[0-9]{6,8}-[0-9]+$`, rctx.EventID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`event_id`, rctx.EventID, `^[0-9]{6,8}-[0-9]+$`))
-		}
-	}
-	paramUserID := req.Params["user_id"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		rctx.UserID = rawUserID
+	paramIds := req.Params["ids"]
+	if len(paramIds) > 0 {
+		params := paramIds
+		rctx.Ids = params
 	}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *ShowEventsContext) OK(r *Event) error {
+func (ctx *ShowEventsContext) OK(r EventCollection) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventCollection{}
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
 // OKTiny sends a HTTP response with status code 200.
-func (ctx *ShowEventsContext) OKTiny(r *EventTiny) error {
+func (ctx *ShowEventsContext) OKTiny(r EventTinyCollection) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventTinyCollection{}
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -620,6 +780,98 @@ func (ctx *UploadFilesContext) BadRequest(r error) error {
 		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
+// OffPinsContext provides the pins off action context.
+type OffPinsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *PinPayload
+}
+
+// NewOffPinsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the pins controller off action.
+func NewOffPinsContext(ctx context.Context, r *http.Request, service *goa.Service) (*OffPinsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := OffPinsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *OffPinsContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *OffPinsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *OffPinsContext) Unauthorized(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
+}
+
+// OnPinsContext provides the pins on action context.
+type OnPinsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *PinPayload
+}
+
+// NewOnPinsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the pins controller on action.
+func NewOnPinsContext(ctx context.Context, r *http.Request, service *goa.Service) (*OnPinsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := OnPinsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *OnPinsContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *OnPinsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *OnPinsContext) Unauthorized(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
 }
 
 // ShowUsersContext provides the users show action context.

@@ -213,6 +213,8 @@ type EventsController interface {
 	Delete(*DeleteEventsContext) error
 	List(*ListEventsContext) error
 	Modify(*ModifyEventsContext) error
+	Nearby(*NearbyEventsContext) error
+	Notify(*NotifyEventsContext) error
 	Show(*ShowEventsContext) error
 	Update(*UpdateEventsContext) error
 }
@@ -224,6 +226,9 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/:user_id/:event_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/:user_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/nearby", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/notice", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/detail", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/update", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
@@ -313,6 +318,44 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 			return err
 		}
 		// Build the context
+		rctx, err := NewNearbyEventsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Nearby(rctx)
+	}
+	h = handleEventsOrigin(h)
+	service.Mux.Handle("GET", "/api/develop/v2/events/nearby", ctrl.MuxHandler("nearby", h, nil))
+	service.LogInfo("mount", "ctrl", "Events", "action", "Nearby", "route", "GET /api/develop/v2/events/nearby")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewNotifyEventsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*NoticePayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Notify(rctx)
+	}
+	h = handleEventsOrigin(h)
+	service.Mux.Handle("POST", "/api/develop/v2/events/notice", ctrl.MuxHandler("notify", h, unmarshalNotifyEventsPayload))
+	service.LogInfo("mount", "ctrl", "Events", "action", "Notify", "route", "POST /api/develop/v2/events/notice")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
 		rctx, err := NewShowEventsContext(ctx, req, service)
 		if err != nil {
 			return err
@@ -320,8 +363,8 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 		return ctrl.Show(rctx)
 	}
 	h = handleEventsOrigin(h)
-	service.Mux.Handle("GET", "/api/develop/v2/events/:user_id/:event_id", ctrl.MuxHandler("show", h, nil))
-	service.LogInfo("mount", "ctrl", "Events", "action", "Show", "route", "GET /api/develop/v2/events/:user_id/:event_id")
+	service.Mux.Handle("GET", "/api/develop/v2/events/detail", ctrl.MuxHandler("show", h, nil))
+	service.LogInfo("mount", "ctrl", "Events", "action", "Show", "route", "GET /api/develop/v2/events/detail")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -399,6 +442,21 @@ func unmarshalModifyEventsPayload(ctx context.Context, service *goa.Service, req
 	return nil
 }
 
+// unmarshalNotifyEventsPayload unmarshals the request body into the context request data Payload field.
+func unmarshalNotifyEventsPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &noticePayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
 // FilesController is the controller interface for the Files actions.
 type FilesController interface {
 	goa.Muxer
@@ -431,16 +489,14 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	service.LogInfo("mount", "ctrl", "Files", "action", "Upload", "route", "POST /api/develop/v2/files/upload", "security", "jwt")
 
 	h = ctrl.FileHandler("/files/*filename", "public/files/")
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleFilesOrigin(h)
 	service.Mux.Handle("GET", "/files/*filename", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/", "route", "GET /files/*filename", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/", "route", "GET /files/*filename")
 
 	h = ctrl.FileHandler("/files/", "public/files/index.html")
-	h = handleSecurity("jwt", h, "api:access")
 	h = handleFilesOrigin(h)
 	service.Mux.Handle("GET", "/files/", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/index.html", "route", "GET /files/", "security", "jwt")
+	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/index.html", "route", "GET /files/")
 }
 
 // handleFilesOrigin applies the CORS response headers corresponding to the origin.
@@ -468,6 +524,124 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// PinsController is the controller interface for the Pins actions.
+type PinsController interface {
+	goa.Muxer
+	Off(*OffPinsContext) error
+	On(*OnPinsContext) error
+}
+
+// MountPinsController "mounts" a Pins resource controller on the given service.
+func MountPinsController(service *goa.Service, ctrl PinsController) {
+	initService(service)
+	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/pins/off", ctrl.MuxHandler("preflight", handlePinsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/pins/on", ctrl.MuxHandler("preflight", handlePinsOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewOffPinsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*PinPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Off(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handlePinsOrigin(h)
+	service.Mux.Handle("PUT", "/api/develop/v2/pins/off", ctrl.MuxHandler("off", h, unmarshalOffPinsPayload))
+	service.LogInfo("mount", "ctrl", "Pins", "action", "Off", "route", "PUT /api/develop/v2/pins/off", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewOnPinsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*PinPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.On(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handlePinsOrigin(h)
+	service.Mux.Handle("PUT", "/api/develop/v2/pins/on", ctrl.MuxHandler("on", h, unmarshalOnPinsPayload))
+	service.LogInfo("mount", "ctrl", "Pins", "action", "On", "route", "PUT /api/develop/v2/pins/on", "security", "jwt")
+}
+
+// handlePinsOrigin applies the CORS response headers corresponding to the origin.
+func handlePinsOrigin(h goa.Handler) goa.Handler {
+
+	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		origin := req.Header.Get("Origin")
+		if origin == "" {
+			// Not a CORS request
+			return h(ctx, rw, req)
+		}
+		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+			ctx = goa.WithLogContext(ctx, "origin", origin)
+			rw.Header().Set("Access-Control-Allow-Origin", origin)
+			rw.Header().Set("Vary", "Origin")
+			rw.Header().Set("Access-Control-Expose-Headers", "X-Time")
+			rw.Header().Set("Access-Control-Max-Age", "600")
+			rw.Header().Set("Access-Control-Allow-Credentials", "true")
+			if acrm := req.Header.Get("Access-Control-Request-Method"); acrm != "" {
+				// We are handling a preflight request
+				rw.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+			}
+			return h(ctx, rw, req)
+		}
+
+		return h(ctx, rw, req)
+	}
+}
+
+// unmarshalOffPinsPayload unmarshals the request body into the context request data Payload field.
+func unmarshalOffPinsPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &pinPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalOnPinsPayload unmarshals the request body into the context request data Payload field.
+func unmarshalOnPinsPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &pinPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }
 
 // SwaggerController is the controller interface for the Swagger actions.

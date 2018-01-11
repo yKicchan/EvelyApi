@@ -8,7 +8,7 @@ import (
 	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
 	"context"
-    "errors"
+	"errors"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
@@ -141,7 +141,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(p.Password))
 	if err != nil {
 		log.Printf("[EvelyApi] %s", err)
-    	return ctx.BadRequest(errors.New("The ID and password you entered did not match."))
+		return ctx.BadRequest(errors.New("The ID and password you entered did not match."))
 	}
 
 	// JWTを生成して返す

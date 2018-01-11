@@ -16,10 +16,8 @@ import (
 )
 
 // EventsHref returns the resource href.
-func EventsHref(userID, eventID interface{}) string {
-	paramuserID := strings.TrimLeftFunc(fmt.Sprintf("%v", userID), func(r rune) bool { return r == '/' })
-	parameventID := strings.TrimLeftFunc(fmt.Sprintf("%v", eventID), func(r rune) bool { return r == '/' })
-	return fmt.Sprintf("/api/develop/v2/events/%v/%v", paramuserID, parameventID)
+func EventsHref() string {
+	return "/api/develop/v2/events/detail"
 }
 
 // UsersHref returns the resource href.

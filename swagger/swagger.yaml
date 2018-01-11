@@ -428,6 +428,55 @@ definitions:
     - state
     title: Mail
     type: object
+  NoticePayload:
+    description: デバイストークンと現在位置情報
+    example:
+      deviceToken: token
+      lat: 34.706425
+      lng: 135.50124
+    properties:
+      deviceToken:
+        description: デバイストークン
+        example: token
+        type: string
+      lat:
+        description: 緯度
+        example: 34.706425
+        maximum: 90
+        minimum: -90
+        type: number
+      lng:
+        description: 経度
+        example: 135.50124
+        maximum: 180
+        minimum: -180
+        type: number
+    required:
+    - deviceToken
+    - lat
+    - lng
+    title: NoticePayload
+    type: object
+  PinPayload:
+    description: ピンする/外すイベントのID
+    example:
+      ids:
+      - 5a44d5f2775672b659ba00fa
+      - 2as4d5d27d5612b65cca000b
+    properties:
+      ids:
+        description: ピンするイベントのID配列
+        example:
+        - 5a44d5f2775672b659ba00fa
+        - 2as4d5d27d5612b65cca000b
+        items:
+          example: Commodi fuga sit cumque aperiam.
+          type: string
+        type: array
+    required:
+    - ids
+    title: PinPayload
+    type: object
   Plan:
     description: イベントの開催予定情報
     example:
@@ -922,7 +971,6 @@ paths:
       - description: イベントID
         in: path
         name: event_id
-        pattern: ^[0-9]{6,8}-[0-9]+$
         required: true
         type: string
       - description: ユーザーID
@@ -956,42 +1004,6 @@ paths:
       summary: delete events
       tags:
       - events
-    get:
-      description: イベント情報取得
-      operationId: events#show
-      parameters:
-      - description: イベントID
-        in: path
-        name: event_id
-        pattern: ^[0-9]{6,8}-[0-9]+$
-        required: true
-        type: string
-      - description: ユーザーID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      produces:
-      - application/vnd.event+json
-      - application/vnd.goa.error
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/Event'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - http
-      summary: show events
-      tags:
-      - events
     put:
       description: |-
         イベント編集
@@ -1003,7 +1015,6 @@ paths:
       - description: イベントID
         in: path
         name: event_id
-        pattern: ^[0-9]{6,8}-[0-9]+$
         required: true
         type: string
       - description: ユーザーID
@@ -1049,6 +1060,121 @@ paths:
       summary: modify events
       tags:
       - events
+  /api/develop/v2/events/detail:
+    get:
+      description: イベント情報取得
+      operationId: events#show
+      parameters:
+      - collectionFormat: multi
+        description: 詳細を見るイベントのID配列
+        in: query
+        items:
+          type: string
+        name: ids
+        required: false
+        type: array
+      produces:
+      - application/vnd.event+json; type=collection
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EventCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: show events
+      tags:
+      - events
+  /api/develop/v2/events/nearby:
+    get:
+      description: 近くのイベントを検索する
+      operationId: events#nearby
+      parameters:
+      - description: 緯度
+        in: query
+        maximum: 90
+        minimum: -90
+        name: lat
+        required: true
+        type: number
+      - default: 3
+        description: 取得件数
+        in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        required: true
+        type: integer
+      - description: 経度
+        in: query
+        maximum: 180
+        minimum: -180
+        name: lng
+        required: true
+        type: number
+      - default: 0
+        description: 除外件数
+        in: query
+        minimum: 0
+        name: offset
+        required: true
+        type: integer
+      - default: 500
+        description: 検索範囲(半径m)
+        in: query
+        minimum: 10
+        name: range
+        required: false
+        type: integer
+      produces:
+      - application/vnd.event+json; type=collection
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EventCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: nearby events
+      tags:
+      - events
+  /api/develop/v2/events/notice:
+    post:
+      description: 近くにイベントがあれば通知する
+      operationId: events#notify
+      parameters:
+      - description: デバイストークンと現在位置情報
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/NoticePayload'
+      produces:
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      schemes:
+      - http
+      summary: notify events
+      tags:
+      - events
   /api/develop/v2/events/update:
     get:
       description: イベントの開催フラグを更新する
@@ -1091,6 +1217,80 @@ paths:
       summary: upload files
       tags:
       - files
+  /api/develop/v2/pins/off:
+    put:
+      description: |-
+        ピンを外す
+
+        Required security scopes:
+          * `api:access`
+      operationId: pins#off
+      parameters:
+      - description: ピンする/外すイベントのID
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/PinPayload'
+      produces:
+      - application/vnd.goa.error
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: off pins
+      tags:
+      - pins
+  /api/develop/v2/pins/on:
+    put:
+      description: |-
+        ピンする
+
+        Required security scopes:
+          * `api:access`
+      operationId: pins#on
+      parameters:
+      - description: ピンする/外すイベントのID
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/PinPayload'
+      produces:
+      - application/vnd.goa.error
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: on pins
+      tags:
+      - pins
   /api/develop/v2/users/{user_id}:
     get:
       description: アカウント情報取得
@@ -1124,9 +1324,6 @@ paths:
       - users
   /files/{filename}:
     get:
-      description: |-
-        Required security scopes:
-          * `api:access`
       operationId: files#/files/*filename
       parameters:
       - description: Relative file path
@@ -1145,9 +1342,6 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - http
-      security:
-      - jwt:
-        - api:access
       summary: Download public/files/
 produces:
 - application/json
@@ -1155,6 +1349,8 @@ produces:
 - application/gob
 - application/x-gob
 responses:
+  BadRequest:
+    description: Bad Request
   OK:
     description: OK
 schemes:

@@ -508,6 +508,133 @@ func (ut *Mail) Validate() (err error) {
 	return
 }
 
+// デバイストークンと現在位置情報
+type noticePayload struct {
+	// デバイストークン
+	DeviceToken *string `form:"deviceToken,omitempty" json:"deviceToken,omitempty" xml:"deviceToken,omitempty"`
+	// 緯度
+	Lat *float64 `form:"lat,omitempty" json:"lat,omitempty" xml:"lat,omitempty"`
+	// 経度
+	Lng *float64 `form:"lng,omitempty" json:"lng,omitempty" xml:"lng,omitempty"`
+}
+
+// Validate validates the noticePayload type instance.
+func (ut *noticePayload) Validate() (err error) {
+	if ut.DeviceToken == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "deviceToken"))
+	}
+	if ut.Lat == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "lat"))
+	}
+	if ut.Lng == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "lng"))
+	}
+	if ut.Lat != nil {
+		if *ut.Lat < -90.000000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.lat`, *ut.Lat, -90.000000, true))
+		}
+	}
+	if ut.Lat != nil {
+		if *ut.Lat > 90.000000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.lat`, *ut.Lat, 90.000000, false))
+		}
+	}
+	if ut.Lng != nil {
+		if *ut.Lng < -180.000000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.lng`, *ut.Lng, -180.000000, true))
+		}
+	}
+	if ut.Lng != nil {
+		if *ut.Lng > 180.000000 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.lng`, *ut.Lng, 180.000000, false))
+		}
+	}
+	return
+}
+
+// Publicize creates NoticePayload from noticePayload
+func (ut *noticePayload) Publicize() *NoticePayload {
+	var pub NoticePayload
+	if ut.DeviceToken != nil {
+		pub.DeviceToken = *ut.DeviceToken
+	}
+	if ut.Lat != nil {
+		pub.Lat = *ut.Lat
+	}
+	if ut.Lng != nil {
+		pub.Lng = *ut.Lng
+	}
+	return &pub
+}
+
+// デバイストークンと現在位置情報
+type NoticePayload struct {
+	// デバイストークン
+	DeviceToken string `form:"deviceToken" json:"deviceToken" xml:"deviceToken"`
+	// 緯度
+	Lat float64 `form:"lat" json:"lat" xml:"lat"`
+	// 経度
+	Lng float64 `form:"lng" json:"lng" xml:"lng"`
+}
+
+// Validate validates the NoticePayload type instance.
+func (ut *NoticePayload) Validate() (err error) {
+	if ut.DeviceToken == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "deviceToken"))
+	}
+
+	if ut.Lat < -90.000000 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lat`, ut.Lat, -90.000000, true))
+	}
+	if ut.Lat > 90.000000 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lat`, ut.Lat, 90.000000, false))
+	}
+	if ut.Lng < -180.000000 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lng`, ut.Lng, -180.000000, true))
+	}
+	if ut.Lng > 180.000000 {
+		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lng`, ut.Lng, 180.000000, false))
+	}
+	return
+}
+
+// ピンする/外すイベントのID
+type pinPayload struct {
+	// ピンするイベントのID配列
+	Ids []string `form:"ids,omitempty" json:"ids,omitempty" xml:"ids,omitempty"`
+}
+
+// Validate validates the pinPayload type instance.
+func (ut *pinPayload) Validate() (err error) {
+	if ut.Ids == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "ids"))
+	}
+	return
+}
+
+// Publicize creates PinPayload from pinPayload
+func (ut *pinPayload) Publicize() *PinPayload {
+	var pub PinPayload
+	if ut.Ids != nil {
+		pub.Ids = ut.Ids
+	}
+	return &pub
+}
+
+// ピンする/外すイベントのID
+type PinPayload struct {
+	// ピンするイベントのID配列
+	Ids []string `form:"ids" json:"ids" xml:"ids"`
+}
+
+// Validate validates the PinPayload type instance.
+func (ut *PinPayload) Validate() (err error) {
+	if ut.Ids == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "ids"))
+	}
+	return
+}
+
 // イベントの開催予定情報
 type plan struct {
 	Location     *location     `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`

@@ -133,10 +133,10 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit in
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	tmp13 := strconv.Itoa(limit)
-	values.Set("limit", tmp13)
-	tmp14 := strconv.Itoa(offset)
-	values.Set("offset", tmp14)
+	tmp19 := strconv.Itoa(limit)
+	values.Set("limit", tmp19)
+	tmp20 := strconv.Itoa(offset)
+	values.Set("offset", tmp20)
 	if keyword != nil {
 		values.Set("keyword", *keyword)
 	}
@@ -198,17 +198,101 @@ func (c *Client) NewModifyEventsRequest(ctx context.Context, path string, payloa
 	return req, nil
 }
 
-// ShowEventsPath computes a request path to the show action of events.
-func ShowEventsPath(userID string, eventID string) string {
-	param0 := userID
-	param1 := eventID
+// NearbyEventsPath computes a request path to the nearby action of events.
+func NearbyEventsPath() string {
 
-	return fmt.Sprintf("/api/develop/v2/events/%s/%s", param0, param1)
+	return fmt.Sprintf("/api/develop/v2/events/nearby")
+}
+
+// 近くのイベントを検索する
+func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, limit int, lng float64, offset int, range_ *int) (*http.Response, error) {
+	req, err := c.NewNearbyEventsRequest(ctx, path, lat, limit, lng, offset, range_)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewNearbyEventsRequest create the request corresponding to the nearby action endpoint of the events resource.
+func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat float64, limit int, lng float64, offset int, range_ *int) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	tmp21 := strconv.FormatFloat(lat, 'f', -1, 64)
+	values.Set("lat", tmp21)
+	tmp22 := strconv.Itoa(limit)
+	values.Set("limit", tmp22)
+	tmp23 := strconv.FormatFloat(lng, 'f', -1, 64)
+	values.Set("lng", tmp23)
+	tmp24 := strconv.Itoa(offset)
+	values.Set("offset", tmp24)
+	if range_ != nil {
+		tmp25 := strconv.Itoa(*range_)
+		values.Set("range", tmp25)
+	}
+	u.RawQuery = values.Encode()
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
+// NotifyEventsPath computes a request path to the notify action of events.
+func NotifyEventsPath() string {
+
+	return fmt.Sprintf("/api/develop/v2/events/notice")
+}
+
+// 近くにイベントがあれば通知する
+func (c *Client) NotifyEvents(ctx context.Context, path string, payload *NoticePayload, contentType string) (*http.Response, error) {
+	req, err := c.NewNotifyEventsRequest(ctx, path, payload, contentType)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewNotifyEventsRequest create the request corresponding to the notify action endpoint of the events resource.
+func (c *Client) NewNotifyEventsRequest(ctx context.Context, path string, payload *NoticePayload, contentType string) (*http.Request, error) {
+	var body bytes.Buffer
+	if contentType == "" {
+		contentType = "*/*" // Use default encoder
+	}
+	err := c.Encoder.Encode(payload, &body, contentType)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode body: %s", err)
+	}
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("POST", u.String(), &body)
+	if err != nil {
+		return nil, err
+	}
+	header := req.Header
+	if contentType == "*/*" {
+		header.Set("Content-Type", "application/json")
+	} else {
+		header.Set("Content-Type", contentType)
+	}
+	return req, nil
+}
+
+// ShowEventsPath computes a request path to the show action of events.
+func ShowEventsPath() string {
+
+	return fmt.Sprintf("/api/develop/v2/events/detail")
 }
 
 // イベント情報取得
-func (c *Client) ShowEvents(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewShowEventsRequest(ctx, path)
+func (c *Client) ShowEvents(ctx context.Context, path string, ids []string) (*http.Response, error) {
+	req, err := c.NewShowEventsRequest(ctx, path, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -216,12 +300,18 @@ func (c *Client) ShowEvents(ctx context.Context, path string) (*http.Response, e
 }
 
 // NewShowEventsRequest create the request corresponding to the show action endpoint of the events resource.
-func (c *Client) NewShowEventsRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewShowEventsRequest(ctx context.Context, path string, ids []string) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	for _, p := range ids {
+		tmp26 := p
+		values.Add("ids", tmp26)
+	}
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err

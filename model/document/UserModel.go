@@ -6,7 +6,15 @@ import (
 )
 
 // ユーザーの全情報(オブジェクトIDを除く)を抽出するセレクタ
-var USER_FULL_SELECTOR = bson.M{"_id": 0}
+var USER_FULL_SELECTOR = bson.M{
+    "_id": 0,
+    "id": 1,
+    "password": 1,
+    "name": 1,
+    "mail": 1,
+    "tel": 1,
+    "create_at": 1,
+}
 
 // ユーザーの一部情報のみ抽出するセレクタ
 var USER_TINY_SELECTOR = bson.M{
