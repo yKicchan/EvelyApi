@@ -125,7 +125,7 @@ var _ = Resource("events", func() {
 		Routing(GET("/detail"))
 		Params(func() {
 			Param("ids", ArrayOf(String), "詳細を見るイベントのID配列", func() {
-				Example([]string{"5a44d5f2775672b659ba00fa", "2as4d5d27d5612b65cca000b"})
+                Example([]string{"5a44d5f2775672b659ba00fa", "5a44d5f2775672b659ba00fb"})
 			})
             Required("ids")
 		})

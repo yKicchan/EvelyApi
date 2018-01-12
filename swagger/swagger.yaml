@@ -462,13 +462,13 @@ definitions:
     example:
       ids:
       - 5a44d5f2775672b659ba00fa
-      - 2as4d5d27d5612b65cca000b
+      - 5a44d5f2775672b659ba00fb
     properties:
       ids:
         description: ピンするイベントのID配列
         example:
         - 5a44d5f2775672b659ba00fa
-        - 2as4d5d27d5612b65cca000b
+        - 5a44d5f2775672b659ba00fb
         items:
           example: Porro rem commodi.
           type: string
@@ -552,6 +552,9 @@ definitions:
       id: yKicchan
       mail: yKicchanApp@gmail.com
       name: きっちゃそ
+      pins:
+      - 5a44d5f2775672b659ba00fa
+      - 5a44d5f2775672b659ba00fb
       tel: 090-1234-5678
     properties:
       createdAt:
@@ -573,6 +576,15 @@ definitions:
         maxLength: 50
         minLength: 1
         type: string
+      pins:
+        description: ピンしているイベントのID配列
+        example:
+        - 5a44d5f2775672b659ba00fa
+        - 5a44d5f2775672b659ba00fb
+        items:
+          example: Sit cumque aperiam praesentium dolor debitis nemo.
+          type: string
+        type: array
       tel:
         default: ""
         description: 電話番号
@@ -583,6 +595,7 @@ definitions:
     - name
     - mail
     - tel
+    - pins
     - createdAt
     title: 'Mediatype identifier: application/vnd.user+json; view=default'
     type: object

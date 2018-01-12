@@ -323,7 +323,7 @@ Payload example:
 {
    "ids": [
       "5a44d5f2775672b659ba00fa",
-      "2as4d5d27d5612b65cca000b"
+      "5a44d5f2775672b659ba00fb"
    ]
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
@@ -347,7 +347,7 @@ Payload example:
 {
    "ids": [
       "5a44d5f2775672b659ba00fa",
-      "2as4d5d27d5612b65cca000b"
+      "5a44d5f2775672b659ba00fb"
    ]
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp8.Run(c, args) },
