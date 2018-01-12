@@ -52,6 +52,9 @@ func main() {
     c5 := api.NewFilesController(service)
 	// c5 := api.NewFilesController(service, db)
 	app.MountFilesController(service, c5)
+	// Mount "pins" controller
+	c6 := api.NewPinsController(service, db)
+	app.MountPinsController(service, c6)
 
 	// Start service
 	if err := service.ListenAndServe(":8888"); err != nil {

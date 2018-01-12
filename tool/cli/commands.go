@@ -67,9 +67,7 @@ type (
 	// DeleteEventsCommand is the command line data structure for the delete action of events
 	DeleteEventsCommand struct {
 		// イベントID
-		EventID string
-		// ユーザーID
-		UserID      string
+		EventID     string
 		PrettyPrint bool
 	}
 
@@ -89,9 +87,7 @@ type (
 		Payload     string
 		ContentType string
 		// イベントID
-		EventID string
-		// ユーザーID
-		UserID      string
+		EventID     string
 		PrettyPrint bool
 	}
 
@@ -193,17 +189,6 @@ Payload example:
             "endDate": "1990-02-18T14:03:59Z",
             "startDate": "1975-07-28T07:45:40Z"
          }
-      },
-      {
-         "location": {
-            "lat": 34.706424,
-            "lng": 135.50123,
-            "name": "ECCコンピュータ専門学校2303教室"
-         },
-         "upcomingDate": {
-            "endDate": "1990-02-18T14:03:59Z",
-            "startDate": "1975-07-28T07:45:40Z"
-         }
       }
    ],
    "scope": "public",
@@ -223,7 +208,7 @@ Payload example:
 	}
 	tmp2 := new(DeleteEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events ["/api/develop/v2/events/USER_ID/EVENT_ID"]`,
+		Use:   `events ["/api/develop/v2/events/EVENT_ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp2.Run(c, args) },
 	}
@@ -237,7 +222,7 @@ Payload example:
 	}
 	tmp3 := new(ListEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events [("/api/develop/v2/events"|"/api/develop/v2/events/USER_ID")]`,
+		Use:   `events ["/api/develop/v2/events"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp3.Run(c, args) },
 	}
@@ -251,7 +236,7 @@ Payload example:
 	}
 	tmp4 := new(ModifyEventsCommand)
 	sub = &cobra.Command{
-		Use:   `events ["/api/develop/v2/events/USER_ID/EVENT_ID"]`,
+		Use:   `events ["/api/develop/v2/events/EVENT_ID"]`,
 		Short: ``,
 		Long: `
 
@@ -263,17 +248,6 @@ Payload example:
    "noticeRange": 500,
    "openFlg": false,
    "plans": [
-      {
-         "location": {
-            "lat": 34.706424,
-            "lng": 135.50123,
-            "name": "ECCコンピュータ専門学校2303教室"
-         },
-         "upcomingDate": {
-            "endDate": "1990-02-18T14:03:59Z",
-            "startDate": "1975-07-28T07:45:40Z"
-         }
-      },
       {
          "location": {
             "lat": 34.706424,
@@ -900,7 +874,7 @@ func (cmd *DeleteEventsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/api/develop/v2/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
+		path = fmt.Sprintf("/api/develop/v2/events/%v", url.QueryEscape(cmd.EventID))
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
@@ -918,8 +892,6 @@ func (cmd *DeleteEventsCommand) Run(c *client.Client, args []string) error {
 func (cmd *DeleteEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var eventID string
 	cc.Flags().StringVar(&cmd.EventID, "event_id", eventID, `イベントID`)
-	var userID string
-	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
 }
 
 // Run makes the HTTP request corresponding to the ListEventsCommand command.
@@ -932,7 +904,7 @@ func (cmd *ListEventsCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListEvents(ctx, path, cmd.Limit, cmd.Offset, stringFlagVal("keyword", cmd.Keyword))
+	resp, err := c.ListEvents(ctx, path, stringFlagVal("keyword", cmd.Keyword), intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -957,7 +929,7 @@ func (cmd *ModifyEventsCommand) Run(c *client.Client, args []string) error {
 	if len(args) > 0 {
 		path = args[0]
 	} else {
-		path = fmt.Sprintf("/api/develop/v2/events/%v/%v", url.QueryEscape(cmd.UserID), url.QueryEscape(cmd.EventID))
+		path = fmt.Sprintf("/api/develop/v2/events/%v", url.QueryEscape(cmd.EventID))
 	}
 	var payload client.EventPayload
 	if cmd.Payload != "" {
@@ -984,8 +956,6 @@ func (cmd *ModifyEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Clien
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 	var eventID string
 	cc.Flags().StringVar(&cmd.EventID, "event_id", eventID, `イベントID`)
-	var userID string
-	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
 }
 
 // Run makes the HTTP request corresponding to the NearbyEventsCommand command.
@@ -1024,7 +994,7 @@ func (cmd *NearbyEventsCommand) Run(c *client.Client, args []string) error {
 		goa.LogError(ctx, "required flag is missing", "flag", "--lng")
 		return fmt.Errorf("required flag lng is missing")
 	}
-	resp, err := c.NearbyEvents(ctx, path, *tmp17, cmd.Limit, *tmp18, cmd.Offset, intFlagVal("range", cmd.Range))
+	resp, err := c.NearbyEvents(ctx, path, *tmp17, *tmp18, cmd.Range, intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err

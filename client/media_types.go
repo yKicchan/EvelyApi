@@ -302,30 +302,6 @@ func (c *Client) DecodeFilePath(resp *http.Response) (*FilePath, error) {
 	return &decoded, err
 }
 
-// File_pathCollection is the media type for an array of File_path (default view)
-//
-// Identifier: application/vnd.file_path+json; type=collection; view=default
-type FilePathCollection []*FilePath
-
-// Validate validates the FilePathCollection media type instance.
-func (mt FilePathCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
-// DecodeFilePathCollection decodes the FilePathCollection instance encoded in resp body.
-func (c *Client) DecodeFilePathCollection(resp *http.Response) (FilePathCollection, error) {
-	var decoded FilePathCollection
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return decoded, err
-}
-
 // DecodeErrorResponse decodes the ErrorResponse instance encoded in resp body.
 func (c *Client) DecodeErrorResponse(resp *http.Response) (*goa.ErrorResponse, error) {
 	var decoded goa.ErrorResponse

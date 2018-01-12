@@ -59,28 +59,24 @@ var _ = Resource("events", func() {
 	Action("list", func() {
 		Description("イベント複数取得")
 		NoSecurity()
-		Routing(GET(""), GET("/:user_id"))
+		Routing(GET(""))
 		Params(func() {
 			Param("limit", Integer, "取得件数", func() {
 				Minimum(5)
 				Maximum(50)
 				Default(10)
-				Example(30)
+				Example(10)
 			})
 			Param("offset", Integer, "除外件数", func() {
 				Minimum(0)
 				Default(0)
-				Example(10)
+				Example(0)
 			})
 			Param("keyword", String, "キーワード", func() {
 				MaxLength(50)
 				Default("")
 				Example("花澤香菜 Live")
 			})
-			Param("user_id", String, "ユーザーID", func() {
-				Example("yKicchan")
-			})
-			Required("limit", "offset")
 		})
 		Response(OK, CollectionOf(EventMedia))
 		Response(NotFound, ErrorMedia)
@@ -117,7 +113,7 @@ var _ = Resource("events", func() {
 				Minimum(10)
 				Default(500)
 			})
-			Required("lat", "lng", "limit", "offset")
+			Required("lat", "lng", "range")
 		})
 		Response(OK, CollectionOf(EventMedia))
 		Response(BadRequest, ErrorMedia)
@@ -131,6 +127,7 @@ var _ = Resource("events", func() {
 			Param("ids", ArrayOf(String), "詳細を見るイベントのID配列", func() {
 				Example([]string{"5a44d5f2775672b659ba00fa", "2as4d5d27d5612b65cca000b"})
 			})
+            Required("ids")
 		})
 		Response(OK, CollectionOf(EventMedia))
 		Response(BadRequest, ErrorMedia)
@@ -148,11 +145,8 @@ var _ = Resource("events", func() {
 
 	Action("modify", func() {
 		Description("イベント編集")
-		Routing(PUT("/:user_id/:event_id"))
+		Routing(PUT("/:event_id"))
 		Params(func() {
-			Param("user_id", String, "ユーザーID", func() {
-				Example("yKicchan")
-			})
 			Param("event_id", String, "イベントID", func() {
 				Example("5a44d5f2775672b659ba00fa")
 			})
@@ -167,17 +161,15 @@ var _ = Resource("events", func() {
 
 	Action("delete", func() {
 		Description("イベント削除")
-		Routing(DELETE("/:user_id/:event_id"))
+		Routing(DELETE("/:event_id"))
 		Params(func() {
-			Param("user_id", String, "ユーザーID", func() {
-				Example("yKicchan")
-			})
 			Param("event_id", String, "イベントID", func() {
 				Example("5a44d5f2775672b659ba00fa")
 			})
 		})
 		Response(OK)
 		Response(Unauthorized, ErrorMedia)
+        Response(BadRequest, ErrorMedia)
 		Response(Forbidden, ErrorMedia)
 		Response(NotFound, ErrorMedia)
 	})
@@ -195,7 +187,7 @@ var _ = Resource("events", func() {
 		Routing(POST("/notice"))
 		Payload(NoticePayload)
 		Response(OK)
-		Response(BadRequest)
+		Response(BadRequest, ErrorMedia)
 	})
 })
 
@@ -249,7 +241,7 @@ var _ = Resource("files", func() {
 			Scope("api:access")
 		})
 		Routing(POST("/upload"))
-		Response(OK, CollectionOf(FilePathMedia))
+		Response(OK, ArrayOf(String))
 		Response(BadRequest, ErrorMedia)
 	})
 

@@ -31,7 +31,7 @@ func (c *FilesController) Upload(ctx *app.UploadFilesContext) error {
 	if reader == nil {
 		return goa.ErrBadRequest("not a multipart request")
 	}
-	var files []*app.FilePath
+	var files []string
 	for {
 		p, err := reader.NextPart()
 		if err == io.EOF {
@@ -46,7 +46,7 @@ func (c *FilesController) Upload(ctx *app.UploadFilesContext) error {
 		}
 		defer f.Close()
 		io.Copy(f, p)
-		files = append(files, &app.FilePath{Path: f.Name()})
+		files = append(files, f.Name())
 	}
 
 	return ctx.OK(files)

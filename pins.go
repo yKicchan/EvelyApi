@@ -1,23 +1,18 @@
-package api
+package main
 
 import (
 	"EvelyApi/app"
-	"EvelyApi/model"
 	"github.com/goadesign/goa"
 )
 
 // PinsController implements the pins resource.
 type PinsController struct {
 	*goa.Controller
-	db *model.EvelyDB
 }
 
 // NewPinsController creates a pins controller.
-func NewPinsController(service *goa.Service, db *model.EvelyDB) *PinsController {
-	return &PinsController{
-        Controller: service.NewController("PinsController"),
-		db:         db,
-    }
+func NewPinsController(service *goa.Service) *PinsController {
+	return &PinsController{Controller: service.NewController("PinsController")}
 }
 
 // Off runs the off action.

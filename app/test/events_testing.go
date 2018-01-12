@@ -335,11 +335,11 @@ func CreateEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 	return rw, mt
 }
 
-// DeleteEventsForbidden runs the method Delete of the given controller with the given parameters.
+// DeleteEventsBadRequest runs the method Delete of the given controller with the given parameters.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func DeleteEventsForbidden(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) (http.ResponseWriter, error) {
+func DeleteEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -360,14 +360,78 @@ func DeleteEventsForbidden(t goatest.TInterface, ctx context.Context, service *g
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	deleteCtx, _err := app.NewDeleteEventsContext(goaCtx, req, service)
+	if _err != nil {
+		panic("invalid test data " + _err.Error()) // bug
+	}
+
+	// Perform action
+	_err = ctrl.Delete(deleteCtx)
+
+	// Validate response
+	if _err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
+	}
+	if rw.Code != 400 {
+		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
+	}
+	var mt error
+	if resp != nil {
+		var ok bool
+		mt, ok = resp.(error)
+		if !ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
+
+	// Return results
+	return rw, mt
+}
+
+// DeleteEventsForbidden runs the method Delete of the given controller with the given parameters.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func DeleteEventsForbidden(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string) (http.ResponseWriter, error) {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	u := &url.URL{
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
+	}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		panic("invalid test " + err.Error()) // bug
+	}
+	prms := url.Values{}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -405,7 +469,7 @@ func DeleteEventsForbidden(t goatest.TInterface, ctx context.Context, service *g
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func DeleteEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) (http.ResponseWriter, error) {
+func DeleteEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -426,14 +490,13 @@ func DeleteEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -471,7 +534,7 @@ func DeleteEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 // It returns the response writer so it's possible to inspect the response headers.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func DeleteEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) http.ResponseWriter {
+func DeleteEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string) http.ResponseWriter {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -492,14 +555,13 @@ func DeleteEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -529,7 +591,7 @@ func DeleteEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func DeleteEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string) (http.ResponseWriter, error) {
+func DeleteEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -550,14 +612,13 @@ func DeleteEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, err := http.NewRequest("DELETE", u.String(), nil)
 	if err != nil {
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -681,97 +742,6 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 	return rw, mt
 }
 
-// ListEventsBadRequest1 runs the method List of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
-// If ctx is nil then context.Background() is used.
-// If service is nil then a default service is created.
-func ListEventsBadRequest1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) (http.ResponseWriter, error) {
-	// Setup service
-	var (
-		logBuf bytes.Buffer
-		resp   interface{}
-
-		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
-	)
-	if service == nil {
-		service = goatest.Service(&logBuf, respSetter)
-	} else {
-		logger := log.New(&logBuf, "", log.Ltime)
-		service.WithLogger(goa.NewLogger(logger))
-		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
-		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
-		service.Encoder.Register(newEncoder, "*/*")
-	}
-
-	// Setup request context
-	rw := httptest.NewRecorder()
-	query := url.Values{}
-	{
-		sliceVal := []string{keyword}
-		query["keyword"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		query["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		query["offset"] = sliceVal
-	}
-	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v2/events/%v", userID),
-		RawQuery: query.Encode(),
-	}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		panic("invalid test " + err.Error()) // bug
-	}
-	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
-	{
-		sliceVal := []string{keyword}
-		prms["keyword"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		prms["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		prms["offset"] = sliceVal
-	}
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
-	listCtx, _err := app.NewListEventsContext(goaCtx, req, service)
-	if _err != nil {
-		panic("invalid test data " + _err.Error()) // bug
-	}
-
-	// Perform action
-	_err = ctrl.List(listCtx)
-
-	// Validate response
-	if _err != nil {
-		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
-	}
-	if rw.Code != 400 {
-		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
-	}
-	var mt error
-	if resp != nil {
-		var ok bool
-		mt, ok = resp.(error)
-		if !ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
-		}
-	}
-
-	// Return results
-	return rw, mt
-}
-
 // ListEventsNotFound runs the method List of the given controller with the given parameters.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
@@ -818,97 +788,6 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
-	{
-		sliceVal := []string{keyword}
-		prms["keyword"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		prms["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		prms["offset"] = sliceVal
-	}
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
-	listCtx, _err := app.NewListEventsContext(goaCtx, req, service)
-	if _err != nil {
-		panic("invalid test data " + _err.Error()) // bug
-	}
-
-	// Perform action
-	_err = ctrl.List(listCtx)
-
-	// Validate response
-	if _err != nil {
-		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
-	}
-	if rw.Code != 404 {
-		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
-	}
-	var mt error
-	if resp != nil {
-		var ok bool
-		mt, ok = resp.(error)
-		if !ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
-		}
-	}
-
-	// Return results
-	return rw, mt
-}
-
-// ListEventsNotFound1 runs the method List of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
-// If ctx is nil then context.Background() is used.
-// If service is nil then a default service is created.
-func ListEventsNotFound1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) (http.ResponseWriter, error) {
-	// Setup service
-	var (
-		logBuf bytes.Buffer
-		resp   interface{}
-
-		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
-	)
-	if service == nil {
-		service = goatest.Service(&logBuf, respSetter)
-	} else {
-		logger := log.New(&logBuf, "", log.Ltime)
-		service.WithLogger(goa.NewLogger(logger))
-		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
-		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
-		service.Encoder.Register(newEncoder, "*/*")
-	}
-
-	// Setup request context
-	rw := httptest.NewRecorder()
-	query := url.Values{}
-	{
-		sliceVal := []string{keyword}
-		query["keyword"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		query["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		query["offset"] = sliceVal
-	}
-	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v2/events/%v", userID),
-		RawQuery: query.Encode(),
-	}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		panic("invalid test " + err.Error()) // bug
-	}
-	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	{
 		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
@@ -1141,201 +1020,11 @@ func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 	return rw, mt
 }
 
-// ListEventsOK1 runs the method List of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
-// If ctx is nil then context.Background() is used.
-// If service is nil then a default service is created.
-func ListEventsOK1(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) (http.ResponseWriter, app.EventCollection) {
-	// Setup service
-	var (
-		logBuf bytes.Buffer
-		resp   interface{}
-
-		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
-	)
-	if service == nil {
-		service = goatest.Service(&logBuf, respSetter)
-	} else {
-		logger := log.New(&logBuf, "", log.Ltime)
-		service.WithLogger(goa.NewLogger(logger))
-		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
-		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
-		service.Encoder.Register(newEncoder, "*/*")
-	}
-
-	// Setup request context
-	rw := httptest.NewRecorder()
-	query := url.Values{}
-	{
-		sliceVal := []string{keyword}
-		query["keyword"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		query["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		query["offset"] = sliceVal
-	}
-	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v2/events/%v", userID),
-		RawQuery: query.Encode(),
-	}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		panic("invalid test " + err.Error()) // bug
-	}
-	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
-	{
-		sliceVal := []string{keyword}
-		prms["keyword"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		prms["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		prms["offset"] = sliceVal
-	}
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
-	listCtx, _err := app.NewListEventsContext(goaCtx, req, service)
-	if _err != nil {
-		panic("invalid test data " + _err.Error()) // bug
-	}
-
-	// Perform action
-	_err = ctrl.List(listCtx)
-
-	// Validate response
-	if _err != nil {
-		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
-	}
-	if rw.Code != 200 {
-		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
-	}
-	var mt app.EventCollection
-	if resp != nil {
-		var ok bool
-		mt, ok = resp.(app.EventCollection)
-		if !ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.EventCollection", resp, resp)
-		}
-		_err = mt.Validate()
-		if _err != nil {
-			t.Errorf("invalid response media type: %s", _err)
-		}
-	}
-
-	// Return results
-	return rw, mt
-}
-
-// ListEventsOK1Tiny runs the method List of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
-// If ctx is nil then context.Background() is used.
-// If service is nil then a default service is created.
-func ListEventsOK1Tiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, keyword string, limit int, offset int) (http.ResponseWriter, app.EventTinyCollection) {
-	// Setup service
-	var (
-		logBuf bytes.Buffer
-		resp   interface{}
-
-		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
-	)
-	if service == nil {
-		service = goatest.Service(&logBuf, respSetter)
-	} else {
-		logger := log.New(&logBuf, "", log.Ltime)
-		service.WithLogger(goa.NewLogger(logger))
-		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
-		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
-		service.Encoder.Register(newEncoder, "*/*")
-	}
-
-	// Setup request context
-	rw := httptest.NewRecorder()
-	query := url.Values{}
-	{
-		sliceVal := []string{keyword}
-		query["keyword"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		query["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		query["offset"] = sliceVal
-	}
-	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v2/events/%v", userID),
-		RawQuery: query.Encode(),
-	}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		panic("invalid test " + err.Error()) // bug
-	}
-	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
-	{
-		sliceVal := []string{keyword}
-		prms["keyword"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		prms["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		prms["offset"] = sliceVal
-	}
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
-	listCtx, _err := app.NewListEventsContext(goaCtx, req, service)
-	if _err != nil {
-		panic("invalid test data " + _err.Error()) // bug
-	}
-
-	// Perform action
-	_err = ctrl.List(listCtx)
-
-	// Validate response
-	if _err != nil {
-		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
-	}
-	if rw.Code != 200 {
-		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
-	}
-	var mt app.EventTinyCollection
-	if resp != nil {
-		var ok bool
-		mt, ok = resp.(app.EventTinyCollection)
-		if !ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.EventTinyCollection", resp, resp)
-		}
-		_err = mt.Validate()
-		if _err != nil {
-			t.Errorf("invalid response media type: %s", _err)
-		}
-	}
-
-	// Return results
-	return rw, mt
-}
-
 // ModifyEventsBadRequest runs the method Modify of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
+func ModifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1366,14 +1055,13 @@ func ModifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
 		panic("invalid test " + _err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -1412,7 +1100,7 @@ func ModifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsForbidden(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
+func ModifyEventsForbidden(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1443,14 +1131,13 @@ func ModifyEventsForbidden(t goatest.TInterface, ctx context.Context, service *g
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
 		panic("invalid test " + _err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -1489,7 +1176,7 @@ func ModifyEventsForbidden(t goatest.TInterface, ctx context.Context, service *g
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
+func ModifyEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1520,14 +1207,13 @@ func ModifyEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
 		panic("invalid test " + _err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -1566,7 +1252,7 @@ func ModifyEventsNotFound(t goatest.TInterface, ctx context.Context, service *go
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, *app.Event) {
+func ModifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string, payload *app.EventPayload) (http.ResponseWriter, *app.Event) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1598,14 +1284,13 @@ func ModifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
 		panic("invalid test " + _err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -1648,7 +1333,7 @@ func ModifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, *app.EventTiny) {
+func ModifyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string, payload *app.EventPayload) (http.ResponseWriter, *app.EventTiny) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1680,14 +1365,13 @@ func ModifyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
 		panic("invalid test " + _err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -1730,7 +1414,7 @@ func ModifyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ModifyEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
+func ModifyEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, eventID string, payload *app.EventPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1761,14 +1445,13 @@ func ModifyEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/%v/%v", userID, eventID),
+		Path: fmt.Sprintf("/api/develop/v2/events/%v", eventID),
 	}
 	req, _err := http.NewRequest("PUT", u.String(), nil)
 	if _err != nil {
 		panic("invalid test " + _err.Error()) // bug
 	}
 	prms := url.Values{}
-	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
 	prms["event_id"] = []string{fmt.Sprintf("%v", eventID)}
 	if ctx == nil {
 		ctx = context.Background()
@@ -2130,10 +1813,10 @@ func NearbyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.
 }
 
 // NotifyEventsBadRequest runs the method Notify of the given controller with the given parameters and payload.
-// It returns the response writer so it's possible to inspect the response headers.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NoticePayload) http.ResponseWriter {
+func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NoticePayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2158,8 +1841,7 @@ func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 		if !ok {
 			panic(err) // bug
 		}
-		t.Errorf("unexpected payload validation error: %+v", e)
-		return nil
+		return nil, e
 	}
 
 	// Setup request context
@@ -2192,9 +1874,17 @@ func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	if rw.Code != 400 {
 		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
 	}
+	var mt error
+	if resp != nil {
+		var _ok bool
+		mt, _ok = resp.(error)
+		if !_ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
 
 	// Return results
-	return rw
+	return rw, mt
 }
 
 // NotifyEventsOK runs the method Notify of the given controller with the given parameters and payload.

@@ -1,6 +1,7 @@
 package design
 
 import (
+	. "EvelyApi/config"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 )
@@ -48,7 +49,7 @@ var EventPayload = Type("EventPayload", func() {
 	Attribute("plans", ArrayOf(Plan), "イベントの開催予定一覧")
 	Attribute("noticeRange", Integer, "通知範囲(m)", func() {
 		Minimum(100)
-		Maximum(5000)
+		Maximum(MAX_NOTICE_RANGE)
 		Default(500)
 		Example(500)
 	})

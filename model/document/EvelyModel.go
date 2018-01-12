@@ -15,15 +15,15 @@ func (this EvelyModel) make() evelyModel {
 }
 
 func (this EvelyModel) GetEvent() *EventModel {
-    return this.make().event
+	return this.make().event
 }
 
 func (this EvelyModel) GetUser() *UserModel {
-    return this.make().user
+	return this.make().user
 }
 
 func (this EvelyModel) GetPendingUser() *PendingUserModel {
-    return this.make().pendingUser
+	return this.make().pendingUser
 }
 
 func Event(e *EventModel) EvelyModel {

@@ -237,7 +237,6 @@ type DeleteEventsContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	EventID string
-	UserID  string
 }
 
 // NewDeleteEventsContext parses the incoming request URL and body, performs validations and creates the
@@ -254,11 +253,6 @@ func NewDeleteEventsContext(ctx context.Context, r *http.Request, service *goa.S
 		rawEventID := paramEventID[0]
 		rctx.EventID = rawEventID
 	}
-	paramUserID := req.Params["user_id"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		rctx.UserID = rawUserID
-	}
 	return &rctx, err
 }
 
@@ -270,6 +264,14 @@ func (ctx *DeleteEventsContext) OK(resp []byte) error {
 	ctx.ResponseData.WriteHeader(200)
 	_, err := ctx.ResponseData.Write(resp)
 	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *DeleteEventsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // Unauthorized sends a HTTP response with status code 401.
@@ -304,7 +306,6 @@ type ListEventsContext struct {
 	Keyword string
 	Limit   int
 	Offset  int
-	UserID  string
 }
 
 // NewListEventsContext parses the incoming request URL and body, performs validations and creates the
@@ -357,11 +358,6 @@ func NewListEventsContext(ctx context.Context, r *http.Request, service *goa.Ser
 			err = goa.MergeErrors(err, goa.InvalidRangeError(`offset`, rctx.Offset, 0, true))
 		}
 	}
-	paramUserID := req.Params["user_id"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		rctx.UserID = rawUserID
-	}
 	return &rctx, err
 }
 
@@ -409,7 +405,6 @@ type ModifyEventsContext struct {
 	*goa.ResponseData
 	*goa.RequestData
 	EventID string
-	UserID  string
 	Payload *EventPayload
 }
 
@@ -426,11 +421,6 @@ func NewModifyEventsContext(ctx context.Context, r *http.Request, service *goa.S
 	if len(paramEventID) > 0 {
 		rawEventID := paramEventID[0]
 		rctx.EventID = rawEventID
-	}
-	paramUserID := req.Params["user_id"]
-	if len(paramUserID) > 0 {
-		rawUserID := paramUserID[0]
-		rctx.UserID = rawUserID
 	}
 	return &rctx, err
 }
@@ -647,9 +637,11 @@ func (ctx *NotifyEventsContext) OK(resp []byte) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *NotifyEventsContext) BadRequest() error {
-	ctx.ResponseData.WriteHeader(400)
-	return nil
+func (ctx *NotifyEventsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
 // ShowEventsContext provides the events show action context.
@@ -670,7 +662,9 @@ func NewShowEventsContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req.Request = r
 	rctx := ShowEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
 	paramIds := req.Params["ids"]
-	if len(paramIds) > 0 {
+	if len(paramIds) == 0 {
+		err = goa.MergeErrors(err, goa.MissingParamError("ids"))
+	} else {
 		params := paramIds
 		rctx.Ids = params
 	}
@@ -764,12 +758,9 @@ func NewUploadFilesContext(ctx context.Context, r *http.Request, service *goa.Se
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *UploadFilesContext) OK(r FilePathCollection) error {
+func (ctx *UploadFilesContext) OK(r []string) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.file_path+json; type=collection")
-	}
-	if r == nil {
-		r = FilePathCollection{}
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

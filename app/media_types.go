@@ -259,23 +259,6 @@ func (mt *FilePath) Validate() (err error) {
 	return
 }
 
-// File_pathCollection is the media type for an array of File_path (default view)
-//
-// Identifier: application/vnd.file_path+json; type=collection; view=default
-type FilePathCollection []*FilePath
-
-// Validate validates the FilePathCollection media type instance.
-func (mt FilePathCollection) Validate() (err error) {
-	for _, e := range mt {
-		if e != nil {
-			if err2 := e.Validate(); err2 != nil {
-				err = goa.MergeErrors(err, err2)
-			}
-		}
-	}
-	return
-}
-
 // アクセストークン (default view)
 //
 // Identifier: application/vnd.token+json; view=default

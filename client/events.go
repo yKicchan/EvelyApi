@@ -68,11 +68,10 @@ func (c *Client) NewCreateEventsRequest(ctx context.Context, path string, payloa
 }
 
 // DeleteEventsPath computes a request path to the delete action of events.
-func DeleteEventsPath(userID string, eventID string) string {
-	param0 := userID
-	param1 := eventID
+func DeleteEventsPath(eventID string) string {
+	param0 := eventID
 
-	return fmt.Sprintf("/api/develop/v2/events/%s/%s", param0, param1)
+	return fmt.Sprintf("/api/develop/v2/events/%s", param0)
 }
 
 // イベント削除
@@ -109,16 +108,9 @@ func ListEventsPath() string {
 	return fmt.Sprintf("/api/develop/v2/events")
 }
 
-// ListEventsPath2 computes a request path to the list action of events.
-func ListEventsPath2(userID string) string {
-	param0 := userID
-
-	return fmt.Sprintf("/api/develop/v2/events/%s", param0)
-}
-
 // イベント複数取得
-func (c *Client) ListEvents(ctx context.Context, path string, limit int, offset int, keyword *string) (*http.Response, error) {
-	req, err := c.NewListEventsRequest(ctx, path, limit, offset, keyword)
+func (c *Client) ListEvents(ctx context.Context, path string, keyword *string, limit *int, offset *int) (*http.Response, error) {
+	req, err := c.NewListEventsRequest(ctx, path, keyword, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -126,19 +118,23 @@ func (c *Client) ListEvents(ctx context.Context, path string, limit int, offset 
 }
 
 // NewListEventsRequest create the request corresponding to the list action endpoint of the events resource.
-func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit int, offset int, keyword *string) (*http.Request, error) {
+func (c *Client) NewListEventsRequest(ctx context.Context, path string, keyword *string, limit *int, offset *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	tmp19 := strconv.Itoa(limit)
-	values.Set("limit", tmp19)
-	tmp20 := strconv.Itoa(offset)
-	values.Set("offset", tmp20)
 	if keyword != nil {
 		values.Set("keyword", *keyword)
+	}
+	if limit != nil {
+		tmp19 := strconv.Itoa(*limit)
+		values.Set("limit", tmp19)
+	}
+	if offset != nil {
+		tmp20 := strconv.Itoa(*offset)
+		values.Set("offset", tmp20)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -149,11 +145,10 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, limit in
 }
 
 // ModifyEventsPath computes a request path to the modify action of events.
-func ModifyEventsPath(userID string, eventID string) string {
-	param0 := userID
-	param1 := eventID
+func ModifyEventsPath(eventID string) string {
+	param0 := eventID
 
-	return fmt.Sprintf("/api/develop/v2/events/%s/%s", param0, param1)
+	return fmt.Sprintf("/api/develop/v2/events/%s", param0)
 }
 
 // イベント編集
@@ -205,8 +200,8 @@ func NearbyEventsPath() string {
 }
 
 // 近くのイベントを検索する
-func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, limit int, lng float64, offset int, range_ *int) (*http.Response, error) {
-	req, err := c.NewNearbyEventsRequest(ctx, path, lat, limit, lng, offset, range_)
+func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, lng float64, range_ int, limit *int, offset *int) (*http.Response, error) {
+	req, err := c.NewNearbyEventsRequest(ctx, path, lat, lng, range_, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +209,7 @@ func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, lim
 }
 
 // NewNearbyEventsRequest create the request corresponding to the nearby action endpoint of the events resource.
-func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat float64, limit int, lng float64, offset int, range_ *int) (*http.Request, error) {
+func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat float64, lng float64, range_ int, limit *int, offset *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
@@ -223,15 +218,17 @@ func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat fl
 	values := u.Query()
 	tmp21 := strconv.FormatFloat(lat, 'f', -1, 64)
 	values.Set("lat", tmp21)
-	tmp22 := strconv.Itoa(limit)
-	values.Set("limit", tmp22)
-	tmp23 := strconv.FormatFloat(lng, 'f', -1, 64)
-	values.Set("lng", tmp23)
-	tmp24 := strconv.Itoa(offset)
-	values.Set("offset", tmp24)
-	if range_ != nil {
-		tmp25 := strconv.Itoa(*range_)
-		values.Set("range", tmp25)
+	tmp22 := strconv.FormatFloat(lng, 'f', -1, 64)
+	values.Set("lng", tmp22)
+	tmp23 := strconv.Itoa(range_)
+	values.Set("range", tmp23)
+	if limit != nil {
+		tmp24 := strconv.Itoa(*limit)
+		values.Set("limit", tmp24)
+	}
+	if offset != nil {
+		tmp25 := strconv.Itoa(*offset)
+		values.Set("offset", tmp25)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

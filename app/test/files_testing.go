@@ -89,10 +89,10 @@ func UploadFilesBadRequest(t goatest.TInterface, ctx context.Context, service *g
 }
 
 // UploadFilesOK runs the method Upload of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
+// It returns the response writer so it's possible to inspect the response headers.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func UploadFilesOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.FilesController) (http.ResponseWriter, app.FilePathCollection) {
+func UploadFilesOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.FilesController) http.ResponseWriter {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -139,19 +139,7 @@ func UploadFilesOK(t goatest.TInterface, ctx context.Context, service *goa.Servi
 	if rw.Code != 200 {
 		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
 	}
-	var mt app.FilePathCollection
-	if resp != nil {
-		var ok bool
-		mt, ok = resp.(app.FilePathCollection)
-		if !ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.FilePathCollection", resp, resp)
-		}
-		_err = mt.Validate()
-		if _err != nil {
-			t.Errorf("invalid response media type: %s", _err)
-		}
-	}
 
 	// Return results
-	return rw, mt
+	return rw
 }

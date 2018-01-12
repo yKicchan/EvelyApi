@@ -2,6 +2,7 @@ package collection
 
 import (
 	. "EvelyApi/model/document"
+    . "EvelyApi/config"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"strings"
@@ -53,53 +54,21 @@ func (this *EventsCollection) Delete(keys Keys) error {
 	return this.Remove(keys.ToQuery())
 }
 
-// イベントの検索オプション
-type findEventsOptions struct {
-	keyword string
-	userID  string
-}
-
-// イベントの検索オプションを関数化
-type FindEventsOptions func(*findEventsOptions)
-
-/**
- * ユーザーIDを検索オプションに設定するクロージャを返す
- * @param  id ユーザーID
- * @return    クロージャ
- */
-func WithUserID(id string) FindEventsOptions {
-	return func(ops *findEventsOptions) {
-		ops.userID = id
-	}
-}
-
-/**
- * キーワードを検索オプションに設定するクロージャを返す
- * @param  keyword キーワード
- * @return         クロージャ
- */
-func WithKeyword(keyword string) FindEventsOptions {
-	return func(ops *findEventsOptions) {
-		ops.keyword = keyword
-	}
-}
-
 /**
  * イベント情報をパラメーターから検索し、複数件返す
- * @param  limit   検索件数
- * @param  offset  除外件数
- * @param  options 検索オプション
- * @return events  複数のイベント情報
+ * @param  options 検索時のオプション
+ * @return events  検索にヒットした複数のイベント情報
  * @return err     検索時に発生したエラー
  */
-func (this *EventsCollection) FindEvents(limit, offset int, options ...FindEventsOptions) (events []*EventModel, err error) {
-	// 検索オプションを取得
-	opt := findEventsOptions{}
+func (this *EventsCollection) FindEvents(options ...FindOptions) (events []*EventModel, err error) {
+	// 検索オプションを取得、設定
+	opt := findOptions{}
 	for _, o := range options {
 		o(&opt)
 	}
 	// 検索オプションの内容からクエリを作成
 	query := bson.M{}
+	// キーワード検索
 	if len(opt.keyword) > 0 {
 		keywords := strings.Split(opt.keyword, " ")
 		for _, keyword := range keywords {
@@ -111,7 +80,7 @@ func (this *EventsCollection) FindEvents(limit, offset int, options ...FindEvent
 						"$or": []interface{}{
 							bson.M{"title": regex},
 							bson.M{"body": regex},
-							bson.M{"place.name": regex},
+							bson.M{"plans.location.name": regex},
 							bson.M{"host.name": regex},
 						},
 					},
@@ -119,18 +88,30 @@ func (this *EventsCollection) FindEvents(limit, offset int, options ...FindEvent
 			}
 		}
 	}
-	if len(opt.userID) != 0 {
-		if len(opt.keyword) > 0 {
-			query = bson.M{
-				"$and": []interface{}{
-					query,
-					bson.M{"host.id": opt.userID},
+	// 位置情報検索
+	if opt.r > 0 {
+		query["plans"] = bson.M{
+			"$elemMatch": bson.M{
+				"location.lng_lat": bson.M{
+					"$nearSphere":  []float64{opt.lng, opt.lat},
+					"$maxDistance": (float64(opt.r) * DEGREE_PER_METER),
 				},
-			}
-		} else {
-			query = bson.M{"host.id": opt.userID}
+			},
 		}
 	}
-	err = this.Find(query).Select(EVENT_TINY_SELECTOR).Skip(offset).Limit(limit).All(&events)
+
+	// 検索条件からイベントを検索
+	q := this.Find(query).Select(EVENT_TINY_SELECTOR)
+
+	// 除外件数を指定
+	if opt.offset > 0 {
+		q = q.Skip(opt.offset)
+	}
+	// 検索件数の上限を指定
+	if opt.limit > 0 {
+		q = q.Limit(opt.limit)
+	}
+	// 結果を返す
+	err = q.All(&events)
 	return
 }

@@ -224,8 +224,7 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/:user_id/:event_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/:user_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/:event_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/nearby", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/notice", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/detail", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
@@ -268,8 +267,8 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleEventsOrigin(h)
-	service.Mux.Handle("DELETE", "/api/develop/v2/events/:user_id/:event_id", ctrl.MuxHandler("delete", h, nil))
-	service.LogInfo("mount", "ctrl", "Events", "action", "Delete", "route", "DELETE /api/develop/v2/events/:user_id/:event_id", "security", "jwt")
+	service.Mux.Handle("DELETE", "/api/develop/v2/events/:event_id", ctrl.MuxHandler("delete", h, nil))
+	service.LogInfo("mount", "ctrl", "Events", "action", "Delete", "route", "DELETE /api/develop/v2/events/:event_id", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -286,8 +285,6 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	h = handleEventsOrigin(h)
 	service.Mux.Handle("GET", "/api/develop/v2/events", ctrl.MuxHandler("list", h, nil))
 	service.LogInfo("mount", "ctrl", "Events", "action", "List", "route", "GET /api/develop/v2/events")
-	service.Mux.Handle("GET", "/api/develop/v2/events/:user_id", ctrl.MuxHandler("list", h, nil))
-	service.LogInfo("mount", "ctrl", "Events", "action", "List", "route", "GET /api/develop/v2/events/:user_id")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -309,8 +306,8 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	}
 	h = handleSecurity("jwt", h, "api:access")
 	h = handleEventsOrigin(h)
-	service.Mux.Handle("PUT", "/api/develop/v2/events/:user_id/:event_id", ctrl.MuxHandler("modify", h, unmarshalModifyEventsPayload))
-	service.LogInfo("mount", "ctrl", "Events", "action", "Modify", "route", "PUT /api/develop/v2/events/:user_id/:event_id", "security", "jwt")
+	service.Mux.Handle("PUT", "/api/develop/v2/events/:event_id", ctrl.MuxHandler("modify", h, unmarshalModifyEventsPayload))
+	service.LogInfo("mount", "ctrl", "Events", "action", "Modify", "route", "PUT /api/develop/v2/events/:event_id", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request

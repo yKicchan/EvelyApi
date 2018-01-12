@@ -212,6 +212,44 @@ definitions:
       title: Git勉強会
       updateDate: 2005-04-23T09:00:35Z
       url: http://comp.ecc.ac.jp/
+    - body: |-
+        初心者でもGitを扱えるようになる勉強会を開催します！
+        ノートPCを各自持参してください。
+      createdAt: 1974-02-03T21:26:56Z
+      host:
+        id: yKicchan
+        name: きっちゃそ
+      id: 20170225-2
+      mail: yKicchanApp@gmail.com
+      noticeRange: 500
+      openFlg: false
+      plans:
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      scope: public
+      tel: 090-1234-5678
+      title: Git勉強会
+      updateDate: 2005-04-23T09:00:35Z
+      url: http://comp.ecc.ac.jp/
     items:
       $ref: '#/definitions/Event'
     title: 'Mediatype identifier: application/vnd.event+json; type=collection; view=default'
@@ -226,13 +264,6 @@ definitions:
       noticeRange: 500
       openFlg: false
       plans:
-      - location:
-          lat: 34.706425
-          lng: 135.50124
-          name: ECCコンピュータ専門学校2303教室
-        upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
       - location:
           lat: 34.706425
           lng: 135.50124
@@ -281,13 +312,6 @@ definitions:
           upcomingDate:
             endDate: 1990-02-18T14:03:59Z
             startDate: 1975-07-28T07:45:40Z
-        - location:
-            lat: 34.706425
-            lng: 135.50124
-            name: ECCコンピュータ専門学校2303教室
-          upcomingDate:
-            endDate: 1990-02-18T14:03:59Z
-            startDate: 1975-07-28T07:45:40Z
         items:
           $ref: '#/definitions/Plan'
         type: array
@@ -328,30 +352,6 @@ definitions:
     - openFlg
     title: EventPayload
     type: object
-  File_path:
-    description: アップロード済みのファイルのパス (default view)
-    example:
-      path: /files/image.png
-    properties:
-      path:
-        description: ファイルのパス
-        example: /files/image.png
-        type: string
-    required:
-    - path
-    title: 'Mediatype identifier: application/vnd.file_path+json; view=default'
-    type: object
-  File_pathCollection:
-    description: File_pathCollection is the media type for an array of File_path (default
-      view)
-    example:
-    - path: /files/image.png
-    - path: /files/image.png
-    items:
-      $ref: '#/definitions/File_path'
-    title: 'Mediatype identifier: application/vnd.file_path+json; type=collection;
-      view=default'
-    type: array
   Location:
     description: イベントの開催場所
     example:
@@ -470,7 +470,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 2as4d5d27d5612b65cca000b
         items:
-          example: Commodi fuga sit cumque aperiam.
+          example: Porro rem commodi.
           type: string
         type: array
     required:
@@ -833,20 +833,15 @@ paths:
         maximum: 50
         minimum: 5
         name: limit
-        required: true
+        required: false
         type: integer
       - default: 0
         description: 除外件数
         in: query
         minimum: 0
         name: offset
-        required: true
-        type: integer
-      - description: ユーザーID
-        in: query
-        name: user_id
         required: false
-        type: string
+        type: integer
       produces:
       - application/vnd.event+json; type=collection
       - application/vnd.goa.error
@@ -906,60 +901,7 @@ paths:
       summary: create events
       tags:
       - events
-  /api/develop/v2/events/{user_id}:
-    get:
-      description: イベント複数取得
-      operationId: events#list#1
-      parameters:
-      - default: ""
-        description: キーワード
-        in: query
-        maxLength: 50
-        name: keyword
-        required: false
-        type: string
-      - default: 10
-        description: 取得件数
-        in: query
-        maximum: 50
-        minimum: 5
-        name: limit
-        required: true
-        type: integer
-      - default: 0
-        description: 除外件数
-        in: query
-        minimum: 0
-        name: offset
-        required: true
-        type: integer
-      - description: ユーザーID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      produces:
-      - application/vnd.event+json; type=collection
-      - application/vnd.goa.error
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/EventCollection'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/error'
-      schemes:
-      - http
-      summary: list events
-      tags:
-      - events
-  /api/develop/v2/events/{user_id}/{event_id}:
+  /api/develop/v2/events/{event_id}:
     delete:
       description: |-
         イベント削除
@@ -973,17 +915,16 @@ paths:
         name: event_id
         required: true
         type: string
-      - description: ユーザーID
-        in: path
-        name: user_id
-        required: true
-        type: string
       produces:
       - application/vnd.goa.error
       - text/plain
       responses:
         "200":
           description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
         "401":
           description: Unauthorized
           schema:
@@ -1015,11 +956,6 @@ paths:
       - description: イベントID
         in: path
         name: event_id
-        required: true
-        type: string
-      - description: ユーザーID
-        in: path
-        name: user_id
         required: true
         type: string
       - description: イベント作成・編集で受け取るイベント情報
@@ -1071,7 +1007,7 @@ paths:
         items:
           type: string
         name: ids
-        required: false
+        required: true
         type: array
       produces:
       - application/vnd.event+json; type=collection
@@ -1112,7 +1048,7 @@ paths:
         maximum: 50
         minimum: 1
         name: limit
-        required: true
+        required: false
         type: integer
       - description: 経度
         in: query
@@ -1126,14 +1062,14 @@ paths:
         in: query
         minimum: 0
         name: offset
-        required: true
+        required: false
         type: integer
       - default: 500
         description: 検索範囲(半径m)
         in: query
         minimum: 10
         name: range
-        required: false
+        required: true
         type: integer
       produces:
       - application/vnd.event+json; type=collection
@@ -1164,12 +1100,15 @@ paths:
         schema:
           $ref: '#/definitions/NoticePayload'
       produces:
+      - application/vnd.goa.error
       - text/plain
       responses:
         "200":
           description: OK
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
       schemes:
       - http
       summary: notify events
@@ -1198,13 +1137,11 @@ paths:
           * `api:access`
       operationId: files#upload
       produces:
-      - application/vnd.file_path+json; type=collection
       - application/vnd.goa.error
+      - text/plain
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/File_pathCollection'
         "400":
           description: Bad Request
           schema:
@@ -1349,8 +1286,6 @@ produces:
 - application/gob
 - application/x-gob
 responses:
-  BadRequest:
-    description: Bad Request
   OK:
     description: OK
 schemes:
