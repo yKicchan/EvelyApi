@@ -80,7 +80,7 @@ func (this *EventsCollection) FindEvents(options ...FindOptions) (events []*Even
 						"$or": []interface{}{
 							bson.M{"title": regex},
 							bson.M{"body": regex},
-							bson.M{"plans.location.name": regex},
+							bson.M{"plans": bson.M{"$elemMatch": bson.M{"location.name": regex}}},
 							bson.M{"host.name": regex},
 						},
 					},
