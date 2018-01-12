@@ -107,12 +107,17 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 	// IDと一致するイベントを検索
 	var events []*EventModel
 	for _, id := range ctx.Ids {
-        m, _ := c.db.Events().FindDoc(Keys{"_id": id})
-        events = append(events, m.GetEvent())
+        m, err := c.db.Events().FindDoc(Keys{"_id": bson.ObjectIdHex(id)})
+        if err == nil {
+            events = append(events, m.GetEvent())
+        }
     }
 
     // イベント情報をレスポンス形式に変換して返す
     res := make(app.EventCollection, len(events))
+    if len(res) == 0 {
+        return ctx.OK(res)
+    }
 	for i := range events {
 		res[i] = parser.ToEventMedia(events[i])
 	}
@@ -152,7 +157,21 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 
 // Nearby runs the nearby action.
 func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
-	return nil
+    // パラメーターの位置情報から付近のイベントを検索
+    events, err := c.db.Events().FindEvents(
+        WithLimit(ctx.Limit),
+        WithOffset(ctx.Offset),
+        WithLocation(ctx.Lat, ctx.Lng, float64(ctx.Range) * DEGREE_PER_METER),
+    )
+    if err != nil {
+        return ctx.BadRequest(err)
+    }
+    // イベント情報をレスポンス形式に変換して返す
+	res := make(app.EventTinyCollection, len(events))
+	for i := range events {
+		res[i] = parser.ToEventTinyMedia(events[i])
+	}
+	return ctx.OKTiny(res)
 }
 
 // Notify runs the notify action.
