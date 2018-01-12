@@ -67,7 +67,7 @@ func (this *EventsCollection) FindEvents(options ...FindOptions) (events []*Even
 		o(&opt)
 	}
 	// 検索オプションの内容からクエリを作成
-	query := bson.M{}
+	var query bson.M
 	// キーワード検索
 	if len(opt.keyword) > 0 {
 		keywords := strings.Split(opt.keyword, " ")
@@ -90,13 +90,16 @@ func (this *EventsCollection) FindEvents(options ...FindOptions) (events []*Even
 	}
 	// 位置情報検索
 	if opt.r > 0 {
-		query["plans"] = bson.M{
-			"$elemMatch": bson.M{
-				"location.lng_lat": bson.M{
-					"$nearSphere":  []float64{opt.lng, opt.lat},
-					"$maxDistance": (float64(opt.r) * DEGREE_PER_METER),
-				},
-			},
+		query = bson.M{
+            "plans.location.lng_lat": bson.M{
+                "$nearSphere": bson.M{
+                    "$geometry": bson.M{
+                        "type":        "Point",
+                        "coordinates": []float64{opt.lng, opt.lat},
+                    },
+                    "$maxDistance": (float64(opt.r) * DEGREE_PER_METER),
+                },
+            },
 		}
 	}
 
