@@ -129,12 +129,12 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, keyword 
 		values.Set("keyword", *keyword)
 	}
 	if limit != nil {
-		tmp19 := strconv.Itoa(*limit)
-		values.Set("limit", tmp19)
+		tmp20 := strconv.Itoa(*limit)
+		values.Set("limit", tmp20)
 	}
 	if offset != nil {
-		tmp20 := strconv.Itoa(*offset)
-		values.Set("offset", tmp20)
+		tmp21 := strconv.Itoa(*offset)
+		values.Set("offset", tmp21)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -216,19 +216,19 @@ func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat fl
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	tmp21 := strconv.FormatFloat(lat, 'f', -1, 64)
-	values.Set("lat", tmp21)
-	tmp22 := strconv.FormatFloat(lng, 'f', -1, 64)
-	values.Set("lng", tmp22)
-	tmp23 := strconv.Itoa(range_)
-	values.Set("range", tmp23)
+	tmp22 := strconv.FormatFloat(lat, 'f', -1, 64)
+	values.Set("lat", tmp22)
+	tmp23 := strconv.FormatFloat(lng, 'f', -1, 64)
+	values.Set("lng", tmp23)
+	tmp24 := strconv.Itoa(range_)
+	values.Set("range", tmp24)
 	if limit != nil {
-		tmp24 := strconv.Itoa(*limit)
-		values.Set("limit", tmp24)
+		tmp25 := strconv.Itoa(*limit)
+		values.Set("limit", tmp25)
 	}
 	if offset != nil {
-		tmp25 := strconv.Itoa(*offset)
-		values.Set("offset", tmp25)
+		tmp26 := strconv.Itoa(*offset)
+		values.Set("offset", tmp26)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -281,6 +281,36 @@ func (c *Client) NewNotifyEventsRequest(ctx context.Context, path string, payloa
 	return req, nil
 }
 
+// PinEventsPath computes a request path to the pin action of events.
+func PinEventsPath(userID string) string {
+	param0 := userID
+
+	return fmt.Sprintf("/api/develop/v2/events/pin/%s", param0)
+}
+
+// ユーザーのピンしたイベント一覧を取得する
+func (c *Client) PinEvents(ctx context.Context, path string) (*http.Response, error) {
+	req, err := c.NewPinEventsRequest(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	return c.Client.Do(ctx, req)
+}
+
+// NewPinEventsRequest create the request corresponding to the pin action endpoint of the events resource.
+func (c *Client) NewPinEventsRequest(ctx context.Context, path string) (*http.Request, error) {
+	scheme := c.Scheme
+	if scheme == "" {
+		scheme = "http"
+	}
+	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	return req, nil
+}
+
 // ShowEventsPath computes a request path to the show action of events.
 func ShowEventsPath() string {
 
@@ -305,8 +335,8 @@ func (c *Client) NewShowEventsRequest(ctx context.Context, path string, ids []st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	for _, p := range ids {
-		tmp26 := p
-		values.Add("ids", tmp26)
+		tmp27 := p
+		values.Add("ids", tmp27)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

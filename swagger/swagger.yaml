@@ -1127,6 +1127,33 @@ paths:
       summary: notify events
       tags:
       - events
+  /api/develop/v2/events/pin/{user_id}:
+    get:
+      description: ユーザーのピンしたイベント一覧を取得する
+      operationId: events#pin
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/vnd.event+json; type=collection
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EventCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: pin events
+      tags:
+      - events
   /api/develop/v2/events/update:
     get:
       description: イベントの開催フラグを更新する

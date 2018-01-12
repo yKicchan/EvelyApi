@@ -74,6 +74,16 @@ func (this *UsersCollection) VerifyEmail(email string) bool {
 }
 
 /**
+ * ユーザーが存在しているかを判定する
+ * @param  keys ユーザーを特定するキー
+ * @return bool true: 存在している, false: 存在していない
+ */
+func (this *UsersCollection) Exists(keys Keys) bool {
+    _, err := this.FindDoc(keys)
+    return err == nil
+}
+
+/**
  * ユーザーをオプションから検索する
  * @param  options 検索オプション
  * @return users   検索結果のユーザー配列

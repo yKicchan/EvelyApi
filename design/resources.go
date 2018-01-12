@@ -189,6 +189,19 @@ var _ = Resource("events", func() {
 		Response(OK)
 		Response(BadRequest, ErrorMedia)
 	})
+
+    Action("pin", func() {
+        Description("ユーザーのピンしたイベント一覧を取得する")
+        NoSecurity()
+        Routing(GET("/pin/:user_id"))
+		Params(func() {
+			Param("user_id", String, "ユーザーID", func() {
+				Example("yKicchan")
+			})
+		})
+        Response(OK, CollectionOf(EventMedia))
+        Response(BadRequest, ErrorMedia)
+    })
 })
 
 // アカウントに対するアクション

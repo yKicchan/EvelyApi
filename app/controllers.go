@@ -215,6 +215,7 @@ type EventsController interface {
 	Modify(*ModifyEventsContext) error
 	Nearby(*NearbyEventsContext) error
 	Notify(*NotifyEventsContext) error
+	Pin(*PinEventsContext) error
 	Show(*ShowEventsContext) error
 	Update(*UpdateEventsContext) error
 }
@@ -227,6 +228,7 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/:event_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/nearby", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/notice", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/pin/:user_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/detail", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/update", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 
@@ -346,6 +348,22 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	h = handleEventsOrigin(h)
 	service.Mux.Handle("POST", "/api/develop/v2/events/notice", ctrl.MuxHandler("notify", h, unmarshalNotifyEventsPayload))
 	service.LogInfo("mount", "ctrl", "Events", "action", "Notify", "route", "POST /api/develop/v2/events/notice")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewPinEventsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		return ctrl.Pin(rctx)
+	}
+	h = handleEventsOrigin(h)
+	service.Mux.Handle("GET", "/api/develop/v2/events/pin/:user_id", ctrl.MuxHandler("pin", h, nil))
+	service.LogInfo("mount", "ctrl", "Events", "action", "Pin", "route", "GET /api/develop/v2/events/pin/:user_id")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
