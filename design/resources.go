@@ -125,7 +125,7 @@ var _ = Resource("events", func() {
 		Routing(GET("/detail"))
 		Params(func() {
 			Param("ids", ArrayOf(String), "詳細を見るイベントのID配列", func() {
-				Example([]string{"5a44d5f2775672b659ba00fa", "2as4d5d27d5612b65cca000b"})
+                Example([]string{"5a44d5f2775672b659ba00fa", "5a44d5f2775672b659ba00fb"})
 			})
             Required("ids")
 		})
@@ -189,6 +189,30 @@ var _ = Resource("events", func() {
 		Response(OK)
 		Response(BadRequest, ErrorMedia)
 	})
+
+    Action("pin", func() {
+        Description("ユーザーのピンしたイベント一覧を取得する")
+        NoSecurity()
+        Routing(GET("/pin/:user_id"))
+		Params(func() {
+			Param("user_id", String, "ユーザーID", func() {
+				Example("yKicchan")
+			})
+            Param("limit", Integer, "取得件数", func() {
+				Minimum(1)
+				Maximum(50)
+				Default(10)
+				Example(10)
+			})
+			Param("offset", Integer, "除外件数", func() {
+				Minimum(0)
+				Default(0)
+				Example(10)
+			})
+		})
+        Response(OK, CollectionOf(EventMedia))
+        Response(BadRequest, ErrorMedia)
+    })
 })
 
 // アカウントに対するアクション

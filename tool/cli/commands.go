@@ -113,6 +113,17 @@ type (
 		PrettyPrint bool
 	}
 
+	// PinEventsCommand is the command line data structure for the pin action of events
+	PinEventsCommand struct {
+		// ユーザーID
+		UserID string
+		// 取得件数
+		Limit int
+		// 除外件数
+		Offset      int
+		PrettyPrint bool
+	}
+
 	// ShowEventsCommand is the command line data structure for the show action of events
 	ShowEventsCommand struct {
 		// 詳細を見るイベントのID配列
@@ -323,7 +334,7 @@ Payload example:
 {
    "ids": [
       "5a44d5f2775672b659ba00fa",
-      "2as4d5d27d5612b65cca000b"
+      "5a44d5f2775672b659ba00fb"
    ]
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp7.Run(c, args) },
@@ -347,7 +358,7 @@ Payload example:
 {
    "ids": [
       "5a44d5f2775672b659ba00fa",
-      "2as4d5d27d5612b65cca000b"
+      "5a44d5f2775672b659ba00fb"
    ]
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp8.Run(c, args) },
@@ -357,10 +368,24 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
+		Use:   "pin",
+		Short: `ユーザーのピンしたイベント一覧を取得する`,
+	}
+	tmp9 := new(PinEventsCommand)
+	sub = &cobra.Command{
+		Use:   `events ["/api/develop/v2/events/pin/USER_ID"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp9.Run(c, args) },
+	}
+	tmp9.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp9.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
 		Use:   "send-mail",
 		Short: `新規登録用のメール送信`,
 	}
-	tmp9 := new(SendMailAuthCommand)
+	tmp10 := new(SendMailAuthCommand)
 	sub = &cobra.Command{
 		Use:   `auth ["/api/develop/v2/auth/signup/send_mail"]`,
 		Short: ``,
@@ -371,40 +396,40 @@ Payload example:
 {
    "email": "yKicchanApp@gmail.com"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp9.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp10.Run(c, args) },
 	}
-	tmp9.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp9.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp10.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp10.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "show",
 		Short: `show action`,
 	}
-	tmp10 := new(ShowEventsCommand)
+	tmp11 := new(ShowEventsCommand)
 	sub = &cobra.Command{
 		Use:   `events ["/api/develop/v2/events/detail"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp10.Run(c, args) },
-	}
-	tmp10.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp10.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	tmp11 := new(ShowUsersCommand)
-	sub = &cobra.Command{
-		Use:   `users ["/api/develop/v2/users/USER_ID"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp11.Run(c, args) },
 	}
 	tmp11.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp11.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
+	tmp12 := new(ShowUsersCommand)
+	sub = &cobra.Command{
+		Use:   `users ["/api/develop/v2/users/USER_ID"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp12.Run(c, args) },
+	}
+	tmp12.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp12.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "signin",
 		Short: `ログイン`,
 	}
-	tmp12 := new(SigninAuthCommand)
+	tmp13 := new(SigninAuthCommand)
 	sub = &cobra.Command{
 		Use:   `auth ["/api/develop/v2/auth/signin"]`,
 		Short: ``,
@@ -416,17 +441,17 @@ Payload example:
    "id": "yKicchan",
    "password": "password"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp12.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp13.Run(c, args) },
 	}
-	tmp12.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp12.PrettyPrint, "pp", false, "Pretty print response body")
+	tmp13.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp13.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "signup",
 		Short: `新規登録`,
 	}
-	tmp13 := new(SignupAuthCommand)
+	tmp14 := new(SignupAuthCommand)
 	sub = &cobra.Command{
 		Use:   `auth ["/api/develop/v2/auth/signup"]`,
 		Short: ``,
@@ -441,33 +466,19 @@ Payload example:
    "password": "password",
    "tel": "090-1234-5678"
 }`,
-		RunE: func(cmd *cobra.Command, args []string) error { return tmp13.Run(c, args) },
-	}
-	tmp13.RegisterFlags(sub, c)
-	sub.PersistentFlags().BoolVar(&tmp13.PrettyPrint, "pp", false, "Pretty print response body")
-	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "update",
-		Short: `イベントの開催フラグを更新する`,
-	}
-	tmp14 := new(UpdateEventsCommand)
-	sub = &cobra.Command{
-		Use:   `events ["/api/develop/v2/events/update"]`,
-		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp14.Run(c, args) },
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp14.Run(c, args) },
 	}
 	tmp14.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp14.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "upload",
-		Short: `ファイルアップロード`,
+		Use:   "update",
+		Short: `イベントの開催フラグを更新する`,
 	}
-	tmp15 := new(UploadFilesCommand)
+	tmp15 := new(UpdateEventsCommand)
 	sub = &cobra.Command{
-		Use:   `files ["/api/develop/v2/files/upload"]`,
+		Use:   `events ["/api/develop/v2/events/update"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp15.Run(c, args) },
 	}
@@ -476,17 +487,31 @@ Payload example:
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "verify-token",
-		Short: `新規登録時のトークンのチェック`,
+		Use:   "upload",
+		Short: `ファイルアップロード`,
 	}
-	tmp16 := new(VerifyTokenAuthCommand)
+	tmp16 := new(UploadFilesCommand)
 	sub = &cobra.Command{
-		Use:   `auth ["/api/develop/v2/auth/signup/verify_token"]`,
+		Use:   `files ["/api/develop/v2/files/upload"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp16.Run(c, args) },
 	}
 	tmp16.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp16.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "verify-token",
+		Short: `新規登録時のトークンのチェック`,
+	}
+	tmp17 := new(VerifyTokenAuthCommand)
+	sub = &cobra.Command{
+		Use:   `auth ["/api/develop/v2/auth/signup/verify_token"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp17.Run(c, args) },
+	}
+	tmp17.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp17.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -968,33 +993,33 @@ func (cmd *NearbyEventsCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp17 *float64
+	var tmp18 *float64
 	if cmd.Lat != "" {
 		var err error
-		tmp17, err = float64Val(cmd.Lat)
+		tmp18, err = float64Val(cmd.Lat)
 		if err != nil {
 			goa.LogError(ctx, "failed to parse flag into *float64 value", "flag", "--lat", "err", err)
 			return err
 		}
 	}
-	if tmp17 == nil {
+	if tmp18 == nil {
 		goa.LogError(ctx, "required flag is missing", "flag", "--lat")
 		return fmt.Errorf("required flag lat is missing")
 	}
-	var tmp18 *float64
+	var tmp19 *float64
 	if cmd.Lng != "" {
 		var err error
-		tmp18, err = float64Val(cmd.Lng)
+		tmp19, err = float64Val(cmd.Lng)
 		if err != nil {
 			goa.LogError(ctx, "failed to parse flag into *float64 value", "flag", "--lng", "err", err)
 			return err
 		}
 	}
-	if tmp18 == nil {
+	if tmp19 == nil {
 		goa.LogError(ctx, "required flag is missing", "flag", "--lng")
 		return fmt.Errorf("required flag lng is missing")
 	}
-	resp, err := c.NearbyEvents(ctx, path, *tmp17, *tmp18, cmd.Range, intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
+	resp, err := c.NearbyEvents(ctx, path, *tmp18, *tmp19, cmd.Range, intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1047,6 +1072,35 @@ func (cmd *NotifyEventsCommand) Run(c *client.Client, args []string) error {
 func (cmd *NotifyEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
 	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
+}
+
+// Run makes the HTTP request corresponding to the PinEventsCommand command.
+func (cmd *PinEventsCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = fmt.Sprintf("/api/develop/v2/events/pin/%v", url.QueryEscape(cmd.UserID))
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.PinEvents(ctx, path, intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *PinEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var userID string
+	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
+	cc.Flags().IntVar(&cmd.Limit, "limit", 10, `取得件数`)
+	var offset int
+	cc.Flags().IntVar(&cmd.Offset, "offset", offset, `除外件数`)
 }
 
 // Run makes the HTTP request corresponding to the ShowEventsCommand command.

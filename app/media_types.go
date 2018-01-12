@@ -287,6 +287,8 @@ type User struct {
 	Mail *Mail `form:"mail" json:"mail" xml:"mail"`
 	// 名前
 	Name string `form:"name" json:"name" xml:"name"`
+	// ピンしているイベントのID配列
+	Pins []string `form:"pins" json:"pins" xml:"pins"`
 	// 電話番号
 	Tel string `form:"tel" json:"tel" xml:"tel"`
 }
@@ -304,6 +306,9 @@ func (mt *User) Validate() (err error) {
 	}
 	if mt.Tel == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "tel"))
+	}
+	if mt.Pins == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "pins"))
 	}
 
 	if utf8.RuneCountInString(mt.ID) < 4 {

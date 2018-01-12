@@ -3,6 +3,7 @@ package parser
 import (
 	"EvelyApi/app"
 	. "EvelyApi/model/document"
+	"labix.org/v2/mgo/bson"
 )
 
 // 緯度経度の配列番号を定数化
@@ -18,7 +19,7 @@ const (
  */
 func ToEventMedia(e *EventModel) *app.Event {
 	return &app.Event{
-		ID:    e.ID.String(),
+		ID:    e.ID.Hex(),
 		Title: e.Title,
 		Body:  e.Body,
 		Host: &app.UserTiny{
@@ -44,7 +45,7 @@ func ToEventMedia(e *EventModel) *app.Event {
  */
 func ToEventTinyMedia(e *EventModel) *app.EventTiny {
 	return &app.EventTiny{
-		ID:    e.ID.String(),
+		ID:    e.ID.Hex(),
 		Title: e.Title,
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
@@ -90,6 +91,14 @@ func ToUserMedia(u *UserModel) *app.User {
 			State: u.Mail.State,
 		},
 		Tel:       u.Tel,
+        Pins:      toPinsMedia(u.Pins),
 		CreatedAt: u.CreatedAt,
 	}
+}
+
+func toPinsMedia(old []bson.ObjectId) (new []string) {
+    for _, o := range old {
+        new = append(new, o.Hex())
+    }
+    return new
 }

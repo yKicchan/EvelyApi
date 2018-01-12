@@ -78,14 +78,18 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 		Attribute("name")
 		Attribute("mail", Mail)
 		Attribute("tel")
+        Attribute("pins", ArrayOf(String), "ピンしているイベントのID配列", func() {
+            Example([]string{"5a44d5f2775672b659ba00fa", "5a44d5f2775672b659ba00fb"})
+        })
 		Attribute("createdAt", DateTime, "作成日時")
 	})
-	Required("id", "name", "mail", "tel", "createdAt")
+	Required("id", "name", "mail", "tel", "pins", "createdAt")
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
 		Attribute("mail")
 		Attribute("tel")
+        Attribute("pins")
 		Attribute("createdAt")
 	})
 	View("tiny", func() {

@@ -238,6 +238,31 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 	return nil
 }
 
+// Pin runs the pin action.
+func (c *EventsController) Pin(ctx *app.PinEventsContext) error {
+
+    // ユーザーのピンしているイベント一覧を取得する
+    m, err := c.db.Users().FindDoc(Keys{"id": ctx.UserID})
+    if err != nil {
+        return ctx.BadRequest(errors.New("User ID '" + ctx.UserID + "' does not exist"))
+    }
+    var events []*EventModel
+    u := m.GetUser()
+    for i := ctx.Offset; i < len(u.Pins) && i < ctx.Limit; i++ {
+        m, err := c.db.Events().FindDoc(Keys{"_id": u.Pins[i]})
+        if err == nil {
+            events = append(events, m.GetEvent())
+        }
+    }
+
+	// イベント情報をレスポンス形式に変換して返す
+	res := make(app.EventTinyCollection, len(events))
+	for i := range events {
+		res[i] = parser.ToEventTinyMedia(events[i])
+	}
+	return ctx.OKTiny(res)
+}
+
 // Update runs the update action.
 func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
 	return ctx.OK([]byte("現在実装中"))

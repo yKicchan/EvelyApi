@@ -3,7 +3,11 @@ package api
 import (
 	"EvelyApi/app"
 	"EvelyApi/model"
+    . "EvelyApi/model/collection"
+	. "EvelyApi/model/document"
 	"github.com/goadesign/goa"
+	"labix.org/v2/mgo/bson"
+    // "log"
 )
 
 // PinsController implements the pins resource.
@@ -22,20 +26,59 @@ func NewPinsController(service *goa.Service, db *model.EvelyDB) *PinsController 
 
 // Off runs the off action.
 func (c *PinsController) Off(ctx *app.OffPinsContext) error {
-	// PinsController_Off: start_implement
 
-	// Put your logic here
+    // ユーザー情報から現在のピンの配列を取得
+	claims := GetJWTClaims(ctx)
+	uid := claims["id"].(string)
+    keys := Keys{"id": uid}
+    m, _ := c.db.Users().FindDoc(keys)
+    user := m.GetUser()
 
-	return nil
-	// PinsController_Off: end_implement
+    // ピンするIDを現在のピン配列と比較、あれば削除し、保存
+    for _, id := range ctx.Payload.Ids {
+        n := indexOf(user.Pins, bson.ObjectIdHex(id))
+        if n != -1 {
+            user.Pins = append(user.Pins[:n], user.Pins[n+1:]...)
+        }
+    }
+    err := c.db.Users().Save(User(user), keys)
+    if err != nil {
+		return ctx.BadRequest(err)
+	}
+	return ctx.OK([]byte("Success!!"))
 }
 
 // On runs the on action.
 func (c *PinsController) On(ctx *app.OnPinsContext) error {
-	// PinsController_On: start_implement
 
-	// Put your logic here
+    // ユーザー情報から現在のピンの配列を取得
+	claims := GetJWTClaims(ctx)
+	uid := claims["id"].(string)
+    keys := Keys{"id": uid}
+    m, _ := c.db.Users().FindDoc(keys)
+    user := m.GetUser()
 
-	return nil
-	// PinsController_On: end_implement
+    // ピンするIDを現在のピン配列と比較、なければ追加し、保存
+    for _, id := range ctx.Payload.Ids {
+        if indexOf(user.Pins, bson.ObjectIdHex(id)) == -1 {
+            user.Pins = append(user.Pins, bson.ObjectIdHex(id))
+        }
+    }
+    c.db.Users().Save(User(user), keys)
+	return ctx.OK([]byte("Success!!"))
+}
+
+/**
+ * slice(array)の中の指定の値が存在するインデックスを調べる
+ * @param  slice 探す対象のスライス
+ * @param  val   探す値
+ * @return int   インデックス ないとき-1
+ */
+func indexOf(slice []bson.ObjectId, val bson.ObjectId) int {
+    for i := range slice {
+        if slice[i] == val {
+            return i
+        }
+    }
+    return -1
 }

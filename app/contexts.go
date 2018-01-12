@@ -644,6 +644,94 @@ func (ctx *NotifyEventsContext) BadRequest(r error) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
+// PinEventsContext provides the events pin action context.
+type PinEventsContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Limit  int
+	Offset int
+	UserID string
+}
+
+// NewPinEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller pin action.
+func NewPinEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*PinEventsContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := PinEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramLimit := req.Params["limit"]
+	if len(paramLimit) == 0 {
+		rctx.Limit = 10
+	} else {
+		rawLimit := paramLimit[0]
+		if limit, err2 := strconv.Atoi(rawLimit); err2 == nil {
+			rctx.Limit = limit
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("limit", rawLimit, "integer"))
+		}
+		if rctx.Limit < 1 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`limit`, rctx.Limit, 1, true))
+		}
+		if rctx.Limit > 50 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`limit`, rctx.Limit, 50, false))
+		}
+	}
+	paramOffset := req.Params["offset"]
+	if len(paramOffset) == 0 {
+		rctx.Offset = 0
+	} else {
+		rawOffset := paramOffset[0]
+		if offset, err2 := strconv.Atoi(rawOffset); err2 == nil {
+			rctx.Offset = offset
+		} else {
+			err = goa.MergeErrors(err, goa.InvalidParamTypeError("offset", rawOffset, "integer"))
+		}
+		if rctx.Offset < 0 {
+			err = goa.MergeErrors(err, goa.InvalidRangeError(`offset`, rctx.Offset, 0, true))
+		}
+	}
+	paramUserID := req.Params["user_id"]
+	if len(paramUserID) > 0 {
+		rawUserID := paramUserID[0]
+		rctx.UserID = rawUserID
+	}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *PinEventsContext) OK(r EventCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKTiny sends a HTTP response with status code 200.
+func (ctx *PinEventsContext) OKTiny(r EventTinyCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventTinyCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *PinEventsContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
 // ShowEventsContext provides the events show action context.
 type ShowEventsContext struct {
 	context.Context
