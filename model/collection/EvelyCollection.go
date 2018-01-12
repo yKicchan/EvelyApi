@@ -43,9 +43,6 @@ type Keys map[string]interface{}
  */
 func (this Keys) ToQuery() (query bson.M) {
 	for key, val := range this {
-		if key == "_id" {
-			val = bson.ObjectIdHex(val.(string))
-		}
 		query = bson.M{
 			"$and": []interface{}{
 				query,

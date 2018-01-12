@@ -60,7 +60,7 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 	uid := claims["id"].(string)
 
     // 削除権限があるか(本人のものか)を判定
-	eid := ctx.EventID
+	eid := bson.ObjectIdHex(ctx.EventID)
 	m, err := c.db.Events().FindDoc(Keys{"_id": eid})
     e := m.GetEvent()
     if err != nil {
@@ -129,7 +129,7 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 		Name: claims["name"].(string),
 	}
 	// 編集権限があるか(本人のものか)を判定
-	eid := ctx.EventID
+    eid := bson.ObjectIdHex(ctx.EventID)
 	m, err := c.db.Events().FindDoc(Keys{"_id": eid})
     e := m.GetEvent()
     if err != nil {
@@ -140,7 +140,7 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 	}
 
 	// DBのイベント情報を更新
-	event := parser.ToEventModel(ctx.Payload, bson.ObjectIdHex(eid), user)
+	event := parser.ToEventModel(ctx.Payload, eid, user)
 	keys := Keys{"_id": eid}
 	err = c.db.Events().Save(Event(event), keys)
 	if err != nil {
