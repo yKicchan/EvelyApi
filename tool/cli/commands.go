@@ -116,7 +116,11 @@ type (
 	// PinEventsCommand is the command line data structure for the pin action of events
 	PinEventsCommand struct {
 		// ユーザーID
-		UserID      string
+		UserID string
+		// 取得件数
+		Limit int
+		// 除外件数
+		Offset      int
 		PrettyPrint bool
 	}
 
@@ -1080,7 +1084,7 @@ func (cmd *PinEventsCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.PinEvents(ctx, path)
+	resp, err := c.PinEvents(ctx, path, intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1094,6 +1098,9 @@ func (cmd *PinEventsCommand) Run(c *client.Client, args []string) error {
 func (cmd *PinEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var userID string
 	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
+	cc.Flags().IntVar(&cmd.Limit, "limit", 10, `取得件数`)
+	var offset int
+	cc.Flags().IntVar(&cmd.Offset, "offset", offset, `除外件数`)
 }
 
 // Run makes the HTTP request corresponding to the ShowEventsCommand command.

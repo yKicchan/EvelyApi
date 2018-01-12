@@ -1959,7 +1959,7 @@ func NotifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func PinEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string) (http.ResponseWriter, error) {
+func PinEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, limit int, offset int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1979,8 +1979,18 @@ func PinEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa
 
 	// Setup request context
 	rw := httptest.NewRecorder()
+	query := url.Values{}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		query["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		query["offset"] = sliceVal
+	}
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/pin/%v", userID),
+		Path:     fmt.Sprintf("/api/develop/v2/events/pin/%v", userID),
+		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -1988,6 +1998,14 @@ func PinEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa
 	}
 	prms := url.Values{}
 	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		prms["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		prms["offset"] = sliceVal
+	}
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -2024,7 +2042,7 @@ func PinEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func PinEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string) (http.ResponseWriter, app.EventCollection) {
+func PinEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, limit int, offset int) (http.ResponseWriter, app.EventCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2044,8 +2062,18 @@ func PinEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service
 
 	// Setup request context
 	rw := httptest.NewRecorder()
+	query := url.Values{}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		query["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		query["offset"] = sliceVal
+	}
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/pin/%v", userID),
+		Path:     fmt.Sprintf("/api/develop/v2/events/pin/%v", userID),
+		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -2053,6 +2081,14 @@ func PinEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service
 	}
 	prms := url.Values{}
 	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		prms["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		prms["offset"] = sliceVal
+	}
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -2093,7 +2129,7 @@ func PinEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func PinEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string) (http.ResponseWriter, app.EventTinyCollection) {
+func PinEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, userID string, limit int, offset int) (http.ResponseWriter, app.EventTinyCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2113,8 +2149,18 @@ func PinEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Ser
 
 	// Setup request context
 	rw := httptest.NewRecorder()
+	query := url.Values{}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		query["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		query["offset"] = sliceVal
+	}
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/pin/%v", userID),
+		Path:     fmt.Sprintf("/api/develop/v2/events/pin/%v", userID),
+		RawQuery: query.Encode(),
 	}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
@@ -2122,6 +2168,14 @@ func PinEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Ser
 	}
 	prms := url.Values{}
 	prms["user_id"] = []string{fmt.Sprintf("%v", userID)}
+	{
+		sliceVal := []string{strconv.Itoa(limit)}
+		prms["limit"] = sliceVal
+	}
+	{
+		sliceVal := []string{strconv.Itoa(offset)}
+		prms["offset"] = sliceVal
+	}
 	if ctx == nil {
 		ctx = context.Background()
 	}

@@ -289,8 +289,8 @@ func PinEventsPath(userID string) string {
 }
 
 // ユーザーのピンしたイベント一覧を取得する
-func (c *Client) PinEvents(ctx context.Context, path string) (*http.Response, error) {
-	req, err := c.NewPinEventsRequest(ctx, path)
+func (c *Client) PinEvents(ctx context.Context, path string, limit *int, offset *int) (*http.Response, error) {
+	req, err := c.NewPinEventsRequest(ctx, path, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -298,12 +298,22 @@ func (c *Client) PinEvents(ctx context.Context, path string) (*http.Response, er
 }
 
 // NewPinEventsRequest create the request corresponding to the pin action endpoint of the events resource.
-func (c *Client) NewPinEventsRequest(ctx context.Context, path string) (*http.Request, error) {
+func (c *Client) NewPinEventsRequest(ctx context.Context, path string, limit *int, offset *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
+	values := u.Query()
+	if limit != nil {
+		tmp27 := strconv.Itoa(*limit)
+		values.Set("limit", tmp27)
+	}
+	if offset != nil {
+		tmp28 := strconv.Itoa(*offset)
+		values.Set("offset", tmp28)
+	}
+	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -335,8 +345,8 @@ func (c *Client) NewShowEventsRequest(ctx context.Context, path string, ids []st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	for _, p := range ids {
-		tmp27 := p
-		values.Add("ids", tmp27)
+		tmp29 := p
+		values.Add("ids", tmp29)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

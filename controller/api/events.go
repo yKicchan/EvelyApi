@@ -228,8 +228,9 @@ func (c *EventsController) Pin(ctx *app.PinEventsContext) error {
         return ctx.BadRequest(errors.New("User ID '" + ctx.UserID + "' does not exist"))
     }
     var events []*EventModel
-    for _, id := range m.GetUser().Pins {
-        m, err := c.db.Events().FindDoc(Keys{"_id": id})
+    u := m.GetUser()
+    for i := ctx.Offset; i < len(u.Pins) && i < ctx.Limit; i++ {
+        m, err := c.db.Events().FindDoc(Keys{"_id": u.Pins[i]})
         if err == nil {
             events = append(events, m.GetEvent())
         }

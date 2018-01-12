@@ -198,6 +198,17 @@ var _ = Resource("events", func() {
 			Param("user_id", String, "ユーザーID", func() {
 				Example("yKicchan")
 			})
+            Param("limit", Integer, "取得件数", func() {
+				Minimum(1)
+				Maximum(50)
+				Default(10)
+				Example(10)
+			})
+			Param("offset", Integer, "除外件数", func() {
+				Minimum(0)
+				Default(0)
+				Example(10)
+			})
 		})
         Response(OK, CollectionOf(EventMedia))
         Response(BadRequest, ErrorMedia)

@@ -1132,6 +1132,21 @@ paths:
       description: ユーザーのピンしたイベント一覧を取得する
       operationId: events#pin
       parameters:
+      - default: 10
+        description: 取得件数
+        in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        required: false
+        type: integer
+      - default: 0
+        description: 除外件数
+        in: query
+        minimum: 0
+        name: offset
+        required: false
+        type: integer
       - description: ユーザーID
         in: path
         name: user_id
