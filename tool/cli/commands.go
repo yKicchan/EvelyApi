@@ -460,6 +460,7 @@ Payload example:
 Payload example:
 
 {
+   "deviceToken": "token",
    "id": "yKicchan",
    "mail": "yKicchanApp@gmail.com",
    "name": "きっちゃそ",

@@ -21,27 +21,25 @@ func NewUsersCollection(c *mgo.Collection) *UsersCollection {
 
 /**
  * ユーザーを保存(更新)する
- * @param  model 保存(更新)するユーザーの情報
+ * @param  user  保存(更新)するユーザーの情報
  * @param  keys  ユーザーを特定するキー
  * @return error エラー
  */
-func (this *UsersCollection) Save(model EvelyModel, keys Keys) error {
-	u := model.GetUser()
-	update := bson.M{"$set": u}
+func (this *UsersCollection) Save(user *UserModel, keys Keys) error {
+	update := bson.M{"$set": user}
 	_, err := this.Upsert(keys.ToQuery(), update)
 	return err
 }
 
 /**
  * ユーザーを検索する
- * @param  keys  ユーザーを特定するキー
- * @param  model ユーザーの情報
- * @return err   エラー
+ * @param  keys ユーザーを特定するキー
+ * @return user ユーザーの情報
+ * @return err  エラー
  */
-func (this *UsersCollection) FindDoc(keys Keys) (EvelyModel, error) {
-	u := &UserModel{}
-	err := this.Find(keys.ToQuery()).One(&u)
-	return User(u), err
+func (this *UsersCollection) FindOne(keys Keys) (u *UserModel, err error) {
+	err = this.Find(keys.ToQuery()).One(&u)
+	return
 }
 
 /**
@@ -54,32 +52,12 @@ func (this *UsersCollection) Delete(keys Keys) error {
 }
 
 /**
- * ユーザーIDが使用可能かを判定する
- * @param  id         ユーザーID
- * @return true|false 使用可能 | 使用不可(すでに使われている)
- */
-func (this *UsersCollection) VerifyID(id string) bool {
-	_, err := this.FindDoc(Keys{"id": id})
-	return err != nil
-}
-
-/**
- * メールアドレスが使用可能かを判定する
- * @param  email      メールアドレス
- * @return true|false 使用可能 | 使用不可(すでに使われている)
- */
-func (this *UsersCollection) VerifyEmail(email string) bool {
-	_, err := this.FindDoc(Keys{"mail.email": email})
-	return err != nil
-}
-
-/**
  * ユーザーが存在しているかを判定する
  * @param  keys ユーザーを特定するキー
  * @return bool true: 存在している, false: 存在していない
  */
 func (this *UsersCollection) Exists(keys Keys) bool {
-    _, err := this.FindDoc(keys)
+    _, err := this.FindOne(keys)
     return err == nil
 }
 

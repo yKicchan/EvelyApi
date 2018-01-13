@@ -1,5 +1,5 @@
-hash: 2bb85f3979774298303f0df3dae59299cd63c0b88bb310a01a3cecd54f06eb93
-updated: 2017-12-22T13:49:10.552374608Z
+hash: 8ab627ce26da935bfce0c1af69239d48f975f620efceeac8d405b6ff5c5c214b
+updated: 2018-01-13T05:23:04.8222134Z
 imports:
 - name: github.com/armon/go-metrics
   version: 7aa49fde808223f8dadfdbfd3a20ff6c19e5f9ec
@@ -10,7 +10,7 @@ imports:
 - name: github.com/dimfeld/httptreemux
   version: 8cc36ee10f84b82d0742ffcab770815c7d3f9ad7
 - name: github.com/goadesign/goa
-  version: 4be504b4be3e40368f1993755686da3c572e5197
+  version: e820418346c61978dcffeb5a906aeca9e1e0c01f
   vcs: git
   subpackages:
   - client
@@ -36,29 +36,31 @@ imports:
 - name: github.com/NaySoftware/go-fcm
   version: 2a6c4f48b49f0d5dbfe621589da4c5405157d7c9
 - name: github.com/satori/go.uuid
-  version: 5bf94b69c6b68ee1b541973bb8e1144db23a194b
+  version: 36e9d2ebbde5e3f13ab2e25625fd453271d6522e
 - name: github.com/spf13/cobra
-  version: ccaecb155a2177302cb56cae929251a256d0f646
+  version: b95ab734e27d33e0d8fbabf71ca990568d4e2020
 - name: github.com/spf13/pflag
   version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
 - name: github.com/zach-klippenstein/goregen
   version: 795b5e3961ea1912fde60af417ad85e86acc0d6a
 - name: golang.org/x/crypto
-  version: d585fd2cc9195196078f516b69daff6744ef5e84
+  version: 13931e22f9e72ea58bb73048bc752b48c6d4d4ac
   subpackages:
   - bcrypt
   - blowfish
   - scrypt
 - name: golang.org/x/net
-  version: d866cfc389cec985d6fda2859936a575a55a3ab6
+  version: 5ccada7d0a7ba9aeb5d3aca8d3501b4c2a509fec
   subpackages:
   - websocket
 - name: golang.org/x/tools
-  version: ae8cc594552814363a7aeeb4f2825515a771fa38
+  version: fbec762f837dc349b73d1eaa820552e2ad177942
   subpackages:
   - go/ast/astutil
+- name: gopkg.in/gomail.v2
+  version: 81ebce5c23dfd25c6c67194b37d3dd3f338c98b1
 - name: gopkg.in/yaml.v2
-  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+  version: d670f9405373e636a5a2765eea47fac0c9bc91a4
 - name: labix.org/v2/mgo
   version: "287"
   subpackages:

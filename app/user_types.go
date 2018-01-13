@@ -788,6 +788,8 @@ func (ut *UpcomingDate) Validate() (err error) {
 
 // アカウント作成時に受け取る情報
 type userPayload struct {
+	// デバイストークン
+	DeviceToken *string `form:"deviceToken,omitempty" json:"deviceToken,omitempty" xml:"deviceToken,omitempty"`
 	// ユーザーID
 	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// メールアドレス
@@ -802,6 +804,10 @@ type userPayload struct {
 
 // Finalize sets the default values for userPayload type instance.
 func (ut *userPayload) Finalize() {
+	var defaultDeviceToken = ""
+	if ut.DeviceToken == nil {
+		ut.DeviceToken = &defaultDeviceToken
+	}
 	var defaultTel = ""
 	if ut.Tel == nil {
 		ut.Tel = &defaultTel
@@ -821,9 +827,6 @@ func (ut *userPayload) Validate() (err error) {
 	}
 	if ut.Mail == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "mail"))
-	}
-	if ut.Tel == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "tel"))
 	}
 	if ut.ID != nil {
 		if utf8.RuneCountInString(*ut.ID) < 4 {
@@ -861,6 +864,9 @@ func (ut *userPayload) Validate() (err error) {
 // Publicize creates UserPayload from userPayload
 func (ut *userPayload) Publicize() *UserPayload {
 	var pub UserPayload
+	if ut.DeviceToken != nil {
+		pub.DeviceToken = *ut.DeviceToken
+	}
 	if ut.ID != nil {
 		pub.ID = *ut.ID
 	}
@@ -881,6 +887,8 @@ func (ut *userPayload) Publicize() *UserPayload {
 
 // アカウント作成時に受け取る情報
 type UserPayload struct {
+	// デバイストークン
+	DeviceToken string `form:"deviceToken" json:"deviceToken" xml:"deviceToken"`
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
 	// メールアドレス
@@ -906,9 +914,6 @@ func (ut *UserPayload) Validate() (err error) {
 	}
 	if ut.Mail == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "mail"))
-	}
-	if ut.Tel == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "tel"))
 	}
 	if utf8.RuneCountInString(ut.ID) < 4 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.id`, ut.ID, utf8.RuneCountInString(ut.ID), 4, true))

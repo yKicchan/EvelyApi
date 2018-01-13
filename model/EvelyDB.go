@@ -11,20 +11,14 @@ import (
  */
 type EvelyDB struct {
 	*mgo.Database
+    Events *EventsCollection
+    Users *UsersCollection
 }
 
 func NewEvelyDB(db *mgo.Database) *EvelyDB {
-	return &EvelyDB{db}
-}
-
-func (this *EvelyDB) Events() *EventsCollection {
-	return NewEventsCollection(this.C(EVENT_COLLECTION))
-}
-
-func (this *EvelyDB) Users() *UsersCollection {
-	return NewUsersCollection(this.C(USER_COLLECTION))
-}
-
-func (this *EvelyDB) PendingUsers() *PendingUsersCollection {
-	return NewPendingUsersCollection(this.C(PENDING_USER_COLLECTION))
+	return &EvelyDB{
+        db,
+        NewEventsCollection(db.C(EVENT_COLLECTION)),
+        NewUsersCollection(db.C(USER_COLLECTION)),
+    }
 }

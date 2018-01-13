@@ -3,10 +3,11 @@ package api
 import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
-	"EvelyApi/controller/mailer"
+	"EvelyApi/controller/mail"
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
+    "EvelyApi/controller/parser"
 	"context"
 	"errors"
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -17,17 +18,6 @@ import (
 	"log"
 	"time"
 )
-
-/**
- * メールアドレスをレスポンス形式に変換する
- * @param  email メールアドレス
- * @return Email レスポンス形式に変換したメールアドレス
- */
-func ToEmailMedia(email string) *app.Email {
-	return &app.Email{
-		Email: email,
-	}
-}
 
 // AuthController implements the auth resource.
 type AuthController struct {
@@ -88,8 +78,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 
 	// メールアドレスが使用可能か検査
 	email := ctx.Payload.Email
-	res := c.db.Users().VerifyEmail(email)
-	if !res {
+	if c.db.Users.Exists(Keys{"mail.email": email, "mail.state": STATE_OK}) {
 		return ctx.BadRequest(errors.New("\"" + email + "\" is already in use."))
 	}
 
@@ -102,25 +91,24 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	token := newToken(claims)
 
 	// メール送信
-	subject := "仮登録完了"
 	url := "http://localhost:8888/verify_email?token=" + token
-	body := "登録用URL: " + url
-	err := mailer.SendMail(email, subject, body)
-	if !res {
-		log.Printf("[EvelyApi] faild to send email: %s", err)
+	err := mail.SendSignUpMail(email, url)
+	if err != nil {
 		return ctx.BadRequest(err)
 	}
 
 	// 認証待ちユーザーをDBに保存
-	pu := &PendingUserModel{
-		Email:     email,
-		Token:     token,
+	u := &UserModel{
+		Mail: &Mail{
+            Email: email,
+            Token: token,
+            State: STATE_PENDING,
+        },
 		CreatedAt: claims["created_at"].(time.Time),
 	}
-	keys := Keys{"email": pu.Email}
-	err = c.db.PendingUsers().Save(PendingUser(pu), keys)
+	keys := Keys{"mail.email": u.Mail.Email}
+	err = c.db.Users.Save(u, keys)
 	if err != nil {
-		log.Printf("[EvelyApi] faild to create pending user: %s", err)
 		return ctx.BadRequest(err)
 	}
 	return ctx.OK([]byte("Success!!"))
@@ -131,8 +119,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 
 	// ユーザーが存在するか検索
 	p := ctx.Payload
-	m, err := c.db.Users().FindDoc(Keys{"id": p.ID})
-	user := m.GetUser()
+	user, err := c.db.Users.FindOne(Keys{"id": p.ID})
 	if err != nil {
 		return ctx.BadRequest(errors.New("The ID and password you entered did not match."))
 	}
@@ -140,7 +127,6 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	// IDとパスワードが一致するかを検査
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(p.Password))
 	if err != nil {
-		log.Printf("[EvelyApi] %s", err)
 		return ctx.BadRequest(errors.New("The ID and password you entered did not match."))
 	}
 
@@ -159,16 +145,13 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 
 	// ユーザーIDが使用可能かを検査
 	p := ctx.Payload
-	uc := c.db.Users()
-	if !uc.VerifyID(p.ID) {
-		log.Printf("[EvelyApi] faild to create user: \"" + p.ID + "\" is already in use.")
-		return ctx.BadRequest(errors.New("\"" + p.ID + "\" is already in use."))
+	if !c.db.Users.Exists(Keys{"id": p.ID}) {
+		return ctx.BadRequest(errors.New("User ID '" + p.ID + "' is already in use."))
 	}
 
 	// パスワードを暗号化
 	pass, err := bcrypt.GenerateFromPassword([]byte(p.Password), bcrypt.DefaultCost)
 	if err != nil {
-		log.Printf("[EvelyApi] faild to generate hash: %s", err)
 		return ctx.BadRequest(err)
 	}
 
@@ -183,17 +166,13 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		},
 		Tel: p.Tel,
 	}
-	keys := Keys{"id": user.ID}
-	err = uc.Save(User(user), keys)
+    if p.DeviceToken != "" {
+        user.DeviceToken = p.DeviceToken
+    }
+    keys := Keys{"device_token": p.DeviceToken}
+	err = c.db.Users.Save(user, keys)
 	if err != nil {
-		log.Printf("[EvelyApi] faild to save user: %s", err)
 		return ctx.BadRequest(err)
-	}
-
-	// 一時ユーザーを削除する
-	err = c.db.PendingUsers().Delete(Keys{"email": user.Mail.Email})
-	if err != nil {
-		log.Printf("[EvelyApi] faild to delete pending user: %s", err)
 	}
 
 	// JWTを生成して返す
@@ -209,11 +188,9 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 // VerifyToken runs the verify_token action.
 func (c *AuthController) VerifyToken(ctx *app.VerifyTokenAuthContext) error {
 	// トークンが使用可能か検査
-	m, err := c.db.PendingUsers().FindDoc(Keys{"token": ctx.Token})
-	pu := m.GetPendingUser()
+	u, err := c.db.Users.FindOne(Keys{"mail.token": ctx.Token})
 	if err != nil {
-		log.Printf("[EvelyApi] faild to verify email: %s", err)
 		return ctx.NotFound(err)
 	}
-	return ctx.OK(ToEmailMedia(pu.Email))
+	return ctx.OK(parser.ToEmailMedia(u.Mail.Email))
 }

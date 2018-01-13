@@ -4,10 +4,8 @@ import (
 	"EvelyApi/app"
 	"EvelyApi/model"
     . "EvelyApi/model/collection"
-	. "EvelyApi/model/document"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
-    // "log"
 )
 
 // PinsController implements the pins resource.
@@ -31,8 +29,7 @@ func (c *PinsController) Off(ctx *app.OffPinsContext) error {
 	claims := GetJWTClaims(ctx)
 	uid := claims["id"].(string)
     keys := Keys{"id": uid}
-    m, _ := c.db.Users().FindDoc(keys)
-    user := m.GetUser()
+    user, _ := c.db.Users.FindOne(keys)
 
     // ピンするIDを現在のピン配列と比較、あれば削除し、保存
     for _, id := range ctx.Payload.Ids {
@@ -41,10 +38,7 @@ func (c *PinsController) Off(ctx *app.OffPinsContext) error {
             user.Pins = append(user.Pins[:n], user.Pins[n+1:]...)
         }
     }
-    err := c.db.Users().Save(User(user), keys)
-    if err != nil {
-		return ctx.BadRequest(err)
-	}
+    c.db.Users.Save(user, keys)
 	return ctx.OK([]byte("Success!!"))
 }
 
@@ -55,8 +49,7 @@ func (c *PinsController) On(ctx *app.OnPinsContext) error {
 	claims := GetJWTClaims(ctx)
 	uid := claims["id"].(string)
     keys := Keys{"id": uid}
-    m, _ := c.db.Users().FindDoc(keys)
-    user := m.GetUser()
+    user, _ := c.db.Users.FindOne(keys)
 
     // ピンするIDを現在のピン配列と比較、なければ追加し、保存
     for _, id := range ctx.Payload.Ids {
@@ -64,7 +57,7 @@ func (c *PinsController) On(ctx *app.OnPinsContext) error {
             user.Pins = append(user.Pins, bson.ObjectIdHex(id))
         }
     }
-    c.db.Users().Save(User(user), keys)
+    c.db.Users.Save(user, keys)
 	return ctx.OK([]byte("Success!!"))
 }
 

@@ -102,3 +102,14 @@ func toPinsMedia(old []bson.ObjectId) (new []string) {
     }
     return new
 }
+
+/**
+ * メールアドレスをレスポンス形式に変換する
+ * @param  email メールアドレス
+ * @return Email レスポンス形式に変換したメールアドレス
+ */
+func ToEmailMedia(email string) *app.Email {
+	return &app.Email{
+		Email: email,
+	}
+}

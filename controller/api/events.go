@@ -11,7 +11,6 @@ import (
 	"github.com/NaySoftware/go-fcm"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
-	"log"
     "strconv"
 )
 
@@ -43,9 +42,8 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 	p := ctx.Payload
 	event := parser.ToEventModel(p, bson.NewObjectId(), user)
 	keys := Keys{"_id": event.ID}
-	err := c.db.Events().Save(Event(event), keys)
+	err := c.db.Events.Save(event, keys)
 	if err != nil {
-		log.Printf("[EvelyApi] faild to save event: %s", err)
 		return ctx.BadRequest(err)
 	}
 
@@ -61,19 +59,17 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 
     // 削除権限があるか(本人のものか)を判定
 	eid := bson.ObjectIdHex(ctx.EventID)
-	m, err := c.db.Events().FindDoc(Keys{"_id": eid})
-    e := m.GetEvent()
+    keys := Keys{"_id": eid}
+	e, err := c.db.Events.FindOne(keys)
     if err != nil {
         return ctx.NotFound(err)
     } else if uid != e.Host.ID {
-		log.Printf("[EvelyApi] permission error")
 		return ctx.Forbidden(errors.New("You do not have permission to delete events."))
 	}
 
 	// イベントを削除する
-	err = c.db.Events().Delete(Keys{"_id": eid})
+	err = c.db.Events.Delete(keys)
 	if err != nil {
-		log.Printf("[EvelyApi] failed to delete event: %s", err)
 		return ctx.BadRequest(err)
 	}
 	return ctx.OK([]byte("Seccess!!"))
@@ -83,13 +79,12 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 func (c *EventsController) List(ctx *app.ListEventsContext) error {
 
 	// 条件と一致するイベントを複数検索
-	events, err := c.db.Events().FindEvents(
+	events, err := c.db.Events.FindEvents(
 		WithLimit(ctx.Limit),
 		WithOffset(ctx.Offset),
 		WithKeyword(ctx.Keyword),
 	)
 	if err != nil {
-		log.Printf("[EvelyApi] faild to search events: %s", err)
 		return ctx.BadRequest(err)
 	}
 
@@ -107,9 +102,9 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 	// IDと一致するイベントを検索
 	var events []*EventModel
 	for _, id := range ctx.Ids {
-        m, err := c.db.Events().FindDoc(Keys{"_id": bson.ObjectIdHex(id)})
+        e, err := c.db.Events.FindOne(Keys{"_id": bson.ObjectIdHex(id)})
         if err == nil {
-            events = append(events, m.GetEvent())
+            events = append(events, e)
         }
     }
 
@@ -135,21 +130,18 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 	}
 	// 編集権限があるか(本人のものか)を判定
     eid := bson.ObjectIdHex(ctx.EventID)
-	m, err := c.db.Events().FindDoc(Keys{"_id": eid})
-    e := m.GetEvent()
+	keys := Keys{"_id": eid}
+	e, err := c.db.Events.FindOne(keys)
     if err != nil {
         return ctx.NotFound(err)
     } else if user.ID != e.Host.ID {
-		log.Printf("[EvelyApi] permission error")
 		return ctx.Forbidden(errors.New("You do not have permission to edit events"))
 	}
 
 	// DBのイベント情報を更新
 	event := parser.ToEventModel(ctx.Payload, eid, user)
-	keys := Keys{"_id": eid}
-	err = c.db.Events().Save(Event(event), keys)
+	err = c.db.Events.Save(event, keys)
 	if err != nil {
-		log.Printf("[EvelyApi] faild to save event: %s", err)
 		return ctx.BadRequest(err)
 	}
 	return ctx.OK(parser.ToEventMedia(event))
@@ -158,7 +150,7 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 // Nearby runs the nearby action.
 func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
     // パラメーターの位置情報から付近のイベントを検索
-    events, err := c.db.Events().FindEvents(
+    events, err := c.db.Events.FindEvents(
         WithLimit(ctx.Limit),
         WithOffset(ctx.Offset),
         WithLocation(ctx.Lat, ctx.Lng, float64(ctx.Range) * DEGREE_PER_METER),
@@ -178,18 +170,17 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
     p := ctx.Payload
 	// 現在地から最大通知範囲より内のイベントを取得
-	events, err := c.db.Events().FindEvents(WithLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE))
+	events, err := c.db.Events.FindEvents(WithLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE))
 	if err != nil {
-		log.Printf("[EvelyApi] faild to search events: %s", err)
 		return ctx.BadRequest(err)
 	}
 
 	// ユーザーの位置情報を一時保存
-	user := &UserModel{LngLat: [2]float64{p.Lng, p.Lat}}
 	keys := Keys{"device_token": p.DeviceToken}
-	err = c.db.Users().Save(User(user), keys)
+	user, _ := c.db.Users.FindOne(keys)
+    user.LngLat = [2]float64{p.Lng, p.Lat}
+	err = c.db.Users.Save(user, keys)
 	if err != nil {
-		log.Printf("[EvelyApi] failed to save user: %s", err)
 		return ctx.BadRequest(err)
 	}
 
@@ -200,7 +191,7 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 		r := float64(event.NoticeRange) * DEGREE_PER_METER
 		for _, plan := range event.Plans {
 			// イベントの通知範囲内にユーザーがいたらそのイベントを保存していく
-			users, _ := c.db.Users().FindUsers(WithLocation(plan.Location.LngLat[0], plan.Location.LngLat[1], r), WithDeviceToken(p.DeviceToken))
+			users, _ := c.db.Users.FindUsers(WithLocation(plan.Location.LngLat[0], plan.Location.LngLat[1], r), WithDeviceToken(p.DeviceToken))
 			if len(users) > 0 {
 				nears = append(nears, event)
 				break
@@ -230,7 +221,6 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 	cl.NewFcmRegIdsMsg(ids, data)
 	status, err := cl.Send()
 	if err != nil {
-		log.Printf("[EvelyApi] faild to send FCM :%s", err)
         ctx.BadRequest(err)
 	} else {
 		status.PrintResults()
@@ -242,16 +232,15 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 func (c *EventsController) Pin(ctx *app.PinEventsContext) error {
 
     // ユーザーのピンしているイベント一覧を取得する
-    m, err := c.db.Users().FindDoc(Keys{"id": ctx.UserID})
+    u, err := c.db.Users.FindOne(Keys{"id": ctx.UserID})
     if err != nil {
         return ctx.BadRequest(errors.New("User ID '" + ctx.UserID + "' does not exist"))
     }
     var events []*EventModel
-    u := m.GetUser()
     for i := ctx.Offset; i < len(u.Pins) && i < ctx.Limit; i++ {
-        m, err := c.db.Events().FindDoc(Keys{"_id": u.Pins[i]})
+        e, err := c.db.Events.FindOne(Keys{"_id": u.Pins[i]})
         if err == nil {
-            events = append(events, m.GetEvent())
+            events = append(events, e)
         }
     }
 

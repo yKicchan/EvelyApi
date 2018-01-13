@@ -32,3 +32,4 @@ import:
   - scrypt
 - package: labix.org/v2/mgo
 - package: github.com/NaySoftware/go-fcm
+- package: gopkg.in/gomail.v2

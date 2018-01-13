@@ -26,9 +26,8 @@ func NewEventsCollection(c *mgo.Collection) *EventsCollection {
  * @param  keys  イベントを特定するキー
  * @return error エラー
  */
-func (this *EventsCollection) Save(model EvelyModel, keys Keys) error {
-	e := model.GetEvent()
-	update := bson.M{"$set": e}
+func (this *EventsCollection) Save(event *EventModel, keys Keys) error {
+	update := bson.M{"$set": event}
 	_, err := this.Upsert(keys.ToQuery(), update)
 	return err
 }
@@ -36,13 +35,11 @@ func (this *EventsCollection) Save(model EvelyModel, keys Keys) error {
 /**
  * イベントを検索する
  * @param  keys  イベントを特定するキー
- * @param  model イベントの情報
  * @return err   エラー
  */
-func (this *EventsCollection) FindDoc(keys Keys) (EvelyModel, error) {
-	e := &EventModel{}
-	err := this.Find(keys.ToQuery()).One(&e)
-	return Event(e), err
+func (this *EventsCollection) FindOne(keys Keys) (e *EventModel, err error) {
+	err = this.Find(keys.ToQuery()).One(&e)
+	return
 }
 
 /**

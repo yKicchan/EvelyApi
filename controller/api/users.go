@@ -6,7 +6,6 @@ import (
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
 	"github.com/goadesign/goa"
-	"log"
 )
 
 // UsersController implements the users resource.
@@ -25,11 +24,9 @@ func NewUsersController(service *goa.Service, db *model.EvelyDB) *UsersControlle
 
 // Show runs the show action.
 func (c *UsersController) Show(ctx *app.ShowUsersContext) error {
-	m, err := c.db.Users().FindDoc(Keys{"id": ctx.UserID})
+	user, err := c.db.Users.FindOne(Keys{"id": ctx.UserID})
 	if err != nil {
-		log.Printf("[EvelyApi] %s", err)
 		return ctx.NotFound(err)
 	}
-	user := m.GetUser()
 	return ctx.OK(parser.ToUserMedia(user))
 }

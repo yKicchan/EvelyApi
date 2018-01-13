@@ -132,7 +132,11 @@ var UserPayload = Type("UserPayload", func() {
 		Default("")
 		Example("090-1234-5678")
 	})
-	Required("id", "password", "name", "mail", "tel")
+    Attribute("deviceToken", String, "デバイストークン", func() {
+        Default("")
+        Example("token")
+    })
+	Required("id", "password", "name", "mail")
 })
 
 var Mail = Type("Mail", func() {

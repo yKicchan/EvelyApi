@@ -602,12 +602,18 @@ definitions:
   UserPayload:
     description: アカウント作成時に受け取る情報
     example:
+      deviceToken: token
       id: yKicchan
       mail: yKicchanApp@gmail.com
       name: きっちゃそ
       password: password
       tel: 090-1234-5678
     properties:
+      deviceToken:
+        default: ""
+        description: デバイストークン
+        example: token
+        type: string
       id:
         description: ユーザーID
         example: yKicchan
@@ -640,7 +646,6 @@ definitions:
     - password
     - name
     - mail
-    - tel
     title: UserPayload
     type: object
   UserTiny:
