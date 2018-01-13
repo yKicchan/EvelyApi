@@ -145,7 +145,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 
 	// ユーザーIDが使用可能かを検査
 	p := ctx.Payload
-	if !c.db.Users.Exists(Keys{"id": p.ID}) {
+	if c.db.Users.Exists(Keys{"id": p.ID}) {
 		return ctx.BadRequest(errors.New("User ID '" + p.ID + "' is already in use."))
 	}
 
