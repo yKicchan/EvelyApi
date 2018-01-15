@@ -1,8 +1,8 @@
 package collection
 
 import (
+	. "EvelyApi/config"
 	. "EvelyApi/model/document"
-    . "EvelyApi/config"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 )
@@ -57,8 +57,8 @@ func (this *UsersCollection) Delete(keys Keys) error {
  * @return bool true: 存在している, false: 存在していない
  */
 func (this *UsersCollection) Exists(keys Keys) bool {
-    _, err := this.FindOne(keys)
-    return err == nil
+	_, err := this.FindOne(keys)
+	return err == nil
 }
 
 /**

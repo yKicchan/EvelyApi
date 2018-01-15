@@ -91,16 +91,16 @@ func ToUserMedia(u *UserModel) *app.User {
 			State: u.Mail.State,
 		},
 		Tel:       u.Tel,
-        Pins:      toPinsMedia(u.Pins),
+		Pins:      toPinsMedia(u.Pins),
 		CreatedAt: u.CreatedAt,
 	}
 }
 
 func toPinsMedia(old []bson.ObjectId) (new []string) {
-    for _, o := range old {
-        new = append(new, o.Hex())
-    }
-    return new
+	for _, o := range old {
+		new = append(new, o.Hex())
+	}
+	return new
 }
 
 /**

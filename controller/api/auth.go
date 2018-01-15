@@ -3,11 +3,11 @@ package api
 import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
-	"EvelyApi/controller/mail"
+	"EvelyApi/controller/mailer"
+	"EvelyApi/controller/parser"
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
-    "EvelyApi/controller/parser"
 	"context"
 	"errors"
 	jwtgo "github.com/dgrijalva/jwt-go"
@@ -79,7 +79,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	// メールアドレスが使用可能か検査
 	email := ctx.Payload.Email
 	if c.db.Users.Exists(Keys{"mail.email": email, "mail.state": STATE_OK}) {
-		return ctx.BadRequest(errors.New("\"" + email + "\" is already in use."))
+		return ctx.BadRequest(goa.ErrBadRequest(errors.New("\"" + email + "\" is already in use.")))
 	}
 
 	// トークンを発行する
@@ -92,7 +92,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 
 	// メール送信
 	url := "http://localhost:8888/verify_email?token=" + token
-	err := mail.SendSignUpMail(email, url)
+	err := mailer.SendSignUpConfirmMail(email, url)
 	if err != nil {
 		return ctx.BadRequest(err)
 	}
@@ -100,10 +100,10 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	// 認証待ちユーザーをDBに保存
 	u := &UserModel{
 		Mail: &Mail{
-            Email: email,
-            Token: token,
-            State: STATE_PENDING,
-        },
+			Email: email,
+			Token: token,
+			State: STATE_PENDING,
+		},
 		CreatedAt: claims["created_at"].(time.Time),
 	}
 	keys := Keys{"mail.email": u.Mail.Email}
@@ -121,13 +121,13 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 	p := ctx.Payload
 	user, err := c.db.Users.FindOne(Keys{"id": p.ID})
 	if err != nil {
-		return ctx.BadRequest(errors.New("The ID and password you entered did not match."))
+		return ctx.BadRequest(goa.ErrBadRequest(errors.New("The ID and password you entered did not match.")))
 	}
 
 	// IDとパスワードが一致するかを検査
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(p.Password))
 	if err != nil {
-		return ctx.BadRequest(errors.New("The ID and password you entered did not match."))
+		return ctx.BadRequest(goa.ErrBadRequest(errors.New("The ID and password you entered did not match.")))
 	}
 
 	// JWTを生成して返す
@@ -146,7 +146,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 	// ユーザーIDが使用可能かを検査
 	p := ctx.Payload
 	if c.db.Users.Exists(Keys{"id": p.ID}) {
-		return ctx.BadRequest(errors.New("User ID '" + p.ID + "' is already in use."))
+		return ctx.BadRequest(goa.ErrBadRequest(errors.New("User ID '" + p.ID + "' is already in use.")))
 	}
 
 	// パスワードを暗号化
@@ -166,11 +166,17 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		},
 		Tel: p.Tel,
 	}
-    if p.DeviceToken != "" {
-        user.DeviceToken = p.DeviceToken
-    }
-    keys := Keys{"device_token": p.DeviceToken}
+	if p.DeviceToken != "" {
+		user.DeviceToken = p.DeviceToken
+	}
+	keys := Keys{"device_token": p.DeviceToken}
 	err = c.db.Users.Save(user, keys)
+	if err != nil {
+		return ctx.BadRequest(err)
+	}
+
+	// 登録完了メールを送信
+	err = mailer.SendSignUpCompleteMail(user.Mail.Email, user.Name)
 	if err != nil {
 		return ctx.BadRequest(err)
 	}

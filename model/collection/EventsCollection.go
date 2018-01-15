@@ -1,8 +1,8 @@
 package collection
 
 import (
+	. "EvelyApi/config"
 	. "EvelyApi/model/document"
-    . "EvelyApi/config"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"strings"
@@ -88,15 +88,15 @@ func (this *EventsCollection) FindEvents(options ...FindOptions) (events []*Even
 	// 位置情報検索
 	if opt.r > 0 {
 		query = bson.M{
-            "plans.location.lng_lat": bson.M{
-                "$nearSphere": bson.M{
-                    "$geometry": bson.M{
-                        "type":        "Point",
-                        "coordinates": []float64{opt.lng, opt.lat},
-                    },
-                    "$maxDistance": (float64(opt.r) * DEGREE_PER_METER),
-                },
-            },
+			"plans.location.lng_lat": bson.M{
+				"$nearSphere": bson.M{
+					"$geometry": bson.M{
+						"type":        "Point",
+						"coordinates": []float64{opt.lng, opt.lat},
+					},
+					"$maxDistance": (float64(opt.r) * DEGREE_PER_METER),
+				},
+			},
 		}
 	}
 

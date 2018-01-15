@@ -11,7 +11,7 @@ import (
 	"github.com/NaySoftware/go-fcm"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
-    "strconv"
+	"strconv"
 )
 
 // EventsController implements the events resource.
@@ -57,14 +57,15 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 	claims := GetJWTClaims(ctx)
 	uid := claims["id"].(string)
 
-    // 削除権限があるか(本人のものか)を判定
+	// 削除権限があるか(本人のものか)を判定
 	eid := bson.ObjectIdHex(ctx.EventID)
-    keys := Keys{"_id": eid}
+	keys := Keys{"_id": eid}
 	e, err := c.db.Events.FindOne(keys)
-    if err != nil {
-        return ctx.NotFound(err)
-    } else if uid != e.Host.ID {
-		return ctx.Forbidden(errors.New("You do not have permission to delete events."))
+	if err != nil {
+		return ctx.NotFound(err)
+	} else if uid != e.Host.ID {
+        errForbidden := goa.NewErrorClass("forbidden", 403)
+		return ctx.Forbidden(errForbidden(errors.New("You do not have permission to delete events.")))
 	}
 
 	// イベントを削除する
@@ -102,21 +103,21 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 	// IDと一致するイベントを検索
 	var events []*EventModel
 	for _, id := range ctx.Ids {
-        e, err := c.db.Events.FindOne(Keys{"_id": bson.ObjectIdHex(id)})
-        if err == nil {
-            events = append(events, e)
-        }
-    }
+		e, err := c.db.Events.FindOne(Keys{"_id": bson.ObjectIdHex(id)})
+		if err == nil {
+			events = append(events, e)
+		}
+	}
 
-    // イベント情報をレスポンス形式に変換して返す
-    res := make(app.EventCollection, len(events))
-    if len(res) == 0 {
-        return ctx.OK(res)
-    }
+	// イベント情報をレスポンス形式に変換して返す
+	res := make(app.EventCollection, len(events))
+	if len(res) == 0 {
+		return ctx.OK(res)
+	}
 	for i := range events {
 		res[i] = parser.ToEventMedia(events[i])
 	}
-    return ctx.OK(res)
+	return ctx.OK(res)
 }
 
 // Modify runs the modify action.
@@ -129,13 +130,14 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 		Name: claims["name"].(string),
 	}
 	// 編集権限があるか(本人のものか)を判定
-    eid := bson.ObjectIdHex(ctx.EventID)
+	eid := bson.ObjectIdHex(ctx.EventID)
 	keys := Keys{"_id": eid}
 	e, err := c.db.Events.FindOne(keys)
-    if err != nil {
-        return ctx.NotFound(err)
-    } else if user.ID != e.Host.ID {
-		return ctx.Forbidden(errors.New("You do not have permission to edit events"))
+	if err != nil {
+		return ctx.NotFound(err)
+	} else if user.ID != e.Host.ID {
+        errForbidden := goa.NewErrorClass("forbidden", 403)
+		return ctx.Forbidden(errForbidden(errors.New("You do not have permission to edit events")))
 	}
 
 	// DBのイベント情報を更新
@@ -149,16 +151,16 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 
 // Nearby runs the nearby action.
 func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
-    // パラメーターの位置情報から付近のイベントを検索
-    events, err := c.db.Events.FindEvents(
-        WithLimit(ctx.Limit),
-        WithOffset(ctx.Offset),
-        WithLocation(ctx.Lat, ctx.Lng, float64(ctx.Range) * DEGREE_PER_METER),
-    )
-    if err != nil {
-        return ctx.BadRequest(err)
-    }
-    // イベント情報をレスポンス形式に変換して返す
+	// パラメーターの位置情報から付近のイベントを検索
+	events, err := c.db.Events.FindEvents(
+		WithLimit(ctx.Limit),
+		WithOffset(ctx.Offset),
+		WithLocation(ctx.Lat, ctx.Lng, float64(ctx.Range)*DEGREE_PER_METER),
+	)
+	if err != nil {
+		return ctx.BadRequest(err)
+	}
+	// イベント情報をレスポンス形式に変換して返す
 	res := make(app.EventTinyCollection, len(events))
 	for i := range events {
 		res[i] = parser.ToEventTinyMedia(events[i])
@@ -168,7 +170,7 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 
 // Notify runs the notify action.
 func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
-    p := ctx.Payload
+	p := ctx.Payload
 	// 現在地から最大通知範囲より内のイベントを取得
 	events, err := c.db.Events.FindEvents(WithLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE))
 	if err != nil {
@@ -178,7 +180,7 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 	// ユーザーの位置情報を一時保存
 	keys := Keys{"device_token": p.DeviceToken}
 	user, _ := c.db.Users.FindOne(keys)
-    user.LngLat = [2]float64{p.Lng, p.Lat}
+	user.LngLat = [2]float64{p.Lng, p.Lat}
 	err = c.db.Users.Save(user, keys)
 	if err != nil {
 		return ctx.BadRequest(err)
@@ -221,7 +223,7 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 	cl.NewFcmRegIdsMsg(ids, data)
 	status, err := cl.Send()
 	if err != nil {
-        ctx.BadRequest(err)
+		ctx.BadRequest(err)
 	} else {
 		status.PrintResults()
 	}
@@ -231,18 +233,18 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 // Pin runs the pin action.
 func (c *EventsController) Pin(ctx *app.PinEventsContext) error {
 
-    // ユーザーのピンしているイベント一覧を取得する
-    u, err := c.db.Users.FindOne(Keys{"id": ctx.UserID})
-    if err != nil {
-        return ctx.BadRequest(errors.New("User ID '" + ctx.UserID + "' does not exist"))
-    }
-    var events []*EventModel
-    for i := ctx.Offset; i < len(u.Pins) && i < ctx.Limit; i++ {
-        e, err := c.db.Events.FindOne(Keys{"_id": u.Pins[i]})
-        if err == nil {
-            events = append(events, e)
-        }
-    }
+	// ユーザーのピンしているイベント一覧を取得する
+	u, err := c.db.Users.FindOne(Keys{"id": ctx.UserID})
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(errors.New("User ID '" + ctx.UserID + "' does not exist")))
+	}
+	var events []*EventModel
+	for i := ctx.Offset; i < len(u.Pins) && i < ctx.Limit; i++ {
+		e, err := c.db.Events.FindOne(Keys{"_id": u.Pins[i]})
+		if err == nil {
+			events = append(events, e)
+		}
+	}
 
 	// イベント情報をレスポンス形式に変換して返す
 	res := make(app.EventTinyCollection, len(events))
