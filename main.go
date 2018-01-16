@@ -55,6 +55,9 @@ func main() {
 	// Mount "pins" controller
 	c6 := api.NewPinsController(service, db)
 	app.MountPinsController(service, c6)
+	// Mount "reviews" controller
+	c7 := api.NewReviewsController(service, db)
+	app.MountReviewsController(service, c7)
 
 	// Start service
 	if err := service.ListenAndServe(":8888"); err != nil {

@@ -120,3 +120,29 @@ var FilePathMedia = MediaType("application/vnd.file_path+json", func() {
 		Attribute("path")
 	})
 })
+
+var ReviewMedia = MediaType("application/vnd.review+json", func() {
+    Description("レビュー")
+    Reference(ReviewPayload)
+    Attributes(func() {
+        Attribute("id", String, "レビューID", func() {
+            Example("")
+        })
+        Attribute("rate")
+        Attribute("title")
+        Attribute("body")
+        Attribute("reviewer", UserMedia)
+        Attribute("reviewedAt", DateTime, "レビューした日")
+    })
+    Required("id", "rate", "title", "body", "reviewer", "reviewedAt")
+    View("default", func() {
+        Attribute("id")
+        Attribute("rate")
+        Attribute("title")
+        Attribute("body")
+        Attribute("reviewer", func() {
+            View("tiny")
+        })
+        Attribute("reviewedAt")
+    })
+})

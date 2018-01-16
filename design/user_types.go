@@ -170,3 +170,20 @@ var PinPayload = Type("PinPayload", func() {
 	})
 	Required("ids")
 })
+
+var ReviewPayload = Type("ReviewPayload", func() {
+    Description("レビュー投稿で受け取るレビュー情報")
+    Attribute("rate", Integer, "レート評価", func() {
+        Enum(1, 2, 3, 4, 5)
+        Example(4)
+    })
+    Attribute("title", String, "レビューのタイトル", func() {
+		MinLength(1)
+		MaxLength(30)
+	})
+	Attribute("body", String, "レビューの内容", func() {
+		MinLength(1)
+		MaxLength(5000)
+	})
+    Required("rate", "title", "body")
+})

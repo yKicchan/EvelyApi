@@ -250,6 +250,44 @@ definitions:
       title: Git勉強会
       updateDate: 2005-04-23T09:00:35Z
       url: http://comp.ecc.ac.jp/
+    - body: |-
+        初心者でもGitを扱えるようになる勉強会を開催します！
+        ノートPCを各自持参してください。
+      createdAt: 1974-02-03T21:26:56Z
+      host:
+        id: yKicchan
+        name: きっちゃそ
+      id: 20170225-2
+      mail: yKicchanApp@gmail.com
+      noticeRange: 500
+      openFlg: false
+      plans:
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      scope: public
+      tel: 090-1234-5678
+      title: Git勉強会
+      updateDate: 2005-04-23T09:00:35Z
+      url: http://comp.ecc.ac.jp/
     items:
       $ref: '#/definitions/Event'
     title: 'Mediatype identifier: application/vnd.event+json; type=collection; view=default'
@@ -264,6 +302,20 @@ definitions:
       noticeRange: 500
       openFlg: false
       plans:
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1990-02-18T14:03:59Z
+          startDate: 1975-07-28T07:45:40Z
       - location:
           lat: 34.706425
           lng: 135.50124
@@ -305,6 +357,20 @@ definitions:
       plans:
         description: イベントの開催予定一覧
         example:
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1990-02-18T14:03:59Z
+            startDate: 1975-07-28T07:45:40Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1990-02-18T14:03:59Z
+            startDate: 1975-07-28T07:45:40Z
         - location:
             lat: 34.706425
             lng: 135.50124
@@ -470,7 +536,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Porro rem commodi.
+          example: Consequuntur dolores non eum placeat.
           type: string
         type: array
     required:
@@ -496,6 +562,119 @@ definitions:
     - location
     - upcomingDate
     title: Plan
+    type: object
+  Review:
+    description: レビュー (default view)
+    example:
+      body: xjr
+      id: ""
+      rate: 4
+      reviewedAt: 1981-12-28T11:54:46Z
+      reviewer:
+        id: yKicchan
+        name: きっちゃそ
+      title: m9nry5
+    properties:
+      body:
+        description: レビューの内容
+        example: xjr
+        maxLength: 5000
+        minLength: 1
+        type: string
+      id:
+        description: レビューID
+        example: ""
+        type: string
+      rate:
+        description: レート評価
+        enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        example: 4
+        type: integer
+      reviewedAt:
+        description: レビューした日
+        example: 1981-12-28T11:54:46Z
+        format: date-time
+        type: string
+      reviewer:
+        $ref: '#/definitions/UserTiny'
+      title:
+        description: レビューのタイトル
+        example: m9nry5
+        maxLength: 30
+        minLength: 1
+        type: string
+    required:
+    - id
+    - rate
+    - title
+    - body
+    - reviewer
+    - reviewedAt
+    title: 'Mediatype identifier: application/vnd.review+json; view=default'
+    type: object
+  ReviewCollection:
+    description: ReviewCollection is the media type for an array of Review (default
+      view)
+    example:
+    - body: xjr
+      id: ""
+      rate: 4
+      reviewedAt: 1981-12-28T11:54:46Z
+      reviewer:
+        id: yKicchan
+        name: きっちゃそ
+      title: m9nry5
+    - body: xjr
+      id: ""
+      rate: 4
+      reviewedAt: 1981-12-28T11:54:46Z
+      reviewer:
+        id: yKicchan
+        name: きっちゃそ
+      title: m9nry5
+    items:
+      $ref: '#/definitions/Review'
+    title: 'Mediatype identifier: application/vnd.review+json; type=collection; view=default'
+    type: array
+  ReviewPayload:
+    description: レビュー投稿で受け取るレビュー情報
+    example:
+      body: yym
+      rate: 4
+      title: ygva5jk
+    properties:
+      body:
+        description: レビューの内容
+        example: yym
+        maxLength: 5000
+        minLength: 1
+        type: string
+      rate:
+        description: レート評価
+        enum:
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        example: 4
+        type: integer
+      title:
+        description: レビューのタイトル
+        example: ygva5jk
+        maxLength: 30
+        minLength: 1
+        type: string
+    required:
+    - rate
+    - title
+    - body
+    title: ReviewPayload
     type: object
   SignupPayload:
     description: 新規登録時のメール送信
@@ -582,7 +761,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Sit cumque aperiam praesentium dolor debitis nemo.
+          example: Officia eos sunt veritatis.
           type: string
         type: array
       tel:
@@ -1288,6 +1467,95 @@ paths:
       summary: on pins
       tags:
       - pins
+  /api/develop/v2/reviews/{event_id}:
+    get:
+      description: レビューの一覧取得
+      operationId: reviews#list
+      parameters:
+      - description: イベントID
+        in: path
+        name: event_id
+        required: true
+        type: string
+      - default: 5
+        description: 取得件数
+        in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        required: false
+        type: integer
+      - default: 0
+        description: 除外件数
+        in: query
+        minimum: 0
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.review+json; type=collection
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/ReviewCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      summary: list reviews
+      tags:
+      - reviews
+    post:
+      description: |-
+        レビュー投稿
+
+        Required security scopes:
+          * `api:access`
+      operationId: reviews#create
+      parameters:
+      - description: イベントID
+        in: path
+        name: event_id
+        required: true
+        type: string
+      - description: レビュー投稿で受け取るレビュー情報
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/ReviewPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.review+json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/Review'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: create reviews
+      tags:
+      - reviews
   /api/develop/v2/users/{user_id}:
     get:
       description: アカウント情報取得

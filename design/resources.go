@@ -272,6 +272,49 @@ var _ = Resource("files", func() {
 	Files("/files/*filename", "public/files/")
 })
 
+var _ = Resource("reviews", func() {
+    BasePath("/reviews")
+
+    Action("list", func() {
+        Description("レビューの一覧取得")
+        NoSecurity()
+        Routing(GET("/:event_id"))
+        Params(func() {
+            Param("event_id", String, "イベントID", func() {
+                Example("5a44d5f2775672b659ba00fa")
+            })
+			Param("limit", Integer, "取得件数", func() {
+				Minimum(1)
+				Maximum(50)
+				Default(5)
+				Example(5)
+			})
+			Param("offset", Integer, "除外件数", func() {
+				Minimum(0)
+				Default(0)
+				Example(10)
+			})
+        })
+        Response(OK, CollectionOf(ReviewMedia))
+        Response(BadRequest, ErrorMedia)
+        Response(NotFound, ErrorMedia)
+    })
+
+    Action("create", func() {
+        Description("レビュー投稿")
+        Routing(POST("/:event_id"))
+        Payload(ReviewPayload)
+        Params(func() {
+            Param("event_id", String, "イベントID", func() {
+                Example("5a44d5f2775672b659ba00fa")
+            })
+        })
+        Response(Created, ReviewMedia)
+        Response(BadRequest, ErrorMedia)
+        Response(NotFound, ErrorMedia)
+    })
+})
+
 var _ = Resource("swagger", func() {
 	NoSecurity()
 	Origin("*", func() {
