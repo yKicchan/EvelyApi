@@ -213,11 +213,33 @@ var _ = Resource("events", func() {
         Response(OK, CollectionOf(EventMedia))
         Response(BadRequest, ErrorMedia)
     })
+
+    Action("my_list", func() {
+        Description("自分のイベント一覧を取得する")
+        Routing(GET("/my_list"))
+        Params(func() {
+            Param("limit", Integer, "取得件数", func() {
+                Minimum(1)
+                Maximum(50)
+                Default(10)
+                Example(10)
+            })
+            Param("offset", Integer, "除外件数", func() {
+                Minimum(0)
+                Default(0)
+                Example(10)
+            })
+        })
+        Response(OK, CollectionOf(EventMedia))
+        Response(BadRequest, ErrorMedia)
+        Response(Unauthorized, ErrorMedia)
+    })
 })
 
 // アカウントに対するアクション
 var _ = Resource("users", func() {
 	BasePath("/users")
+
 	Action("show", func() {
 		Description("アカウント情報取得")
 		NoSecurity()

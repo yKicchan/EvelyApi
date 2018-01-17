@@ -1048,6 +1048,54 @@ paths:
       summary: show events
       tags:
       - events
+  /api/develop/v2/events/my_list:
+    get:
+      description: |-
+        自分のイベント一覧を取得する
+
+        Required security scopes:
+          * `api:access`
+      operationId: events#my_list
+      parameters:
+      - default: 10
+        description: 取得件数
+        in: query
+        maximum: 50
+        minimum: 1
+        name: limit
+        required: false
+        type: integer
+      - default: 0
+        description: 除外件数
+        in: query
+        minimum: 0
+        name: offset
+        required: false
+        type: integer
+      produces:
+      - application/vnd.event+json; type=collection
+      - application/vnd.goa.error
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/EventCollection'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: my_list events
+      tags:
+      - events
   /api/develop/v2/events/nearby:
     get:
       description: 近くのイベントを検索する

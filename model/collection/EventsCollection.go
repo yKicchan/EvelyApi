@@ -99,6 +99,10 @@ func (this *EventsCollection) FindEvents(options ...FindOptions) (events []*Even
 			},
 		}
 	}
+    // 作成者検索
+    if len(opt.host) > 0 {
+        query = bson.M{"host.id": opt.host}
+    }
 
 	// 検索条件からイベントを検索
 	q := this.Find(query).Select(EVENT_TINY_SELECTOR)

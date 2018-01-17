@@ -9,6 +9,7 @@ type findOptions struct {
 	lng         float64
 	r           float64
 	deviceToken string
+    host        string
 }
 
 // 検索オプションを設定するため関数化
@@ -71,4 +72,15 @@ func WithDeviceToken(deviceToken string) FindOptions {
 	return func(ops *findOptions) {
 		ops.deviceToken = deviceToken
 	}
+}
+
+/**
+ * イベント作成者のIDを検索オプションに設定する
+ * @param id イベント作成者のID
+ * @return   クロージャ
+ */
+func WithHost(id string) FindOptions {
+    return func(ops *findOptions) {
+        ops.host = id
+    }
 }
