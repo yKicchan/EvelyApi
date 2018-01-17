@@ -132,7 +132,7 @@ var UserPayload = Type("UserPayload", func() {
 		Default("")
 		Example("090-1234-5678")
 	})
-    Attribute("deviceToken", String, "デバイストークン", func() {
+    Attribute("InstanceID", String, "端末のインスタンスID", func() {
         Default("")
         Example("token")
     })
@@ -152,15 +152,23 @@ var Mail = Type("Mail", func() {
 	Required("email", "state")
 })
 
-var NoticePayload = Type("NoticePayload", func() {
-	Description("デバイストークンと現在位置情報")
+var NotifyByInstanceIDPayload = Type("NotifyByInstanceIDPayload", func() {
+	Description("インスタンスIDと現在位置情報")
 	Reference(Location)
-	Attribute("deviceToken", String, "デバイストークン", func() {
+	Attribute("instanceID", String, "通知先となるインスタンスID", func() {
 		Example("token")
 	})
 	Attribute("lat")
 	Attribute("lng")
-	Required("deviceToken", "lat", "lng")
+	Required("instanceID", "lat", "lng")
+})
+
+var NotifyByUserIDPayload = Type("NotifyByUserIDPayload", func() {
+    Description("現在位置情報")
+    Reference(Location)
+    Attribute("lat")
+    Attribute("lng")
+    Required("lat", "lng")
 })
 
 var PinPayload = Type("PinPayload", func() {

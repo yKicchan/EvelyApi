@@ -166,10 +166,10 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		},
 		Tel: p.Tel,
 	}
-	if p.DeviceToken != "" {
-		user.DeviceToken = p.DeviceToken
+	if p.InstanceID != "" {
+		user.InstanceID = p.InstanceID
 	}
-	keys := Keys{"device_token": p.DeviceToken}
+	keys := Keys{"instance_id": p.InstanceID}
 	err = c.db.Users.Save(user, keys)
 	if err != nil {
 		return ctx.BadRequest(err)
