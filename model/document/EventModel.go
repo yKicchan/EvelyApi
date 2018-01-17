@@ -52,6 +52,10 @@ type Location struct {
 	Name   string     `bson:"name"`
 	LngLat [2]float64 `bson:"lng_lat"`
 }
+const (
+    LNG = iota
+    LAT
+)
 
 // イベントの開催予定期間のDBモデル
 type UpcomingDate struct {

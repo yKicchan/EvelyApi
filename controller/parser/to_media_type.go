@@ -6,12 +6,6 @@ import (
 	"labix.org/v2/mgo/bson"
 )
 
-// 緯度経度の配列番号を定数化
-const (
-	Lng = 0
-	Lat = 1
-)
-
 /**
  * イベント情報をAPIのレスポンス形式に変換する
  * @param e イベント情報
@@ -64,8 +58,8 @@ func toPlansMedia(oldPlans []*Plan) (newPlans []*app.Plan) {
 		plan := &app.Plan{
 			Location: &app.Location{
 				Name: old.Location.Name,
-				Lng:  old.Location.LngLat[Lng],
-				Lat:  old.Location.LngLat[Lat],
+				Lng:  old.Location.LngLat[LNG],
+				Lat:  old.Location.LngLat[LAT],
 			},
 			UpcomingDate: &app.UpcomingDate{
 				StartDate: old.UpcomingDate.StartDate,

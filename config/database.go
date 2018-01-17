@@ -7,8 +7,9 @@ const (
 	DB_NAME = "develop"
 
 	// コレクション名
-	EVENT_COLLECTION        = "Events"
-	USER_COLLECTION         = "Users"
+	EVENTS_COLLECTION  = "Events"
+	USERS_COLLECTION   = "Users"
+    REVIEWS_COLLECTION = "Reviews"
 
 	// メールアドレスの状態
 	STATE_PENDING = "Pending"

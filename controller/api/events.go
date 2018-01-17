@@ -6,12 +6,14 @@ import (
 	"EvelyApi/controller/parser"
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
+    . "EvelyApi/model/collection/findOptions"
 	. "EvelyApi/model/document"
 	"errors"
 	"github.com/NaySoftware/go-fcm"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
 	"strconv"
+    "math"
 )
 
 // EventsController implements the events resource.
@@ -80,11 +82,11 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 func (c *EventsController) List(ctx *app.ListEventsContext) error {
 
 	// 条件と一致するイベントを複数検索
-	events, err := c.db.Events.FindEvents(
-		WithLimit(ctx.Limit),
-		WithOffset(ctx.Offset),
-		WithKeyword(ctx.Keyword),
-	)
+	opt := NewFindEventsOptions()
+    opt.SetLimit(ctx.Limit)
+    opt.SetOffset(ctx.Offset)
+    opt.SetKeyword(ctx.Keyword)
+	events, err := c.db.Events.FindEventsByKeyword(opt)
 	if err != nil {
 		return ctx.BadRequest(err)
 	}
@@ -152,11 +154,11 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 // Nearby runs the nearby action.
 func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	// パラメーターの位置情報から付近のイベントを検索
-	events, err := c.db.Events.FindEvents(
-		WithLimit(ctx.Limit),
-		WithOffset(ctx.Offset),
-		WithLocation(ctx.Lat, ctx.Lng, float64(ctx.Range)*DEGREE_PER_METER),
-	)
+	opt := NewFindEventsOptions()
+    opt.SetLimit(ctx.Limit)
+    opt.SetOffset(ctx.Offset)
+    opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
+	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
 		return ctx.BadRequest(err)
 	}
@@ -173,7 +175,9 @@ func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsC
 
 	// 現在地から最大通知範囲より内のイベントを取得
 	p := ctx.Payload
-	events, err := c.db.Events.FindEvents(WithLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE))
+    opt := NewFindEventsOptions()
+    opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
+	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
 		return ctx.BadRequest(err)
 	}
@@ -207,7 +211,9 @@ func (c *EventsController) NotifyByUserID(ctx *app.NotifyByUserIDEventsContext) 
 
     // 現在地から最大通知範囲より内のイベントを取得
 	p := ctx.Payload
-	events, err := c.db.Events.FindEvents(WithLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE))
+    opt := NewFindEventsOptions()
+    opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
+	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
 		return ctx.BadRequest(err)
 	}
@@ -233,7 +239,7 @@ func (c *EventsController) NotifyByUserID(ctx *app.NotifyByUserIDEventsContext) 
         return ctx.NotFound(err)
     }
 	cl := fcm.NewFcmClient(FCM_SERVER_KEY)
-	cl.NewFcmRegIdsMsg(u.InstanceIDs, data)
+	cl.NewFcmRegIdsMsg(u.InstanceIds, data)
 	status, err := cl.Send()
 	if err != nil {
 		ctx.BadRequest(err)
@@ -280,13 +286,13 @@ func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
  * @return nearbyEvents 通知範囲内にあったイベント
  */
 func contain(events []*EventModel, lat, lng float64) (nearbyEvents []*EventModel) {
-    square := func(x int) int { return x * x }
+    square := func(x float64) float64 { return x * x }
     for _, e := range events {
 		// 通知範囲(m)を度単位に変換
 		r := float64(e.NoticeRange) * DEGREE_PER_METER
         for _, plan := range e.Plans {
-            distance := math.sqrt(square(lat - plan.Lat) + square(lng - plan.Lng))
-            if distance > e.NoticeRange {
+            distance := math.Sqrt(square(lat - plan.Location.LngLat[LNG]) + square(lng - plan.Location.LngLat[LAT]))
+            if distance > r {
                 nearbyEvents = append(nearbyEvents, e)
                 break
             }
@@ -300,12 +306,12 @@ func contain(events []*EventModel, lat, lng float64) (nearbyEvents []*EventModel
  * @param  events 近くにあったイベント
  * @return msg    生成した通知用メッセージ
  */
-func createNotifyMessage(events []*EventsModel) (msg map[string]string) {
+func createNotifyMessage(events []*EventModel) (msg map[string]string) {
     // 一番近かったイベントを通知内容に設定する
 	msg["sum"] = "近くで" + events[0].Title + "が開催されています！"
 	// 他にイベントが複数件あった場合Tipsを設定
 	if len(events) > 1 {
-		data["msg"] = "他" + strconv.Itoa(len(events)) + "件のイベント"
+		msg["msg"] = "他" + strconv.Itoa(len(events)) + "件のイベント"
 	}
     return msg
 }

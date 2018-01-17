@@ -13,12 +13,14 @@ type EvelyDB struct {
 	*mgo.Database
 	Events *EventsCollection
 	Users  *UsersCollection
+    Reviews *ReviewsCollection
 }
 
 func NewEvelyDB(db *mgo.Database) *EvelyDB {
 	return &EvelyDB{
 		db,
-		NewEventsCollection(db.C(EVENT_COLLECTION)),
-		NewUsersCollection(db.C(USER_COLLECTION)),
+		NewEventsCollection(db.C(EVENTS_COLLECTION)),
+		NewUsersCollection(db.C(USERS_COLLECTION)),
+        NewReviewsCollection(db.C(REVIEWS_COLLECTION)),
 	}
 }

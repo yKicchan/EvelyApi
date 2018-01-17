@@ -167,7 +167,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		Tel: p.Tel,
 	}
 	if p.InstanceID != "" {
-		user.InstanceID = p.InstanceID
+		user.InstanceIds[0] = p.InstanceID
 	}
 	keys := Keys{"instance_id": p.InstanceID}
 	err = c.db.Users.Save(user, keys)

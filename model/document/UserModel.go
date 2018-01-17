@@ -33,8 +33,7 @@ type UserModel struct {
 	Mail        *Mail           `bson:"mail"`
 	Tel         string          `bson:"tel"`
 	Pins        []bson.ObjectId `bson:"pins"`
-	InstanceIDs []string        `bson:"instance_ids"`
-	LngLat      [2]float64      `bson:"lng_lat"`
+	InstanceIds []string        `bson:"instance_ids"`
 	CreatedAt   time.Time       `bson:"created_at"`
 }
 
