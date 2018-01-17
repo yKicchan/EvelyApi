@@ -26,7 +26,7 @@ func NewUsersController(service *goa.Service, db *model.EvelyDB) *UsersControlle
 func (c *UsersController) Show(ctx *app.ShowUsersContext) error {
 	user, err := c.db.Users.FindOne(Keys{"id": ctx.UserID})
 	if err != nil {
-		return ctx.NotFound(err)
+		return ctx.NotFound(goa.ErrNotFound(err))
 	}
 	return ctx.OK(parser.ToUserMedia(user))
 }

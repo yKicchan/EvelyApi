@@ -8,7 +8,7 @@ import (
 	. "EvelyApi/model/collection"
     . "EvelyApi/model/collection/findOptions"
 	. "EvelyApi/model/document"
-	"errors"
+    . "EvelyApi/middleware"
 	"github.com/NaySoftware/go-fcm"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
@@ -34,19 +34,19 @@ func NewEventsController(service *goa.Service, db *model.EvelyDB) *EventsControl
 func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 
 	// JWTからユーザー情報を取得
-	claims := GetJWTClaims(ctx)
-	user := &UserModel{
-		ID:   claims["id"].(string),
-		Name: claims["name"].(string),
-	}
+	uid, err := GetLoginID(ctx)
+    if err != nil {
+        return ctx.BadRequest(goa.ErrBadRequest(err))
+    }
+    user, _ := c.db.Users.FindOne(Keys{"id": uid})
 
 	// イベントを作成
 	p := ctx.Payload
 	event := parser.ToEventModel(p, bson.NewObjectId(), user)
 	keys := Keys{"_id": event.ID}
-	err := c.db.Events.Save(event, keys)
+	err = c.db.Events.Save(event, keys)
 	if err != nil {
-		return ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 
 	return ctx.Created(parser.ToEventMedia(event))
@@ -55,25 +55,27 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 // Delete runs the delete action.
 func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 
-	// JWTからユーザーIDを取得
-	claims := GetJWTClaims(ctx)
-	uid := claims["id"].(string)
+	// JWTからユーザー情報を取得
+	uid, err := GetLoginID(ctx)
+    if err != nil {
+        return ctx.BadRequest(goa.ErrBadRequest(err))
+    }
 
 	// 削除権限があるか(本人のものか)を判定
 	eid := bson.ObjectIdHex(ctx.EventID)
 	keys := Keys{"_id": eid}
 	e, err := c.db.Events.FindOne(keys)
 	if err != nil {
-		return ctx.NotFound(err)
+		return ctx.NotFound(goa.ErrNotFound(err))
 	} else if uid != e.Host.ID {
         errForbidden := goa.NewErrorClass("forbidden", 403)
-		return ctx.Forbidden(errForbidden(errors.New("You do not have permission to delete events.")))
+		return ctx.Forbidden(errForbidden("You do not have permission to delete events."))
 	}
 
 	// イベントを削除する
 	err = c.db.Events.Delete(keys)
 	if err != nil {
-		return ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 	return ctx.OK([]byte("Seccess!!"))
 }
@@ -88,7 +90,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
     opt.SetKeyword(ctx.Keyword)
 	events, err := c.db.Events.FindEventsByKeyword(opt)
 	if err != nil {
-		return ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 
 	// イベント情報をレスポンス形式に変換して返す
@@ -126,27 +128,28 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 
 	// JWTからユーザー情報を取得する
-	claims := GetJWTClaims(ctx)
-	user := &UserModel{
-		ID:   claims["id"].(string),
-		Name: claims["name"].(string),
-	}
+	uid, err := GetLoginID(ctx)
+    if err != nil {
+        return ctx.BadRequest(goa.ErrBadRequest(err))
+    }
+    user, _ := c.db.Users.FindOne(Keys{"id": uid})
+
 	// 編集権限があるか(本人のものか)を判定
 	eid := bson.ObjectIdHex(ctx.EventID)
 	keys := Keys{"_id": eid}
 	e, err := c.db.Events.FindOne(keys)
 	if err != nil {
-		return ctx.NotFound(err)
+		return ctx.NotFound(goa.ErrNotFound(err))
 	} else if user.ID != e.Host.ID {
         errForbidden := goa.NewErrorClass("forbidden", 403)
-		return ctx.Forbidden(errForbidden(errors.New("You do not have permission to edit events")))
+		return ctx.Forbidden(errForbidden("You do not have permission to edit events"))
 	}
 
 	// DBのイベント情報を更新
 	event := parser.ToEventModel(ctx.Payload, eid, user)
 	err = c.db.Events.Save(event, keys)
 	if err != nil {
-		return ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 	return ctx.OK(parser.ToEventMedia(event))
 }
@@ -160,7 +163,7 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
     opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
 	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
-		return ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 	// イベント情報をレスポンス形式に変換して返す
 	res := make(app.EventTinyCollection, len(events))
@@ -179,7 +182,7 @@ func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsC
     opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
 	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
-		return ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 
 	// 近くのイベントの通知範囲内にユーザーが存在するかを調べる
@@ -199,7 +202,7 @@ func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsC
 	cl.NewFcmRegIdsMsg(ids, data)
 	status, err := cl.Send()
 	if err != nil {
-		ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	} else {
 		status.PrintResults()
 	}
@@ -215,7 +218,7 @@ func (c *EventsController) NotifyByUserID(ctx *app.NotifyByUserIDEventsContext) 
     opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
 	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
-		return ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 
     // 近くのイベントの通知範囲内にユーザーが存在するかを調べる
@@ -230,19 +233,21 @@ func (c *EventsController) NotifyByUserID(ctx *app.NotifyByUserIDEventsContext) 
 	data := createNotifyMessage(nearbyEvents)
 
     // JWTからユーザーIDを取得する
-	claims := GetJWTClaims(ctx)
-    uid := claims["id"].(string)
+	uid, err := GetLoginID(ctx)
+    if err != nil {
+        return ctx.BadRequest(goa.ErrBadRequest(err))
+    }
 
     // インスタンスIDを設定しプッシュ通知送信
     u, err := c.db.Users.FindOne(Keys{"id": uid})
     if err != nil {
-        return ctx.NotFound(err)
+        return ctx.NotFound(goa.ErrNotFound(err))
     }
 	cl := fcm.NewFcmClient(FCM_SERVER_KEY)
 	cl.NewFcmRegIdsMsg(u.InstanceIds, data)
 	status, err := cl.Send()
 	if err != nil {
-		ctx.BadRequest(err)
+		return ctx.BadRequest(goa.ErrBadRequest(err))
 	} else {
 		status.PrintResults()
 	}
@@ -255,7 +260,7 @@ func (c *EventsController) Pin(ctx *app.PinEventsContext) error {
 	// ユーザーのピンしているイベント一覧を取得する
 	u, err := c.db.Users.FindOne(Keys{"id": ctx.UserID})
 	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(errors.New("User ID '" + ctx.UserID + "' does not exist")))
+		return ctx.BadRequest(goa.ErrBadRequest("User ID '" + ctx.UserID + "' does not exist"))
 	}
 	var events []*EventModel
 	for i := ctx.Offset; i < len(u.Pins) && i < ctx.Limit; i++ {

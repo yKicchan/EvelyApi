@@ -4,6 +4,7 @@ import (
 	"EvelyApi/app"
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
+    . "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
 )
@@ -26,19 +27,21 @@ func NewPinsController(service *goa.Service, db *model.EvelyDB) *PinsController 
 func (c *PinsController) Off(ctx *app.OffPinsContext) error {
 
 	// ユーザー情報から現在のピンの配列を取得
-	claims := GetJWTClaims(ctx)
-	uid := claims["id"].(string)
+	uid, err := GetLoginID(ctx)
+    if err != nil {
+        return ctx.BadRequest(goa.ErrBadRequest(err))
+    }
 	keys := Keys{"id": uid}
-	user, _ := c.db.Users.FindOne(keys)
+	u, _ := c.db.Users.FindOne(keys)
 
 	// ピンするIDを現在のピン配列と比較、あれば削除し、保存
 	for _, id := range ctx.Payload.Ids {
-		n := indexOf(user.Pins, bson.ObjectIdHex(id))
+		n := indexOf(u.Pins, bson.ObjectIdHex(id))
 		if n != -1 {
-			user.Pins = append(user.Pins[:n], user.Pins[n+1:]...)
+			u.Pins = append(u.Pins[:n], u.Pins[n+1:]...)
 		}
 	}
-	c.db.Users.Save(user, keys)
+	c.db.Users.Save(u, keys)
 	return ctx.OK([]byte("Success!!"))
 }
 
@@ -46,18 +49,20 @@ func (c *PinsController) Off(ctx *app.OffPinsContext) error {
 func (c *PinsController) On(ctx *app.OnPinsContext) error {
 
 	// ユーザー情報から現在のピンの配列を取得
-	claims := GetJWTClaims(ctx)
-	uid := claims["id"].(string)
+	uid, err := GetLoginID(ctx)
+    if err != nil {
+        return ctx.BadRequest(goa.ErrBadRequest(err))
+    }
 	keys := Keys{"id": uid}
-	user, _ := c.db.Users.FindOne(keys)
+	u, _ := c.db.Users.FindOne(keys)
 
 	// ピンするIDを現在のピン配列と比較、なければ追加し、保存
 	for _, id := range ctx.Payload.Ids {
-		if indexOf(user.Pins, bson.ObjectIdHex(id)) == -1 {
-			user.Pins = append(user.Pins, bson.ObjectIdHex(id))
+		if indexOf(u.Pins, bson.ObjectIdHex(id)) == -1 {
+			u.Pins = append(u.Pins, bson.ObjectIdHex(id))
 		}
 	}
-	c.db.Users.Save(user, keys)
+	c.db.Users.Save(u, keys)
 	return ctx.OK([]byte("Success!!"))
 }
 
