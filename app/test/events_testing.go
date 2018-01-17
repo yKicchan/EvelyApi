@@ -1909,11 +1909,11 @@ func NearbyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.
 	return rw, mt
 }
 
-// NotifyEventsBadRequest runs the method Notify of the given controller with the given parameters and payload.
+// NotifyByInstanceIDEventsBadRequest runs the method NotifyByInstanceID of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NoticePayload) (http.ResponseWriter, error) {
+func NotifyByInstanceIDEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NotifyByInstanceIDPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1944,7 +1944,7 @@ func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/notice"),
+		Path: fmt.Sprintf("/api/develop/v2/events/notify/by_instance_id"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -1955,7 +1955,7 @@ func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 		ctx = context.Background()
 	}
 	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
-	notifyCtx, __err := app.NewNotifyEventsContext(goaCtx, req, service)
+	notifyByInstanceIDCtx, __err := app.NewNotifyByInstanceIDEventsContext(goaCtx, req, service)
 	if __err != nil {
 		_e, _ok := __err.(goa.ServiceError)
 		if !_ok {
@@ -1963,10 +1963,10 @@ func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 		}
 		return nil, _e
 	}
-	notifyCtx.Payload = payload
+	notifyByInstanceIDCtx.Payload = payload
 
 	// Perform action
-	__err = ctrl.Notify(notifyCtx)
+	__err = ctrl.NotifyByInstanceID(notifyByInstanceIDCtx)
 
 	// Validate response
 	if __err != nil {
@@ -1988,11 +1988,11 @@ func NotifyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	return rw, mt
 }
 
-// NotifyEventsOK runs the method Notify of the given controller with the given parameters and payload.
+// NotifyByInstanceIDEventsOK runs the method NotifyByInstanceID of the given controller with the given parameters and payload.
 // It returns the response writer so it's possible to inspect the response headers.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NotifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NoticePayload) http.ResponseWriter {
+func NotifyByInstanceIDEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NotifyByInstanceIDPayload) http.ResponseWriter {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2024,7 +2024,7 @@ func NotifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 	// Setup request context
 	rw := httptest.NewRecorder()
 	u := &url.URL{
-		Path: fmt.Sprintf("/api/develop/v2/events/notice"),
+		Path: fmt.Sprintf("/api/develop/v2/events/notify/by_instance_id"),
 	}
 	req, _err := http.NewRequest("POST", u.String(), nil)
 	if _err != nil {
@@ -2035,7 +2035,7 @@ func NotifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 		ctx = context.Background()
 	}
 	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
-	notifyCtx, __err := app.NewNotifyEventsContext(goaCtx, req, service)
+	notifyByInstanceIDCtx, __err := app.NewNotifyByInstanceIDEventsContext(goaCtx, req, service)
 	if __err != nil {
 		_e, _ok := __err.(goa.ServiceError)
 		if !_ok {
@@ -2044,10 +2044,10 @@ func NotifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 		t.Errorf("unexpected parameter validation error: %+v", _e)
 		return nil
 	}
-	notifyCtx.Payload = payload
+	notifyByInstanceIDCtx.Payload = payload
 
 	// Perform action
-	__err = ctrl.Notify(notifyCtx)
+	__err = ctrl.NotifyByInstanceID(notifyByInstanceIDCtx)
 
 	// Validate response
 	if __err != nil {
@@ -2059,6 +2059,316 @@ func NotifyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 
 	// Return results
 	return rw
+}
+
+// NotifyByUserIDEventsBadRequest runs the method NotifyByUserID of the given controller with the given parameters and payload.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func NotifyByUserIDEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NotifyByUserIDPayload) (http.ResponseWriter, error) {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Validate payload
+	err := payload.Validate()
+	if err != nil {
+		e, ok := err.(goa.ServiceError)
+		if !ok {
+			panic(err) // bug
+		}
+		return nil, e
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	u := &url.URL{
+		Path: fmt.Sprintf("/api/develop/v2/events/notify/by_user_id"),
+	}
+	req, _err := http.NewRequest("POST", u.String(), nil)
+	if _err != nil {
+		panic("invalid test " + _err.Error()) // bug
+	}
+	prms := url.Values{}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	notifyByUserIDCtx, __err := app.NewNotifyByUserIDEventsContext(goaCtx, req, service)
+	if __err != nil {
+		_e, _ok := __err.(goa.ServiceError)
+		if !_ok {
+			panic("invalid test data " + __err.Error()) // bug
+		}
+		return nil, _e
+	}
+	notifyByUserIDCtx.Payload = payload
+
+	// Perform action
+	__err = ctrl.NotifyByUserID(notifyByUserIDCtx)
+
+	// Validate response
+	if __err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", __err, logBuf.String())
+	}
+	if rw.Code != 400 {
+		t.Errorf("invalid response status code: got %+v, expected 400", rw.Code)
+	}
+	var mt error
+	if resp != nil {
+		var __ok bool
+		mt, __ok = resp.(error)
+		if !__ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
+
+	// Return results
+	return rw, mt
+}
+
+// NotifyByUserIDEventsNotFound runs the method NotifyByUserID of the given controller with the given parameters and payload.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func NotifyByUserIDEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NotifyByUserIDPayload) (http.ResponseWriter, error) {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Validate payload
+	err := payload.Validate()
+	if err != nil {
+		e, ok := err.(goa.ServiceError)
+		if !ok {
+			panic(err) // bug
+		}
+		return nil, e
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	u := &url.URL{
+		Path: fmt.Sprintf("/api/develop/v2/events/notify/by_user_id"),
+	}
+	req, _err := http.NewRequest("POST", u.String(), nil)
+	if _err != nil {
+		panic("invalid test " + _err.Error()) // bug
+	}
+	prms := url.Values{}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	notifyByUserIDCtx, __err := app.NewNotifyByUserIDEventsContext(goaCtx, req, service)
+	if __err != nil {
+		_e, _ok := __err.(goa.ServiceError)
+		if !_ok {
+			panic("invalid test data " + __err.Error()) // bug
+		}
+		return nil, _e
+	}
+	notifyByUserIDCtx.Payload = payload
+
+	// Perform action
+	__err = ctrl.NotifyByUserID(notifyByUserIDCtx)
+
+	// Validate response
+	if __err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", __err, logBuf.String())
+	}
+	if rw.Code != 404 {
+		t.Errorf("invalid response status code: got %+v, expected 404", rw.Code)
+	}
+	var mt error
+	if resp != nil {
+		var __ok bool
+		mt, __ok = resp.(error)
+		if !__ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
+
+	// Return results
+	return rw, mt
+}
+
+// NotifyByUserIDEventsOK runs the method NotifyByUserID of the given controller with the given parameters and payload.
+// It returns the response writer so it's possible to inspect the response headers.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func NotifyByUserIDEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NotifyByUserIDPayload) http.ResponseWriter {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Validate payload
+	err := payload.Validate()
+	if err != nil {
+		e, ok := err.(goa.ServiceError)
+		if !ok {
+			panic(err) // bug
+		}
+		t.Errorf("unexpected payload validation error: %+v", e)
+		return nil
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	u := &url.URL{
+		Path: fmt.Sprintf("/api/develop/v2/events/notify/by_user_id"),
+	}
+	req, _err := http.NewRequest("POST", u.String(), nil)
+	if _err != nil {
+		panic("invalid test " + _err.Error()) // bug
+	}
+	prms := url.Values{}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	notifyByUserIDCtx, __err := app.NewNotifyByUserIDEventsContext(goaCtx, req, service)
+	if __err != nil {
+		_e, _ok := __err.(goa.ServiceError)
+		if !_ok {
+			panic("invalid test data " + __err.Error()) // bug
+		}
+		t.Errorf("unexpected parameter validation error: %+v", _e)
+		return nil
+	}
+	notifyByUserIDCtx.Payload = payload
+
+	// Perform action
+	__err = ctrl.NotifyByUserID(notifyByUserIDCtx)
+
+	// Validate response
+	if __err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", __err, logBuf.String())
+	}
+	if rw.Code != 200 {
+		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
+	}
+
+	// Return results
+	return rw
+}
+
+// NotifyByUserIDEventsUnauthorized runs the method NotifyByUserID of the given controller with the given parameters and payload.
+// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
+// If ctx is nil then context.Background() is used.
+// If service is nil then a default service is created.
+func NotifyByUserIDEventsUnauthorized(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, payload *app.NotifyByUserIDPayload) (http.ResponseWriter, error) {
+	// Setup service
+	var (
+		logBuf bytes.Buffer
+		resp   interface{}
+
+		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
+	)
+	if service == nil {
+		service = goatest.Service(&logBuf, respSetter)
+	} else {
+		logger := log.New(&logBuf, "", log.Ltime)
+		service.WithLogger(goa.NewLogger(logger))
+		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
+		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
+		service.Encoder.Register(newEncoder, "*/*")
+	}
+
+	// Validate payload
+	err := payload.Validate()
+	if err != nil {
+		e, ok := err.(goa.ServiceError)
+		if !ok {
+			panic(err) // bug
+		}
+		return nil, e
+	}
+
+	// Setup request context
+	rw := httptest.NewRecorder()
+	u := &url.URL{
+		Path: fmt.Sprintf("/api/develop/v2/events/notify/by_user_id"),
+	}
+	req, _err := http.NewRequest("POST", u.String(), nil)
+	if _err != nil {
+		panic("invalid test " + _err.Error()) // bug
+	}
+	prms := url.Values{}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
+	notifyByUserIDCtx, __err := app.NewNotifyByUserIDEventsContext(goaCtx, req, service)
+	if __err != nil {
+		_e, _ok := __err.(goa.ServiceError)
+		if !_ok {
+			panic("invalid test data " + __err.Error()) // bug
+		}
+		return nil, _e
+	}
+	notifyByUserIDCtx.Payload = payload
+
+	// Perform action
+	__err = ctrl.NotifyByUserID(notifyByUserIDCtx)
+
+	// Validate response
+	if __err != nil {
+		t.Fatalf("controller returned %+v, logs:\n%s", __err, logBuf.String())
+	}
+	if rw.Code != 401 {
+		t.Errorf("invalid response status code: got %+v, expected 401", rw.Code)
+	}
+	var mt error
+	if resp != nil {
+		var __ok bool
+		mt, __ok = resp.(error)
+		if !__ok {
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of error", resp, resp)
+		}
+	}
+
+	// Return results
+	return rw, mt
 }
 
 // PinEventsBadRequest runs the method Pin of the given controller with the given parameters.

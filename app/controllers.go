@@ -214,7 +214,8 @@ type EventsController interface {
 	List(*ListEventsContext) error
 	Modify(*ModifyEventsContext) error
 	Nearby(*NearbyEventsContext) error
-	Notify(*NotifyEventsContext) error
+	NotifyByInstanceID(*NotifyByInstanceIDEventsContext) error
+	NotifyByUserID(*NotifyByUserIDEventsContext) error
 	Pin(*PinEventsContext) error
 	Show(*ShowEventsContext) error
 	Update(*UpdateEventsContext) error
@@ -227,7 +228,8 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/:event_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/nearby", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/notice", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/notify/by_instance_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/notify/by_user_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/pin/:user_id", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/detail", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/events/update", ctrl.MuxHandler("preflight", handleEventsOrigin(cors.HandlePreflight()), nil))
@@ -333,21 +335,44 @@ func MountEventsController(service *goa.Service, ctrl EventsController) {
 			return err
 		}
 		// Build the context
-		rctx, err := NewNotifyEventsContext(ctx, req, service)
+		rctx, err := NewNotifyByInstanceIDEventsContext(ctx, req, service)
 		if err != nil {
 			return err
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*NoticePayload)
+			rctx.Payload = rawPayload.(*NotifyByInstanceIDPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
-		return ctrl.Notify(rctx)
+		return ctrl.NotifyByInstanceID(rctx)
 	}
 	h = handleEventsOrigin(h)
-	service.Mux.Handle("POST", "/api/develop/v2/events/notice", ctrl.MuxHandler("notify", h, unmarshalNotifyEventsPayload))
-	service.LogInfo("mount", "ctrl", "Events", "action", "Notify", "route", "POST /api/develop/v2/events/notice")
+	service.Mux.Handle("POST", "/api/develop/v2/events/notify/by_instance_id", ctrl.MuxHandler("notify_by_instance_id", h, unmarshalNotifyByInstanceIDEventsPayload))
+	service.LogInfo("mount", "ctrl", "Events", "action", "NotifyByInstanceID", "route", "POST /api/develop/v2/events/notify/by_instance_id")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewNotifyByUserIDEventsContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*NotifyByUserIDPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.NotifyByUserID(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleEventsOrigin(h)
+	service.Mux.Handle("POST", "/api/develop/v2/events/notify/by_user_id", ctrl.MuxHandler("notify_by_user_id", h, unmarshalNotifyByUserIDEventsPayload))
+	service.LogInfo("mount", "ctrl", "Events", "action", "NotifyByUserID", "route", "POST /api/develop/v2/events/notify/by_user_id", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -457,9 +482,24 @@ func unmarshalModifyEventsPayload(ctx context.Context, service *goa.Service, req
 	return nil
 }
 
-// unmarshalNotifyEventsPayload unmarshals the request body into the context request data Payload field.
-func unmarshalNotifyEventsPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &noticePayload{}
+// unmarshalNotifyByInstanceIDEventsPayload unmarshals the request body into the context request data Payload field.
+func unmarshalNotifyByInstanceIDEventsPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &notifyByInstanceIDPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalNotifyByUserIDEventsPayload unmarshals the request body into the context request data Payload field.
+func unmarshalNotifyByUserIDEventsPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &notifyByUserIDPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

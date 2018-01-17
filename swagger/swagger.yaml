@@ -494,15 +494,15 @@ definitions:
     - state
     title: Mail
     type: object
-  NoticePayload:
-    description: デバイストークンと現在位置情報
+  NotifyByInstanceIDPayload:
+    description: インスタンスIDと現在位置情報
     example:
-      deviceToken: token
+      instanceID: token
       lat: 34.706425
       lng: 135.50124
     properties:
-      deviceToken:
-        description: デバイストークン
+      instanceID:
+        description: 通知先となるインスタンスID
         example: token
         type: string
       lat:
@@ -518,10 +518,33 @@ definitions:
         minimum: -180
         type: number
     required:
-    - deviceToken
+    - instanceID
     - lat
     - lng
-    title: NoticePayload
+    title: NotifyByInstanceIDPayload
+    type: object
+  NotifyByUserIDPayload:
+    description: 現在位置情報
+    example:
+      lat: 34.706425
+      lng: 135.50124
+    properties:
+      lat:
+        description: 緯度
+        example: 34.706425
+        maximum: 90
+        minimum: -90
+        type: number
+      lng:
+        description: 経度
+        example: 135.50124
+        maximum: 180
+        minimum: -180
+        type: number
+    required:
+    - lat
+    - lng
+    title: NotifyByUserIDPayload
     type: object
   PinPayload:
     description: ピンする/外すイベントのID
@@ -781,16 +804,16 @@ definitions:
   UserPayload:
     description: アカウント作成時に受け取る情報
     example:
-      deviceToken: token
+      InstanceID: token
       id: yKicchan
       mail: yKicchanApp@gmail.com
       name: きっちゃそ
       password: password
       tel: 090-1234-5678
     properties:
-      deviceToken:
+      InstanceID:
         default: ""
-        description: デバイストークン
+        description: 端末のインスタンスID
         example: token
         type: string
       id:
@@ -1285,17 +1308,17 @@ paths:
       summary: nearby events
       tags:
       - events
-  /api/develop/v2/events/notice:
+  /api/develop/v2/events/notify/by_instance_id:
     post:
-      description: 近くにイベントがあれば通知する
-      operationId: events#notify
+      description: 近くにイベントがあればインスタンスID宛に通知する
+      operationId: events#notify_by_instance_id
       parameters:
-      - description: デバイストークンと現在位置情報
+      - description: インスタンスIDと現在位置情報
         in: body
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/NoticePayload'
+          $ref: '#/definitions/NotifyByInstanceIDPayload'
       produces:
       - application/vnd.goa.error
       - text/plain
@@ -1308,7 +1331,48 @@ paths:
             $ref: '#/definitions/error'
       schemes:
       - http
-      summary: notify events
+      summary: notify_by_instance_id events
+      tags:
+      - events
+  /api/develop/v2/events/notify/by_user_id:
+    post:
+      description: |-
+        近くにイベントがあればユーザーのデバイス全てに通知する
+
+        Required security scopes:
+          * `api:access`
+      operationId: events#notify_by_user_id
+      parameters:
+      - description: 現在位置情報
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/NotifyByUserIDPayload'
+      produces:
+      - application/vnd.goa.error
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: notify_by_user_id events
       tags:
       - events
   /api/develop/v2/events/pin/{user_id}:

@@ -181,14 +181,24 @@ var _ = Resource("events", func() {
 		Response(OK)
 	})
 
-	Action("notify", func() {
-		Description("近くにイベントがあれば通知する")
+	Action("notify_by_instance_id", func() {
+		Description("近くにイベントがあればインスタンスID宛に通知する")
 		NoSecurity()
-		Routing(POST("/notice"))
-		Payload(NoticePayload)
+		Routing(POST("/notify/by_instance_id"))
+		Payload(NotifyByInstanceIDPayload)
 		Response(OK)
 		Response(BadRequest, ErrorMedia)
 	})
+
+    Action("notify_by_user_id", func() {
+        Description("近くにイベントがあればユーザーのデバイス全てに通知する")
+        Routing(POST("/notify/by_user_id"))
+        Payload(NotifyByUserIDPayload)
+        Response(OK)
+        Response(BadRequest, ErrorMedia)
+        Response(Unauthorized, ErrorMedia)
+        Response(NotFound, ErrorMedia)
+    })
 
     Action("pin", func() {
         Description("ユーザーのピンしたイベント一覧を取得する")

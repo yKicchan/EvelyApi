@@ -8,7 +8,7 @@ type findOptions struct {
 	lat         float64
 	lng         float64
 	r           float64
-	deviceToken string
+	instanceID string
 }
 
 // 検索オプションを設定するため関数化
@@ -63,12 +63,12 @@ func WithLocation(lat, lng, r float64) FindOptions {
 }
 
 /**
- * デバイストークンを検索オプションに設定する
- * @param  deviceToken デバイストークン
+ * インスタンスIDを検索オプションに設定する
+ * @param  instanceID インスタンスID
  * @return             クロージャ
  */
-func WithDeviceToken(deviceToken string) FindOptions {
+func WithInstanceID(instanceID string) FindOptions {
 	return func(ops *findOptions) {
-		ops.deviceToken = deviceToken
+		ops.instanceID = instanceID
 	}
 }
