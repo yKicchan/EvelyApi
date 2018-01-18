@@ -93,12 +93,12 @@ func (c *Client) NewListReviewsRequest(ctx context.Context, path string, limit *
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if limit != nil {
-		tmp33 := strconv.Itoa(*limit)
-		values.Set("limit", tmp33)
+		tmp36 := strconv.Itoa(*limit)
+		values.Set("limit", tmp36)
 	}
 	if offset != nil {
-		tmp34 := strconv.Itoa(*offset)
-		values.Set("offset", tmp34)
+		tmp37 := strconv.Itoa(*offset)
+		values.Set("offset", tmp37)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

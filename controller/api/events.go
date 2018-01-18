@@ -160,6 +160,31 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 	return ctx.OK(parser.ToEventMedia(event))
 }
 
+// MyList runs the my_list action.
+func (c *EventsController) MyList(ctx *app.MyListEventsContext) error {
+
+	// JWTからユーザーIDを取得
+	claims := GetJWTClaims(ctx)
+    uid := claims["id"].(string)
+
+    // IDからイベントを取得する
+    events, err := c.db.Events.FindEvents(
+        WithHost(uid),
+        WithLimit(ctx.Limit),
+        WithOffset(ctx.Offset),
+    )
+    if err != nil {
+        ctx.BadRequest(err)
+    }
+
+    // イベント情報をレスポンス形式に変換して返す
+	res := make(app.EventTinyCollection, len(events))
+	for i := range events {
+		res[i] = parser.ToEventTinyMedia(events[i])
+	}
+	return ctx.OKTiny(res)
+}
+
 // Nearby runs the nearby action.
 func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	// パラメーターの位置情報から付近のイベントを検索
