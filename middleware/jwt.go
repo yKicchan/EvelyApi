@@ -2,18 +2,18 @@ package middleware
 
 import (
 	"EvelyApi/app"
-    . "EvelyApi/config"
-    . "EvelyApi/model"
-    . "EvelyApi/model/collection"
-    "errors"
+	. "EvelyApi/config"
+	. "EvelyApi/model"
+	. "EvelyApi/model/collection"
 	"context"
+	"errors"
 	"fmt"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 	"io/ioutil"
-	"log"
 	"labix.org/v2/mgo"
+	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -61,11 +61,11 @@ func LoadJWTPublicKeys() ([]jwt.Key, error) {
  */
 var validationHandler, _ = goa.NewMiddleware(func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	// トークンに埋め込まれたユーザーを検査
-	id, err := GetLoginID(ctx);
-    if err != nil {
+	id, err := GetLoginID(ctx)
+	if err != nil {
 		return jwt.ErrJWTError(err)
-    }
-    session, err := mgo.Dial(DB_HOST)
+	}
+	session, err := mgo.Dial(DB_HOST)
 	if err != nil {
 		return jwt.ErrJWTError(fmt.Sprintf("Database initialization failed: %s", err))
 	}
@@ -109,15 +109,15 @@ func NewToken(claims jwtgo.MapClaims) (string, error) {
  * @return id  jwtに埋め込まれたユーザーID
  * @return err 複合中に発生したエラー
  */
-func GetLoginID(ctx context.Context) (string, error){
+func GetLoginID(ctx context.Context) (string, error) {
 	token := jwt.ContextJWT(ctx)
 	claims, ok := token.Claims.(jwtgo.MapClaims)
 	if !ok {
 		return "", errors.New("Unsupported claims shape")
 	}
-    id, ok := claims["id"].(string)
-    if !ok {
-        return "", errors.New("decode error")
-    }
+	id, ok := claims["id"].(string)
+	if !ok {
+		return "", errors.New("decode error")
+	}
 	return id, nil
 }

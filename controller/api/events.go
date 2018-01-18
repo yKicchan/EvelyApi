@@ -4,16 +4,16 @@ import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
 	"EvelyApi/controller/parser"
+	. "EvelyApi/middleware"
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
-    . "EvelyApi/model/collection/findOptions"
+	. "EvelyApi/model/collection/findOptions"
 	. "EvelyApi/model/document"
-    . "EvelyApi/middleware"
 	"github.com/NaySoftware/go-fcm"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
+	"math"
 	"strconv"
-    "math"
 )
 
 // EventsController implements the events resource.
@@ -35,10 +35,10 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 
 	// JWTからユーザー情報を取得
 	uid, err := GetLoginID(ctx)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrBadRequest(err))
-    }
-    user, _ := c.db.Users.FindOne(Keys{"id": uid})
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
+	user, _ := c.db.Users.FindOne(Keys{"id": uid})
 
 	// イベントを作成
 	p := ctx.Payload
@@ -57,9 +57,9 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 
 	// JWTからユーザー情報を取得
 	uid, err := GetLoginID(ctx)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrBadRequest(err))
-    }
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
 
 	// 削除権限があるか(本人のものか)を判定
 	eid := bson.ObjectIdHex(ctx.EventID)
@@ -68,7 +68,7 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 	if err != nil {
 		return ctx.NotFound(goa.ErrNotFound(err))
 	} else if uid != e.Host.ID {
-        errForbidden := goa.NewErrorClass("forbidden", 403)
+		errForbidden := goa.NewErrorClass("forbidden", 403)
 		return ctx.Forbidden(errForbidden("You do not have permission to delete events."))
 	}
 
@@ -85,10 +85,16 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 
 	// 条件と一致するイベントを複数検索
 	opt := NewFindEventsOptions()
-    opt.SetLimit(ctx.Limit)
-    opt.SetOffset(ctx.Offset)
-    opt.SetKeyword(ctx.Keyword)
-	events, err := c.db.Events.FindEventsByKeyword(opt)
+	opt.SetLimit(ctx.Limit)
+	opt.SetOffset(ctx.Offset)
+    var events []*EventModel
+    var err error
+    if ctx.Keyword != "" {
+    	opt.SetKeyword(ctx.Keyword)
+    	events, err = c.db.Events.FindEventsByKeyword(opt)
+    } else {
+        events, err = c.db.Events.FindEvents(opt)
+    }
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
@@ -129,10 +135,10 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 
 	// JWTからユーザー情報を取得する
 	uid, err := GetLoginID(ctx)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrBadRequest(err))
-    }
-    user, _ := c.db.Users.FindOne(Keys{"id": uid})
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
+	user, _ := c.db.Users.FindOne(Keys{"id": uid})
 
 	// 編集権限があるか(本人のものか)を判定
 	eid := bson.ObjectIdHex(ctx.EventID)
@@ -141,7 +147,7 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 	if err != nil {
 		return ctx.NotFound(goa.ErrNotFound(err))
 	} else if user.ID != e.Host.ID {
-        errForbidden := goa.NewErrorClass("forbidden", 403)
+		errForbidden := goa.NewErrorClass("forbidden", 403)
 		return ctx.Forbidden(errForbidden("You do not have permission to edit events"))
 	}
 
@@ -158,9 +164,9 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	// パラメーターの位置情報から付近のイベントを検索
 	opt := NewFindEventsOptions()
-    opt.SetLimit(ctx.Limit)
-    opt.SetOffset(ctx.Offset)
-    opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
+	opt.SetLimit(ctx.Limit)
+	opt.SetOffset(ctx.Offset)
+	opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
 	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
@@ -178,8 +184,8 @@ func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsC
 
 	// 現在地から最大通知範囲より内のイベントを取得
 	p := ctx.Payload
-    opt := NewFindEventsOptions()
-    opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
+	opt := NewFindEventsOptions()
+	opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
 	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
@@ -193,8 +199,8 @@ func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsC
 		return nil
 	}
 
-    // 通知メッセージを作成
-    data := createNotifyMessage(nearbyEvents)
+	// 通知メッセージを作成
+	data := createNotifyMessage(nearbyEvents)
 
 	// インスタンスIDを設定しプッシュ通知送信
 	ids := []string{p.InstanceID}
@@ -212,37 +218,37 @@ func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsC
 // NotifyByUserID runs the notify_by_user_id action.
 func (c *EventsController) NotifyByUserID(ctx *app.NotifyByUserIDEventsContext) error {
 
-    // 現在地から最大通知範囲より内のイベントを取得
+	// 現在地から最大通知範囲より内のイベントを取得
 	p := ctx.Payload
-    opt := NewFindEventsOptions()
-    opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
+	opt := NewFindEventsOptions()
+	opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
 	events, err := c.db.Events.FindEventsByLocation(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 
-    // 近くのイベントの通知範囲内にユーザーが存在するかを調べる
+	// 近くのイベントの通知範囲内にユーザーが存在するかを調べる
 	nearbyEvents := contain(events, p.Lat, p.Lng)
 
-    // 通知するイベントがなかったときは終了
+	// 通知するイベントがなかったときは終了
 	if len(nearbyEvents) == 0 {
 		return nil
 	}
 
-    // 通知メッセージを作成
+	// 通知メッセージを作成
 	data := createNotifyMessage(nearbyEvents)
 
-    // JWTからユーザーIDを取得する
+	// JWTからユーザーIDを取得する
 	uid, err := GetLoginID(ctx)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrBadRequest(err))
-    }
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
 
-    // インスタンスIDを設定しプッシュ通知送信
-    u, err := c.db.Users.FindOne(Keys{"id": uid})
-    if err != nil {
-        return ctx.NotFound(goa.ErrNotFound(err))
-    }
+	// インスタンスIDを設定しプッシュ通知送信
+	u, err := c.db.Users.FindOne(Keys{"id": uid})
+	if err != nil {
+		return ctx.NotFound(goa.ErrNotFound(err))
+	}
 	cl := fcm.NewFcmClient(FCM_SERVER_KEY)
 	cl.NewFcmRegIdsMsg(u.InstanceIds, data)
 	status, err := cl.Send()
@@ -291,19 +297,19 @@ func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
  * @return nearbyEvents 通知範囲内にあったイベント
  */
 func contain(events []*EventModel, lat, lng float64) (nearbyEvents []*EventModel) {
-    square := func(x float64) float64 { return x * x }
-    for _, e := range events {
+	square := func(x float64) float64 { return x * x }
+	for _, e := range events {
 		// 通知範囲(m)を度単位に変換
 		r := float64(e.NoticeRange) * DEGREE_PER_METER
-        for _, plan := range e.Plans {
-            distance := math.Sqrt(square(lat - plan.Location.LngLat[LNG]) + square(lng - plan.Location.LngLat[LAT]))
-            if distance > r {
-                nearbyEvents = append(nearbyEvents, e)
-                break
-            }
-        }
+		for _, schedule := range e.Schedules {
+			distance := math.Sqrt(square(lat-schedule.Location.LngLat[LNG]) + square(lng-schedule.Location.LngLat[LAT]))
+			if distance > r {
+				nearbyEvents = append(nearbyEvents, e)
+				break
+			}
+		}
 	}
-    return nearbyEvents
+	return nearbyEvents
 }
 
 /**
@@ -312,11 +318,11 @@ func contain(events []*EventModel, lat, lng float64) (nearbyEvents []*EventModel
  * @return msg    生成した通知用メッセージ
  */
 func createNotifyMessage(events []*EventModel) (msg map[string]string) {
-    // 一番近かったイベントを通知内容に設定する
+	// 一番近かったイベントを通知内容に設定する
 	msg["sum"] = "近くで" + events[0].Title + "が開催されています！"
 	// 他にイベントが複数件あった場合Tipsを設定
 	if len(events) > 1 {
 		msg["msg"] = "他" + strconv.Itoa(len(events)) + "件のイベント"
 	}
-    return msg
+	return msg
 }

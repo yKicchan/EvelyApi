@@ -2,25 +2,25 @@ package findOptions
 
 // 検索時に使用するオプション
 type findOptions struct {
-    // 検索上限
-	limit  int
-    // 除外件数(0があり得るのでセット判定のためにポインタ型)
+	// 検索上限
+	limit int
+	// 除外件数(0があり得るのでセット判定のためにポインタ型)
 	offset *int
 }
 
 /**
  * 検索オプションを生成する
  */
-func NewFindOptions() FindOptions { return &findOptions{} }
+func NewFindOptions() FindOption { return &findOptions{} }
 
 // 汎用的な検索オプション
-type FindOptions interface {
-    SetLimit(int)
-    SetOffset(int)
-    GetLimit() int
-    GetOffset() int
-    IsLimitSet() bool
-    IsOffsetSet() bool
+type FindOption interface {
+	SetLimit(int)
+	SetOffset(int)
+	GetLimit() int
+	GetOffset() int
+	IsLimitSet() bool
+	IsOffsetSet() bool
 }
 
 /**
@@ -28,9 +28,9 @@ type FindOptions interface {
  * @param limit 上限件数
  */
 func (this *findOptions) SetLimit(limit int) {
-    if limit > 0 {
-        this.limit = limit
-    }
+	if limit > 0 {
+		this.limit = limit
+	}
 }
 
 /**
@@ -38,9 +38,9 @@ func (this *findOptions) SetLimit(limit int) {
  * @param offset 除外件数
  */
 func (this *findOptions) SetOffset(offset int) {
-    if offset >= 0 {
-        this.offset = &offset
-    }
+	if offset >= 0 {
+		this.offset = &offset
+	}
 }
 
 /**

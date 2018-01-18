@@ -5,10 +5,10 @@ import (
 	. "EvelyApi/config"
 	"EvelyApi/controller/mailer"
 	"EvelyApi/controller/parser"
+	. "EvelyApi/middleware"
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
-    . "EvelyApi/middleware"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"golang.org/x/crypto/bcrypt"
@@ -45,9 +45,9 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 		"created_at": time.Now(),
 	}
 	token, err := NewToken(claims)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrInternal(err))
-    }
+	if err != nil {
+		return ctx.BadRequest(goa.ErrInternal(err))
+	}
 
 	// メール送信
 	url := "http://localhost:8888/verify_email?token=" + token
@@ -95,9 +95,9 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 		"id":     user.ID,
 	}
 	token, err := NewToken(claims)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrBadRequest(err))
-    }
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
 	return ctx.OK(&app.Token{Token: "Bearer " + token})
 }
 
@@ -148,9 +148,9 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		"id":     user.ID,
 	}
 	token, err := NewToken(claims)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrInternal(err))
-    }
+	if err != nil {
+		return ctx.BadRequest(goa.ErrInternal(err))
+	}
 	return ctx.OK(&app.Token{Token: "Bearer " + token})
 }
 

@@ -46,7 +46,7 @@ var EventPayload = Type("EventPayload", func() {
 		Default("")
 		Example("http://comp.ecc.ac.jp/")
 	})
-	Attribute("plans", ArrayOf(Plan), "イベントの開催予定一覧")
+	Attribute("schedules", ArrayOf(Schedule), "イベントの開催予定一覧")
 	Attribute("noticeRange", Integer, "通知範囲(m)", func() {
 		Minimum(100)
 		Maximum(MAX_NOTICE_RANGE)
@@ -62,10 +62,10 @@ var EventPayload = Type("EventPayload", func() {
 		Default(false)
 		Example(false)
 	})
-	Required("title", "body", "mail", "tel", "url", "plans", "noticeRange", "scope", "openFlg")
+	Required("title", "body", "mail", "tel", "url", "schedules", "noticeRange", "scope", "openFlg")
 })
 
-var Plan = Type("Plan", func() {
+var Schedule = Type("Schedule", func() {
 	Description("イベントの開催予定情報")
 	Attribute("location", Location)
 	Attribute("upcomingDate", UpcomingDate)
@@ -132,10 +132,10 @@ var UserPayload = Type("UserPayload", func() {
 		Default("")
 		Example("090-1234-5678")
 	})
-    Attribute("InstanceID", String, "端末のインスタンスID", func() {
-        Default("")
-        Example("token")
-    })
+	Attribute("InstanceID", String, "端末のインスタンスID", func() {
+		Default("")
+		Example("token")
+	})
 	Required("id", "password", "name", "mail")
 })
 
@@ -164,28 +164,28 @@ var NotifyByInstanceIDPayload = Type("NotifyByInstanceIDPayload", func() {
 })
 
 var NotifyByUserIDPayload = Type("NotifyByUserIDPayload", func() {
-    Description("現在位置情報")
-    Reference(Location)
-    Attribute("lat")
-    Attribute("lng")
-    Required("lat", "lng")
+	Description("現在位置情報")
+	Reference(Location)
+	Attribute("lat")
+	Attribute("lng")
+	Required("lat", "lng")
 })
 
 var PinPayload = Type("PinPayload", func() {
 	Description("ピンする/外すイベントのID")
 	Attribute("ids", ArrayOf(String), "ピンするイベントのID配列", func() {
-        Example([]string{"5a44d5f2775672b659ba00fa", "5a44d5f2775672b659ba00fb"})
+		Example([]string{"5a44d5f2775672b659ba00fa", "5a44d5f2775672b659ba00fb"})
 	})
 	Required("ids")
 })
 
 var ReviewPayload = Type("ReviewPayload", func() {
-    Description("レビュー投稿で受け取るレビュー情報")
-    Attribute("rate", Integer, "レート評価", func() {
-        Enum(1, 2, 3, 4, 5)
-        Example(4)
-    })
-    Attribute("title", String, "レビューのタイトル", func() {
+	Description("レビュー投稿で受け取るレビュー情報")
+	Attribute("rate", Integer, "レート評価", func() {
+		Enum(1, 2, 3, 4, 5)
+		Example(4)
+	})
+	Attribute("title", String, "レビューのタイトル", func() {
 		MinLength(1)
 		MaxLength(30)
 	})
@@ -193,5 +193,5 @@ var ReviewPayload = Type("ReviewPayload", func() {
 		MinLength(1)
 		MaxLength(5000)
 	})
-    Required("rate", "title", "body")
+	Required("rate", "title", "body")
 })

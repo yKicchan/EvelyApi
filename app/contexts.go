@@ -207,6 +207,14 @@ func (ctx *CreateEventsContext) Created(r *Event) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 201, r)
 }
 
+// CreatedFull sends a HTTP response with status code 201.
+func (ctx *CreateEventsContext) CreatedFull(r *EventFull) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 201, r)
+}
+
 // CreatedTiny sends a HTTP response with status code 201.
 func (ctx *CreateEventsContext) CreatedTiny(r *EventTiny) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
@@ -372,6 +380,17 @@ func (ctx *ListEventsContext) OK(r EventCollection) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// OKFull sends a HTTP response with status code 200.
+func (ctx *ListEventsContext) OKFull(r EventFullCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventFullCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // OKTiny sends a HTTP response with status code 200.
 func (ctx *ListEventsContext) OKTiny(r EventTinyCollection) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
@@ -427,6 +446,14 @@ func NewModifyEventsContext(ctx context.Context, r *http.Request, service *goa.S
 
 // OK sends a HTTP response with status code 200.
 func (ctx *ModifyEventsContext) OK(r *Event) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKFull sends a HTTP response with status code 200.
+func (ctx *ModifyEventsContext) OKFull(r *EventFull) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
 		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json")
 	}
@@ -583,6 +610,17 @@ func (ctx *NearbyEventsContext) OK(r EventCollection) error {
 	}
 	if r == nil {
 		r = EventCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKFull sends a HTTP response with status code 200.
+func (ctx *NearbyEventsContext) OKFull(r EventFullCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventFullCollection{}
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
@@ -767,6 +805,17 @@ func (ctx *PinEventsContext) OK(r EventCollection) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }
 
+// OKFull sends a HTTP response with status code 200.
+func (ctx *PinEventsContext) OKFull(r EventFullCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventFullCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
 // OKTiny sends a HTTP response with status code 200.
 func (ctx *PinEventsContext) OKTiny(r EventTinyCollection) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
@@ -820,6 +869,17 @@ func (ctx *ShowEventsContext) OK(r EventCollection) error {
 	}
 	if r == nil {
 		r = EventCollection{}
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// OKFull sends a HTTP response with status code 200.
+func (ctx *ShowEventsContext) OKFull(r EventFullCollection) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+	}
+	if r == nil {
+		r = EventFullCollection{}
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

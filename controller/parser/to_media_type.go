@@ -20,15 +20,13 @@ func ToEventMedia(e *EventModel) *app.Event {
 			ID:   e.Host.ID,
 			Name: e.Host.Name,
 		},
-		Mail:        e.Mail,
-		Tel:         e.Tel,
-		URL:         e.URL,
-		Plans:       toPlansMedia(e.Plans),
-		NoticeRange: e.NoticeRange,
-		Scope:       e.Scope,
-		OpenFlg:     e.OpenFlg,
-		UpdateDate:  e.UpdateDate,
-		CreatedAt:   e.CreatedAt,
+		Mail:       e.Mail,
+		Tel:        e.Tel,
+		URL:        e.URL,
+		Schedules:  toSchedulesMedia(e.Schedules),
+		IsReviewed: len(e.Reviews) > 0,
+		UpdateDate: e.UpdateDate,
+		CreatedAt:  e.CreatedAt,
 	}
 }
 
@@ -45,17 +43,14 @@ func ToEventTinyMedia(e *EventModel) *app.EventTiny {
 			ID:   e.Host.ID,
 			Name: e.Host.Name,
 		},
-		Plans:       toPlansMedia(e.Plans),
-		NoticeRange: e.NoticeRange,
-		Scope:       e.Scope,
-		OpenFlg:     e.OpenFlg,
-		UpdateDate:  e.UpdateDate,
+		Schedules:  toSchedulesMedia(e.Schedules),
+		IsReviewed: len(e.Reviews) > 0,
 	}
 }
 
-func toPlansMedia(oldPlans []*Plan) (newPlans []*app.Plan) {
-	for _, old := range oldPlans {
-		plan := &app.Plan{
+func toSchedulesMedia(oldSchedules []*Schedule) (newSchedules []*app.Schedule) {
+	for _, old := range oldSchedules {
+		schedule := &app.Schedule{
 			Location: &app.Location{
 				Name: old.Location.Name,
 				Lng:  old.Location.LngLat[LNG],
@@ -66,9 +61,9 @@ func toPlansMedia(oldPlans []*Plan) (newPlans []*app.Plan) {
 				EndDate:   old.UpcomingDate.EndDate,
 			},
 		}
-		newPlans = append(newPlans, plan)
+		newSchedules = append(newSchedules, schedule)
 	}
-	return newPlans
+	return newSchedules
 }
 
 /**
@@ -105,5 +100,24 @@ func toPinsMedia(old []bson.ObjectId) (new []string) {
 func ToEmailMedia(email string) *app.Email {
 	return &app.Email{
 		Email: email,
+	}
+}
+
+/**
+ * レビューをレスポンス形式に変換する
+ * @param  r      レビュー
+ * @return Review レスポンス形式に変換したレビュー
+ */
+func ToReviewMedia(r *ReviewModel) *app.Review {
+	return &app.Review{
+		ID:    r.ID.Hex(),
+		Rate:  r.Rate,
+		Title: r.Title,
+		Body:  r.Body,
+		Reviewer: &app.UserTiny{
+			ID:   r.Reviewer.ID,
+			Name: r.Reviewer.Name,
+		},
+		ReviewedAt: r.ReviewedAt,
 	}
 }

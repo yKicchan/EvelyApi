@@ -28,36 +28,34 @@ definitions:
       host:
         id: yKicchan
         name: きっちゃそ
-      id: 20170225-2
+      id: 5a44d5f2775672b659ba00fa
+      isReviewed: true
       mail: yKicchanApp@gmail.com
-      noticeRange: 500
-      openFlg: false
-      plans:
+      schedules:
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
-      scope: public
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       tel: 090-1234-5678
       title: Git勉強会
-      updateDate: 2005-04-23T09:00:35Z
+      updateDate: 1989-09-08T13:30:39Z
       url: http://comp.ecc.ac.jp/
     properties:
       body:
@@ -77,27 +75,19 @@ definitions:
         $ref: '#/definitions/UserTiny'
       id:
         description: イベントID
-        example: 20170225-2
+        example: 5a44d5f2775672b659ba00fa
         type: string
+      isReviewed:
+        description: レビューの有無
+        example: true
+        type: boolean
       mail:
         default: ""
         description: 連絡先メールアドレス
         example: yKicchanApp@gmail.com
         format: email
         type: string
-      noticeRange:
-        default: 500
-        description: 通知範囲(m)
-        example: 500
-        maximum: 5000
-        minimum: 100
-        type: integer
-      openFlg:
-        default: false
-        description: 開催中かどうか
-        example: false
-        type: boolean
-      plans:
+      schedules:
         description: イベントの開催予定一覧
         example:
         - location:
@@ -105,33 +95,25 @@ definitions:
             lng: 135.50124
             name: ECCコンピュータ専門学校2303教室
           upcomingDate:
-            endDate: 1990-02-18T14:03:59Z
-            startDate: 1975-07-28T07:45:40Z
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
         - location:
             lat: 34.706425
             lng: 135.50124
             name: ECCコンピュータ専門学校2303教室
           upcomingDate:
-            endDate: 1990-02-18T14:03:59Z
-            startDate: 1975-07-28T07:45:40Z
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
         - location:
             lat: 34.706425
             lng: 135.50124
             name: ECCコンピュータ専門学校2303教室
           upcomingDate:
-            endDate: 1990-02-18T14:03:59Z
-            startDate: 1975-07-28T07:45:40Z
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
         items:
-          $ref: '#/definitions/Plan'
+          $ref: '#/definitions/Schedule'
         type: array
-      scope:
-        default: public
-        description: 公開範囲
-        enum:
-        - public
-        - private
-        example: public
-        type: string
       tel:
         default: ""
         description: 連絡先電話番号
@@ -145,7 +127,7 @@ definitions:
         type: string
       updateDate:
         description: 最終更新日時
-        example: 2005-04-23T09:00:35Z
+        example: 1989-09-08T13:30:39Z
         format: date-time
         type: string
       url:
@@ -162,10 +144,8 @@ definitions:
     - mail
     - tel
     - url
-    - plans
-    - noticeRange
-    - scope
-    - openFlg
+    - schedules
+    - isReviewed
     - updateDate
     - createdAt
     title: 'Mediatype identifier: application/vnd.event+json; view=default'
@@ -181,36 +161,34 @@ definitions:
       host:
         id: yKicchan
         name: きっちゃそ
-      id: 20170225-2
+      id: 5a44d5f2775672b659ba00fa
+      isReviewed: true
       mail: yKicchanApp@gmail.com
-      noticeRange: 500
-      openFlg: false
-      plans:
+      schedules:
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
-      scope: public
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       tel: 090-1234-5678
       title: Git勉強会
-      updateDate: 2005-04-23T09:00:35Z
+      updateDate: 1989-09-08T13:30:39Z
       url: http://comp.ecc.ac.jp/
     - body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
@@ -219,74 +197,34 @@ definitions:
       host:
         id: yKicchan
         name: きっちゃそ
-      id: 20170225-2
+      id: 5a44d5f2775672b659ba00fa
+      isReviewed: true
       mail: yKicchanApp@gmail.com
-      noticeRange: 500
-      openFlg: false
-      plans:
+      schedules:
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
-      scope: public
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       tel: 090-1234-5678
       title: Git勉強会
-      updateDate: 2005-04-23T09:00:35Z
-      url: http://comp.ecc.ac.jp/
-    - body: |-
-        初心者でもGitを扱えるようになる勉強会を開催します！
-        ノートPCを各自持参してください。
-      createdAt: 1974-02-03T21:26:56Z
-      host:
-        id: yKicchan
-        name: きっちゃそ
-      id: 20170225-2
-      mail: yKicchanApp@gmail.com
-      noticeRange: 500
-      openFlg: false
-      plans:
-      - location:
-          lat: 34.706425
-          lng: 135.50124
-          name: ECCコンピュータ専門学校2303教室
-        upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
-      - location:
-          lat: 34.706425
-          lng: 135.50124
-          name: ECCコンピュータ専門学校2303教室
-        upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
-      - location:
-          lat: 34.706425
-          lng: 135.50124
-          name: ECCコンピュータ専門学校2303教室
-        upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
-      scope: public
-      tel: 090-1234-5678
-      title: Git勉強会
-      updateDate: 2005-04-23T09:00:35Z
+      updateDate: 1989-09-08T13:30:39Z
       url: http://comp.ecc.ac.jp/
     items:
       $ref: '#/definitions/Event'
@@ -301,28 +239,21 @@ definitions:
       mail: yKicchanApp@gmail.com
       noticeRange: 500
       openFlg: false
-      plans:
+      schedules:
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       - location:
           lat: 34.706425
           lng: 135.50124
           name: ECCコンピュータ専門学校2303教室
         upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
-      - location:
-          lat: 34.706425
-          lng: 135.50124
-          name: ECCコンピュータ専門学校2303教室
-        upcomingDate:
-          endDate: 1990-02-18T14:03:59Z
-          startDate: 1975-07-28T07:45:40Z
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
       scope: public
       tel: 090-1234-5678
       title: Git勉強会
@@ -354,7 +285,7 @@ definitions:
         description: 開催中かどうか
         example: false
         type: boolean
-      plans:
+      schedules:
         description: イベントの開催予定一覧
         example:
         - location:
@@ -362,24 +293,17 @@ definitions:
             lng: 135.50124
             name: ECCコンピュータ専門学校2303教室
           upcomingDate:
-            endDate: 1990-02-18T14:03:59Z
-            startDate: 1975-07-28T07:45:40Z
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
         - location:
             lat: 34.706425
             lng: 135.50124
             name: ECCコンピュータ専門学校2303教室
           upcomingDate:
-            endDate: 1990-02-18T14:03:59Z
-            startDate: 1975-07-28T07:45:40Z
-        - location:
-            lat: 34.706425
-            lng: 135.50124
-            name: ECCコンピュータ専門学校2303教室
-          upcomingDate:
-            endDate: 1990-02-18T14:03:59Z
-            startDate: 1975-07-28T07:45:40Z
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
         items:
-          $ref: '#/definitions/Plan'
+          $ref: '#/definitions/Schedule'
         type: array
       scope:
         default: public
@@ -412,7 +336,7 @@ definitions:
     - mail
     - tel
     - url
-    - plans
+    - schedules
     - noticeRange
     - scope
     - openFlg
@@ -559,48 +483,28 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Consequuntur dolores non eum placeat.
+          example: Omnis reprehenderit et rem odio et.
           type: string
         type: array
     required:
     - ids
     title: PinPayload
     type: object
-  Plan:
-    description: イベントの開催予定情報
-    example:
-      location:
-        lat: 34.706425
-        lng: 135.50124
-        name: ECCコンピュータ専門学校2303教室
-      upcomingDate:
-        endDate: 1990-02-18T14:03:59Z
-        startDate: 1975-07-28T07:45:40Z
-    properties:
-      location:
-        $ref: '#/definitions/Location'
-      upcomingDate:
-        $ref: '#/definitions/UpcomingDate'
-    required:
-    - location
-    - upcomingDate
-    title: Plan
-    type: object
   Review:
     description: レビュー (default view)
     example:
-      body: xjr
+      body: jrahm9nry5
       id: ""
       rate: 4
-      reviewedAt: 1981-12-28T11:54:46Z
+      reviewedAt: 2014-07-04T20:53:13Z
       reviewer:
         id: yKicchan
         name: きっちゃそ
-      title: m9nry5
+      title: 5ayymcy
     properties:
       body:
         description: レビューの内容
-        example: xjr
+        example: jrahm9nry5
         maxLength: 5000
         minLength: 1
         type: string
@@ -620,14 +524,14 @@ definitions:
         type: integer
       reviewedAt:
         description: レビューした日
-        example: 1981-12-28T11:54:46Z
+        example: 2014-07-04T20:53:13Z
         format: date-time
         type: string
       reviewer:
         $ref: '#/definitions/UserTiny'
       title:
         description: レビューのタイトル
-        example: m9nry5
+        example: 5ayymcy
         maxLength: 30
         minLength: 1
         type: string
@@ -644,22 +548,30 @@ definitions:
     description: ReviewCollection is the media type for an array of Review (default
       view)
     example:
-    - body: xjr
+    - body: jrahm9nry5
       id: ""
       rate: 4
-      reviewedAt: 1981-12-28T11:54:46Z
+      reviewedAt: 2014-07-04T20:53:13Z
       reviewer:
         id: yKicchan
         name: きっちゃそ
-      title: m9nry5
-    - body: xjr
+      title: 5ayymcy
+    - body: jrahm9nry5
       id: ""
       rate: 4
-      reviewedAt: 1981-12-28T11:54:46Z
+      reviewedAt: 2014-07-04T20:53:13Z
       reviewer:
         id: yKicchan
         name: きっちゃそ
-      title: m9nry5
+      title: 5ayymcy
+    - body: jrahm9nry5
+      id: ""
+      rate: 4
+      reviewedAt: 2014-07-04T20:53:13Z
+      reviewer:
+        id: yKicchan
+        name: きっちゃそ
+      title: 5ayymcy
     items:
       $ref: '#/definitions/Review'
     title: 'Mediatype identifier: application/vnd.review+json; type=collection; view=default'
@@ -667,13 +579,13 @@ definitions:
   ReviewPayload:
     description: レビュー投稿で受け取るレビュー情報
     example:
-      body: yym
+      body: jkz4yd4fa1
       rate: 4
-      title: ygva5jk
+      title: gwqq84
     properties:
       body:
         description: レビューの内容
-        example: yym
+        example: jkz4yd4fa1
         maxLength: 5000
         minLength: 1
         type: string
@@ -689,7 +601,7 @@ definitions:
         type: integer
       title:
         description: レビューのタイトル
-        example: ygva5jk
+        example: gwqq84
         maxLength: 30
         minLength: 1
         type: string
@@ -698,6 +610,26 @@ definitions:
     - title
     - body
     title: ReviewPayload
+    type: object
+  Schedule:
+    description: イベントの開催予定情報
+    example:
+      location:
+        lat: 34.706425
+        lng: 135.50124
+        name: ECCコンピュータ専門学校2303教室
+      upcomingDate:
+        endDate: 1975-07-28T07:45:40Z
+        startDate: 2005-04-23T09:00:35Z
+    properties:
+      location:
+        $ref: '#/definitions/Location'
+      upcomingDate:
+        $ref: '#/definitions/UpcomingDate'
+    required:
+    - location
+    - upcomingDate
+    title: Schedule
     type: object
   SignupPayload:
     description: 新規登録時のメール送信
@@ -729,17 +661,17 @@ definitions:
   UpcomingDate:
     description: イベントの開催予定日
     example:
-      endDate: 1990-02-18T14:03:59Z
-      startDate: 1975-07-28T07:45:40Z
+      endDate: 1975-07-28T07:45:40Z
+      startDate: 2005-04-23T09:00:35Z
     properties:
       endDate:
         description: 終了日時
-        example: 1990-02-18T14:03:59Z
+        example: 1975-07-28T07:45:40Z
         format: date-time
         type: string
       startDate:
         description: 開始日時
-        example: 1975-07-28T07:45:40Z
+        example: 2005-04-23T09:00:35Z
         format: date-time
         type: string
     required:
@@ -784,7 +716,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Officia eos sunt veritatis.
+          example: Quos totam ipsa.
           type: string
         type: array
       tel:

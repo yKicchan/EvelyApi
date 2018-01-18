@@ -27,7 +27,7 @@ type eventPayload struct {
 	// 開催中かどうか
 	OpenFlg *bool `form:"openFlg,omitempty" json:"openFlg,omitempty" xml:"openFlg,omitempty"`
 	// イベントの開催予定一覧
-	Plans []*plan `form:"plans,omitempty" json:"plans,omitempty" xml:"plans,omitempty"`
+	Schedules []*schedule `form:"schedules,omitempty" json:"schedules,omitempty" xml:"schedules,omitempty"`
 	// 公開範囲
 	Scope *string `form:"scope,omitempty" json:"scope,omitempty" xml:"scope,omitempty"`
 	// 連絡先電話番号
@@ -83,8 +83,8 @@ func (ut *eventPayload) Validate() (err error) {
 	if ut.URL == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "url"))
 	}
-	if ut.Plans == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "plans"))
+	if ut.Schedules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "schedules"))
 	}
 	if ut.NoticeRange == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "noticeRange"))
@@ -120,7 +120,7 @@ func (ut *eventPayload) Validate() (err error) {
 			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.noticeRange`, *ut.NoticeRange, 5000, false))
 		}
 	}
-	for _, e := range ut.Plans {
+	for _, e := range ut.Schedules {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
 				err = goa.MergeErrors(err, err2)
@@ -165,10 +165,10 @@ func (ut *eventPayload) Publicize() *EventPayload {
 	if ut.OpenFlg != nil {
 		pub.OpenFlg = *ut.OpenFlg
 	}
-	if ut.Plans != nil {
-		pub.Plans = make([]*Plan, len(ut.Plans))
-		for i2, elem2 := range ut.Plans {
-			pub.Plans[i2] = elem2.Publicize()
+	if ut.Schedules != nil {
+		pub.Schedules = make([]*Schedule, len(ut.Schedules))
+		for i2, elem2 := range ut.Schedules {
+			pub.Schedules[i2] = elem2.Publicize()
 		}
 	}
 	if ut.Scope != nil {
@@ -197,7 +197,7 @@ type EventPayload struct {
 	// 開催中かどうか
 	OpenFlg bool `form:"openFlg" json:"openFlg" xml:"openFlg"`
 	// イベントの開催予定一覧
-	Plans []*Plan `form:"plans" json:"plans" xml:"plans"`
+	Schedules []*Schedule `form:"schedules" json:"schedules" xml:"schedules"`
 	// 公開範囲
 	Scope string `form:"scope" json:"scope" xml:"scope"`
 	// 連絡先電話番号
@@ -225,8 +225,8 @@ func (ut *EventPayload) Validate() (err error) {
 	if ut.URL == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "url"))
 	}
-	if ut.Plans == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "plans"))
+	if ut.Schedules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "schedules"))
 	}
 
 	if ut.Scope == "" {
@@ -248,7 +248,7 @@ func (ut *EventPayload) Validate() (err error) {
 	if ut.NoticeRange > 5000 {
 		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.noticeRange`, ut.NoticeRange, 5000, false))
 	}
-	for _, e := range ut.Plans {
+	for _, e := range ut.Schedules {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
 				err = goa.MergeErrors(err, err2)
@@ -712,67 +712,6 @@ func (ut *PinPayload) Validate() (err error) {
 	return
 }
 
-// イベントの開催予定情報
-type plan struct {
-	Location     *location     `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
-	UpcomingDate *upcomingDate `form:"upcomingDate,omitempty" json:"upcomingDate,omitempty" xml:"upcomingDate,omitempty"`
-}
-
-// Validate validates the plan type instance.
-func (ut *plan) Validate() (err error) {
-	if ut.Location == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "location"))
-	}
-	if ut.UpcomingDate == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "upcomingDate"))
-	}
-	if ut.Location != nil {
-		if err2 := ut.Location.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	if ut.UpcomingDate != nil {
-		if err2 := ut.UpcomingDate.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
-// Publicize creates Plan from plan
-func (ut *plan) Publicize() *Plan {
-	var pub Plan
-	if ut.Location != nil {
-		pub.Location = ut.Location.Publicize()
-	}
-	if ut.UpcomingDate != nil {
-		pub.UpcomingDate = ut.UpcomingDate.Publicize()
-	}
-	return &pub
-}
-
-// イベントの開催予定情報
-type Plan struct {
-	Location     *Location     `form:"location" json:"location" xml:"location"`
-	UpcomingDate *UpcomingDate `form:"upcomingDate" json:"upcomingDate" xml:"upcomingDate"`
-}
-
-// Validate validates the Plan type instance.
-func (ut *Plan) Validate() (err error) {
-	if ut.Location == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "location"))
-	}
-	if ut.UpcomingDate == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "upcomingDate"))
-	}
-	if ut.Location != nil {
-		if err2 := ut.Location.Validate(); err2 != nil {
-			err = goa.MergeErrors(err, err2)
-		}
-	}
-	return
-}
-
 // レビュー投稿で受け取るレビュー情報
 type reviewPayload struct {
 	// レビューの内容
@@ -870,6 +809,67 @@ func (ut *ReviewPayload) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(ut.Title) > 30 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.title`, ut.Title, utf8.RuneCountInString(ut.Title), 30, false))
+	}
+	return
+}
+
+// イベントの開催予定情報
+type schedule struct {
+	Location     *location     `form:"location,omitempty" json:"location,omitempty" xml:"location,omitempty"`
+	UpcomingDate *upcomingDate `form:"upcomingDate,omitempty" json:"upcomingDate,omitempty" xml:"upcomingDate,omitempty"`
+}
+
+// Validate validates the schedule type instance.
+func (ut *schedule) Validate() (err error) {
+	if ut.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "location"))
+	}
+	if ut.UpcomingDate == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "upcomingDate"))
+	}
+	if ut.Location != nil {
+		if err2 := ut.Location.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if ut.UpcomingDate != nil {
+		if err2 := ut.UpcomingDate.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// Publicize creates Schedule from schedule
+func (ut *schedule) Publicize() *Schedule {
+	var pub Schedule
+	if ut.Location != nil {
+		pub.Location = ut.Location.Publicize()
+	}
+	if ut.UpcomingDate != nil {
+		pub.UpcomingDate = ut.UpcomingDate.Publicize()
+	}
+	return &pub
+}
+
+// イベントの開催予定情報
+type Schedule struct {
+	Location     *Location     `form:"location" json:"location" xml:"location"`
+	UpcomingDate *UpcomingDate `form:"upcomingDate" json:"upcomingDate" xml:"upcomingDate"`
+}
+
+// Validate validates the Schedule type instance.
+func (ut *Schedule) Validate() (err error) {
+	if ut.Location == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "location"))
+	}
+	if ut.UpcomingDate == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "upcomingDate"))
+	}
+	if ut.Location != nil {
+		if err2 := ut.Location.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }

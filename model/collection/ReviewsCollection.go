@@ -29,8 +29,6 @@ func (this *ReviewsCollection) Save(review *ReviewModel, keys Keys) error {
 	return err
 }
 
-
-
 /**
  * レビューを検索する
  * @param  keys レビューを特定するキー

@@ -54,16 +54,12 @@ type Event struct {
 	Host      *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
+	// レビューの有無
+	IsReviewed bool `form:"isReviewed" json:"isReviewed" xml:"isReviewed"`
 	// 連絡先メールアドレス
 	Mail string `form:"mail" json:"mail" xml:"mail"`
-	// 通知範囲(m)
-	NoticeRange int `form:"noticeRange" json:"noticeRange" xml:"noticeRange"`
-	// 開催中かどうか
-	OpenFlg bool `form:"openFlg" json:"openFlg" xml:"openFlg"`
 	// イベントの開催予定一覧
-	Plans []*Plan `form:"plans" json:"plans" xml:"plans"`
-	// 公開範囲
-	Scope string `form:"scope" json:"scope" xml:"scope"`
+	Schedules []*Schedule `form:"schedules" json:"schedules" xml:"schedules"`
 	// 連絡先電話番号
 	Tel string `form:"tel" json:"tel" xml:"tel"`
 	// イベントの名前
@@ -97,8 +93,101 @@ func (mt *Event) Validate() (err error) {
 	if mt.URL == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
 	}
-	if mt.Plans == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "plans"))
+	if mt.Schedules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schedules"))
+	}
+
+	if utf8.RuneCountInString(mt.Body) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1, true))
+	}
+	if utf8.RuneCountInString(mt.Body) > 1000 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1000, false))
+	}
+	if mt.Host != nil {
+		if err2 := mt.Host.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	if err2 := goa.ValidateFormat(goa.FormatEmail, mt.Mail); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.mail`, mt.Mail, goa.FormatEmail, err2))
+	}
+	for _, e := range mt.Schedules {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	if utf8.RuneCountInString(mt.Title) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.title`, mt.Title, utf8.RuneCountInString(mt.Title), 1, true))
+	}
+	if utf8.RuneCountInString(mt.Title) > 30 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.title`, mt.Title, utf8.RuneCountInString(mt.Title), 30, false))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatURI, mt.URL); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.url`, mt.URL, goa.FormatURI, err2))
+	}
+	return
+}
+
+// イベント情報 (full view)
+//
+// Identifier: application/vnd.event+json; view=full
+type EventFull struct {
+	// イベントの詳細
+	Body string `form:"body" json:"body" xml:"body"`
+	// 作成日時
+	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	Host      *UserTiny `form:"host" json:"host" xml:"host"`
+	// イベントID
+	ID string `form:"id" json:"id" xml:"id"`
+	// レビューの有無
+	IsReviewed bool `form:"isReviewed" json:"isReviewed" xml:"isReviewed"`
+	// 連絡先メールアドレス
+	Mail string `form:"mail" json:"mail" xml:"mail"`
+	// 通知範囲(m)
+	NoticeRange int `form:"noticeRange" json:"noticeRange" xml:"noticeRange"`
+	// 開催中かどうか
+	OpenFlg bool `form:"openFlg" json:"openFlg" xml:"openFlg"`
+	// イベントの開催予定一覧
+	Schedules []*Schedule `form:"schedules" json:"schedules" xml:"schedules"`
+	// 公開範囲
+	Scope string `form:"scope" json:"scope" xml:"scope"`
+	// 連絡先電話番号
+	Tel string `form:"tel" json:"tel" xml:"tel"`
+	// イベントの名前
+	Title string `form:"title" json:"title" xml:"title"`
+	// 最終更新日時
+	UpdateDate time.Time `form:"updateDate" json:"updateDate" xml:"updateDate"`
+	// URL
+	URL string `form:"url" json:"url" xml:"url"`
+}
+
+// Validate validates the EventFull media type instance.
+func (mt *EventFull) Validate() (err error) {
+	if mt.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if mt.Title == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "title"))
+	}
+	if mt.Body == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "body"))
+	}
+	if mt.Host == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "host"))
+	}
+	if mt.Mail == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mail"))
+	}
+	if mt.Tel == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "tel"))
+	}
+	if mt.URL == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "url"))
+	}
+	if mt.Schedules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schedules"))
 	}
 
 	if mt.Scope == "" {
@@ -125,7 +214,7 @@ func (mt *Event) Validate() (err error) {
 	if mt.NoticeRange > 5000 {
 		err = goa.MergeErrors(err, goa.InvalidRangeError(`response.noticeRange`, mt.NoticeRange, 5000, false))
 	}
-	for _, e := range mt.Plans {
+	for _, e := range mt.Schedules {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
 				err = goa.MergeErrors(err, err2)
@@ -154,18 +243,12 @@ type EventTiny struct {
 	Host *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
-	// 通知範囲(m)
-	NoticeRange int `form:"noticeRange" json:"noticeRange" xml:"noticeRange"`
-	// 開催中かどうか
-	OpenFlg bool `form:"openFlg" json:"openFlg" xml:"openFlg"`
+	// レビューの有無
+	IsReviewed bool `form:"isReviewed" json:"isReviewed" xml:"isReviewed"`
 	// イベントの開催予定一覧
-	Plans []*Plan `form:"plans" json:"plans" xml:"plans"`
-	// 公開範囲
-	Scope string `form:"scope" json:"scope" xml:"scope"`
+	Schedules []*Schedule `form:"schedules" json:"schedules" xml:"schedules"`
 	// イベントの名前
 	Title string `form:"title" json:"title" xml:"title"`
-	// 最終更新日時
-	UpdateDate time.Time `form:"updateDate" json:"updateDate" xml:"updateDate"`
 }
 
 // Validate validates the EventTiny media type instance.
@@ -179,12 +262,8 @@ func (mt *EventTiny) Validate() (err error) {
 	if mt.Host == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "host"))
 	}
-	if mt.Plans == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "plans"))
-	}
-
-	if mt.Scope == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "scope"))
+	if mt.Schedules == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schedules"))
 	}
 
 	if mt.Host != nil {
@@ -192,21 +271,12 @@ func (mt *EventTiny) Validate() (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if mt.NoticeRange < 100 {
-		err = goa.MergeErrors(err, goa.InvalidRangeError(`response.noticeRange`, mt.NoticeRange, 100, true))
-	}
-	if mt.NoticeRange > 5000 {
-		err = goa.MergeErrors(err, goa.InvalidRangeError(`response.noticeRange`, mt.NoticeRange, 5000, false))
-	}
-	for _, e := range mt.Plans {
+	for _, e := range mt.Schedules {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
 				err = goa.MergeErrors(err, err2)
 			}
 		}
-	}
-	if !(mt.Scope == "public" || mt.Scope == "private") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`response.scope`, mt.Scope, []interface{}{"public", "private"}))
 	}
 	if utf8.RuneCountInString(mt.Title) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.title`, mt.Title, utf8.RuneCountInString(mt.Title), 1, true))
@@ -220,6 +290,13 @@ func (mt *EventTiny) Validate() (err error) {
 // DecodeEvent decodes the Event instance encoded in resp body.
 func (c *Client) DecodeEvent(resp *http.Response) (*Event, error) {
 	var decoded Event
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// DecodeEventFull decodes the EventFull instance encoded in resp body.
+func (c *Client) DecodeEventFull(resp *http.Response) (*EventFull, error) {
+	var decoded EventFull
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return &decoded, err
 }
@@ -238,6 +315,23 @@ type EventCollection []*Event
 
 // Validate validates the EventCollection media type instance.
 func (mt EventCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// EventCollection is the media type for an array of Event (full view)
+//
+// Identifier: application/vnd.event+json; type=collection; view=full
+type EventFullCollection []*EventFull
+
+// Validate validates the EventFullCollection media type instance.
+func (mt EventFullCollection) Validate() (err error) {
 	for _, e := range mt {
 		if e != nil {
 			if err2 := e.Validate(); err2 != nil {
@@ -268,6 +362,13 @@ func (mt EventTinyCollection) Validate() (err error) {
 // DecodeEventCollection decodes the EventCollection instance encoded in resp body.
 func (c *Client) DecodeEventCollection(resp *http.Response) (EventCollection, error) {
 	var decoded EventCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
+// DecodeEventFullCollection decodes the EventFullCollection instance encoded in resp body.
+func (c *Client) DecodeEventFullCollection(resp *http.Response) (EventFullCollection, error) {
+	var decoded EventFullCollection
 	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
 	return decoded, err
 }

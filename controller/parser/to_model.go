@@ -14,19 +14,19 @@ import (
  * @param  user        イベントのホスト情報
  * @return *EventModel DBモデルに変換したイベント情報
  */
-func ToEventModel(p *app.EventPayload, id bson.ObjectId, user *UserModel) *EventModel {
+func ToEventModel(p *app.EventPayload, id bson.ObjectId, u *UserModel) *EventModel {
 	return &EventModel{
 		ID:    id,
 		Title: p.Title,
 		Body:  p.Body,
 		Host: &Host{
-			ID:   user.ID,
-			Name: user.Name,
+			ID:   u.ID,
+			Name: u.Name,
 		},
 		Mail:        p.Mail,
 		Tel:         p.Tel,
 		URL:         p.URL,
-		Plans:       toPlansModel(p.Plans),
+		Schedules:   toSchedulesModel(p.Schedules),
 		NoticeRange: p.NoticeRange,
 		Scope:       p.Scope,
 		OpenFlg:     p.OpenFlg,
@@ -34,9 +34,9 @@ func ToEventModel(p *app.EventPayload, id bson.ObjectId, user *UserModel) *Event
 	}
 }
 
-func toPlansModel(oldPlans []*app.Plan) (newPlans []*Plan) {
-	for _, old := range oldPlans {
-		plan := &Plan{
+func toSchedulesModel(oldSchedules []*app.Schedule) (newSchedules []*Schedule) {
+	for _, old := range oldSchedules {
+		schedule := &Schedule{
 			Location: &Location{
 				Name:   old.Location.Name,
 				LngLat: [2]float64{old.Location.Lng, old.Location.Lat},
@@ -46,7 +46,20 @@ func toPlansModel(oldPlans []*app.Plan) (newPlans []*Plan) {
 				EndDate:   old.UpcomingDate.EndDate,
 			},
 		}
-		newPlans = append(newPlans, plan)
+		newSchedules = append(newSchedules, schedule)
 	}
-	return newPlans
+	return newSchedules
+}
+
+func ToReviewModel(p *app.ReviewPayload, id bson.ObjectId, u *UserModel) *ReviewModel {
+	return &ReviewModel{
+		ID:    id,
+		Title: p.Title,
+        Body: p.Body,
+		Rate:  p.Rate,
+		Reviewer: &Reviewer{
+			ID:   u.ID,
+			Name: u.Name,
+		},
+	}
 }

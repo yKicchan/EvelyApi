@@ -216,7 +216,7 @@ Payload example:
    "mail": "yKicchanApp@gmail.com",
    "noticeRange": 500,
    "openFlg": false,
-   "plans": [
+   "schedules": [
       {
          "location": {
             "lat": 34.706424,
@@ -224,8 +224,8 @@ Payload example:
             "name": "ECCコンピュータ専門学校2303教室"
          },
          "upcomingDate": {
-            "endDate": "1990-02-18T14:03:59Z",
-            "startDate": "1975-07-28T07:45:40Z"
+            "endDate": "1975-07-28T07:45:40Z",
+            "startDate": "2005-04-23T09:00:35Z"
          }
       },
       {
@@ -235,19 +235,8 @@ Payload example:
             "name": "ECCコンピュータ専門学校2303教室"
          },
          "upcomingDate": {
-            "endDate": "1990-02-18T14:03:59Z",
-            "startDate": "1975-07-28T07:45:40Z"
-         }
-      },
-      {
-         "location": {
-            "lat": 34.706424,
-            "lng": 135.50123,
-            "name": "ECCコンピュータ専門学校2303教室"
-         },
-         "upcomingDate": {
-            "endDate": "1990-02-18T14:03:59Z",
-            "startDate": "1975-07-28T07:45:40Z"
+            "endDate": "1975-07-28T07:45:40Z",
+            "startDate": "2005-04-23T09:00:35Z"
          }
       }
    ],
@@ -270,9 +259,9 @@ Payload example:
 Payload example:
 
 {
-   "body": "yym",
+   "body": "jkz4yd4fa1",
    "rate": 4,
-   "title": "ygva5jk"
+   "title": "gwqq84"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp2.Run(c, args) },
 	}
@@ -334,7 +323,7 @@ Payload example:
    "mail": "yKicchanApp@gmail.com",
    "noticeRange": 500,
    "openFlg": false,
-   "plans": [
+   "schedules": [
       {
          "location": {
             "lat": 34.706424,
@@ -342,8 +331,8 @@ Payload example:
             "name": "ECCコンピュータ専門学校2303教室"
          },
          "upcomingDate": {
-            "endDate": "1990-02-18T14:03:59Z",
-            "startDate": "1975-07-28T07:45:40Z"
+            "endDate": "1975-07-28T07:45:40Z",
+            "startDate": "2005-04-23T09:00:35Z"
          }
       },
       {
@@ -353,19 +342,8 @@ Payload example:
             "name": "ECCコンピュータ専門学校2303教室"
          },
          "upcomingDate": {
-            "endDate": "1990-02-18T14:03:59Z",
-            "startDate": "1975-07-28T07:45:40Z"
-         }
-      },
-      {
-         "location": {
-            "lat": 34.706424,
-            "lng": 135.50123,
-            "name": "ECCコンピュータ専門学校2303教室"
-         },
-         "upcomingDate": {
-            "endDate": "1990-02-18T14:03:59Z",
-            "startDate": "1975-07-28T07:45:40Z"
+            "endDate": "1975-07-28T07:45:40Z",
+            "startDate": "2005-04-23T09:00:35Z"
          }
       }
    ],

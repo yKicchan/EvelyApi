@@ -5,34 +5,45 @@ import (
 	"time"
 )
 
+var EVENT_DEFAULT_SELECTOR = bson.M{
+	"_id":1,
+	"title":1,
+	"body":1,
+	"host":1,
+	"mail":1,
+	"tel":1,
+	"url":1,
+	"schedules":1,
+	"reviews":1,
+	"update_date":1,
+	"created_at":1,
+}
+
 // イベントの一部情報のみを取得するセレクタ
 var EVENT_TINY_SELECTOR = bson.M{
-	"_id":          1,
-	"id":           1,
-	"title":        1,
-	"host":         1,
-	"plans":        1,
-	"notice_range": 1,
-	"scope":        1,
-	"open_flg":     1,
-	"update_date":  1,
+	"_id":       1,
+	"title":     1,
+	"host":      1,
+	"schedules": 1,
+	"reviews":   1,
 }
 
 // イベントのDBモデル
 type EventModel struct {
-	ID          bson.ObjectId `bson:"_id"`
-	Title       string        `bson:"title"`
-	Body        string        `bson:"body"`
-	Host        *Host         `bson:"host"`
-	Mail        string        `bson:"mail"`
-	Tel         string        `bson:"tel"`
-	URL         string        `bson:"url"`
-	Plans       []*Plan       `bson:"plans"`
-	NoticeRange int           `bson:"notice_range"`
-	Scope       string        `bson:"scope"`
-	OpenFlg     bool          `bson:"open_flg"`
-	UpdateDate  time.Time     `bson:"update_date"`
-	CreatedAt   time.Time     `bson:"created_at"`
+	ID          bson.ObjectId   `bson:"_id"`
+	Title       string          `bson:"title"`
+	Body        string          `bson:"body"`
+	Host        *Host           `bson:"host"`
+	Mail        string          `bson:"mail"`
+	Tel         string          `bson:"tel"`
+	URL         string          `bson:"url"`
+	Schedules   []*Schedule     `bson:"schedules"`
+	NoticeRange int             `bson:"notice_range"`
+	Scope       string          `bson:"scope"`
+	OpenFlg     bool            `bson:"open_flg"`
+	Reviews     []bson.ObjectId `bson:"reviews"`
+	UpdateDate  time.Time       `bson:"update_date"`
+	CreatedAt   time.Time       `bson:"created_at"`
 }
 
 // イベント主催者のDBモデル
@@ -42,7 +53,7 @@ type Host struct {
 }
 
 // イベントの開催予定情報のDBモデル
-type Plan struct {
+type Schedule struct {
 	Location     *Location     `bson:"location"`
 	UpcomingDate *UpcomingDate `bson:"upcoming_date"`
 }
@@ -52,9 +63,10 @@ type Location struct {
 	Name   string     `bson:"name"`
 	LngLat [2]float64 `bson:"lng_lat"`
 }
+
 const (
-    LNG = iota
-    LAT
+	LNG = iota
+	LAT
 )
 
 // イベントの開催予定期間のDBモデル

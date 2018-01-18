@@ -2,9 +2,9 @@ package api
 
 import (
 	"EvelyApi/app"
+	. "EvelyApi/middleware"
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
-    . "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
 )
@@ -28,9 +28,9 @@ func (c *PinsController) Off(ctx *app.OffPinsContext) error {
 
 	// ユーザー情報から現在のピンの配列を取得
 	uid, err := GetLoginID(ctx)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrBadRequest(err))
-    }
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
 	keys := Keys{"id": uid}
 	u, _ := c.db.Users.FindOne(keys)
 
@@ -50,9 +50,9 @@ func (c *PinsController) On(ctx *app.OnPinsContext) error {
 
 	// ユーザー情報から現在のピンの配列を取得
 	uid, err := GetLoginID(ctx)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrBadRequest(err))
-    }
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
 	keys := Keys{"id": uid}
 	u, _ := c.db.Users.FindOne(keys)
 

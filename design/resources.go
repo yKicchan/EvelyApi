@@ -125,9 +125,9 @@ var _ = Resource("events", func() {
 		Routing(GET("/detail"))
 		Params(func() {
 			Param("ids", ArrayOf(String), "詳細を見るイベントのID配列", func() {
-                Example([]string{"5a44d5f2775672b659ba00fa", "5a44d5f2775672b659ba00fb"})
+				Example([]string{"5a44d5f2775672b659ba00fa", "5a44d5f2775672b659ba00fb"})
 			})
-            Required("ids")
+			Required("ids")
 		})
 		Response(OK, CollectionOf(EventMedia))
 		Response(BadRequest, ErrorMedia)
@@ -169,7 +169,7 @@ var _ = Resource("events", func() {
 		})
 		Response(OK)
 		Response(Unauthorized, ErrorMedia)
-        Response(BadRequest, ErrorMedia)
+		Response(BadRequest, ErrorMedia)
 		Response(Forbidden, ErrorMedia)
 		Response(NotFound, ErrorMedia)
 	})
@@ -190,25 +190,25 @@ var _ = Resource("events", func() {
 		Response(BadRequest, ErrorMedia)
 	})
 
-    Action("notify_by_user_id", func() {
-        Description("近くにイベントがあればユーザーのデバイス全てに通知する")
-        Routing(POST("/notify/by_user_id"))
-        Payload(NotifyByUserIDPayload)
-        Response(OK)
-        Response(BadRequest, ErrorMedia)
-        Response(Unauthorized, ErrorMedia)
-        Response(NotFound, ErrorMedia)
-    })
+	Action("notify_by_user_id", func() {
+		Description("近くにイベントがあればユーザーのデバイス全てに通知する")
+		Routing(POST("/notify/by_user_id"))
+		Payload(NotifyByUserIDPayload)
+		Response(OK)
+		Response(BadRequest, ErrorMedia)
+		Response(Unauthorized, ErrorMedia)
+		Response(NotFound, ErrorMedia)
+	})
 
-    Action("pin", func() {
-        Description("ユーザーのピンしたイベント一覧を取得する")
-        NoSecurity()
-        Routing(GET("/pin/:user_id"))
+	Action("pin", func() {
+		Description("ユーザーのピンしたイベント一覧を取得する")
+		NoSecurity()
+		Routing(GET("/pin/:user_id"))
 		Params(func() {
 			Param("user_id", String, "ユーザーID", func() {
 				Example("yKicchan")
 			})
-            Param("limit", Integer, "取得件数", func() {
+			Param("limit", Integer, "取得件数", func() {
 				Minimum(1)
 				Maximum(50)
 				Default(10)
@@ -220,9 +220,9 @@ var _ = Resource("events", func() {
 				Example(10)
 			})
 		})
-        Response(OK, CollectionOf(EventMedia))
-        Response(BadRequest, ErrorMedia)
-    })
+		Response(OK, CollectionOf(EventMedia))
+		Response(BadRequest, ErrorMedia)
+	})
 })
 
 // アカウントに対するアクション
@@ -283,16 +283,16 @@ var _ = Resource("files", func() {
 })
 
 var _ = Resource("reviews", func() {
-    BasePath("/reviews")
+	BasePath("/reviews")
 
-    Action("list", func() {
-        Description("レビューの一覧取得")
-        NoSecurity()
-        Routing(GET("/:event_id"))
-        Params(func() {
-            Param("event_id", String, "イベントID", func() {
-                Example("5a44d5f2775672b659ba00fa")
-            })
+	Action("list", func() {
+		Description("レビューの一覧取得")
+		NoSecurity()
+		Routing(GET("/:event_id"))
+		Params(func() {
+			Param("event_id", String, "イベントID", func() {
+				Example("5a44d5f2775672b659ba00fa")
+			})
 			Param("limit", Integer, "取得件数", func() {
 				Minimum(1)
 				Maximum(50)
@@ -304,25 +304,25 @@ var _ = Resource("reviews", func() {
 				Default(0)
 				Example(10)
 			})
-        })
-        Response(OK, CollectionOf(ReviewMedia))
-        Response(BadRequest, ErrorMedia)
-        Response(NotFound, ErrorMedia)
-    })
+		})
+		Response(OK, CollectionOf(ReviewMedia))
+		Response(BadRequest, ErrorMedia)
+		Response(NotFound, ErrorMedia)
+	})
 
-    Action("create", func() {
-        Description("レビュー投稿")
-        Routing(POST("/:event_id"))
-        Payload(ReviewPayload)
-        Params(func() {
-            Param("event_id", String, "イベントID", func() {
-                Example("5a44d5f2775672b659ba00fa")
-            })
-        })
-        Response(Created, ReviewMedia)
-        Response(BadRequest, ErrorMedia)
-        Response(NotFound, ErrorMedia)
-    })
+	Action("create", func() {
+		Description("レビュー投稿")
+		Routing(POST("/:event_id"))
+		Payload(ReviewPayload)
+		Params(func() {
+			Param("event_id", String, "イベントID", func() {
+				Example("5a44d5f2775672b659ba00fa")
+			})
+		})
+		Response(Created, ReviewMedia)
+		Response(BadRequest, ErrorMedia)
+		Response(NotFound, ErrorMedia)
+	})
 })
 
 var _ = Resource("swagger", func() {
