@@ -84,17 +84,11 @@ func (c *EventsController) Delete(ctx *app.DeleteEventsContext) error {
 func (c *EventsController) List(ctx *app.ListEventsContext) error {
 
 	// 条件と一致するイベントを複数検索
-	opt := NewFindEventsOptions()
+	opt := NewFindEventsOption()
 	opt.SetLimit(ctx.Limit)
 	opt.SetOffset(ctx.Offset)
-    var events []*EventModel
-    var err error
-    if ctx.Keyword != "" {
-    	opt.SetKeyword(ctx.Keyword)
-    	events, err = c.db.Events.FindEventsByKeyword(opt)
-    } else {
-        events, err = c.db.Events.FindEvents(opt)
-    }
+    opt.SetKeyword(ctx.Keyword)
+    events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
@@ -164,15 +158,17 @@ func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
 func (c *EventsController) MyList(ctx *app.MyListEventsContext) error {
 
 	// JWTからユーザーIDを取得
-	claims := GetJWTClaims(ctx)
-    uid := claims["id"].(string)
+	uid, err := GetLoginID(ctx)
+    if err != nil {
+        return ctx.BadRequest(goa.ErrBadRequest(err))
+    }
 
     // IDからイベントを取得する
-    events, err := c.db.Events.FindEvents(
-        WithHost(uid),
-        WithLimit(ctx.Limit),
-        WithOffset(ctx.Offset),
-    )
+    opt := NewFindEventsOption()
+    opt.SetLimit(ctx.Limit)
+    opt.SetOffset(ctx.Offset)
+    opt.SetHostID(uid)
+    events, err := c.db.Events.FindEvents(opt)
     if err != nil {
         ctx.BadRequest(err)
     }
@@ -188,11 +184,11 @@ func (c *EventsController) MyList(ctx *app.MyListEventsContext) error {
 // Nearby runs the nearby action.
 func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	// パラメーターの位置情報から付近のイベントを検索
-	opt := NewFindEventsOptions()
+	opt := NewFindEventsOption()
 	opt.SetLimit(ctx.Limit)
 	opt.SetOffset(ctx.Offset)
 	opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
-	events, err := c.db.Events.FindEventsByLocation(opt)
+	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
@@ -209,9 +205,9 @@ func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsC
 
 	// 現在地から最大通知範囲より内のイベントを取得
 	p := ctx.Payload
-	opt := NewFindEventsOptions()
+	opt := NewFindEventsOption()
 	opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
-	events, err := c.db.Events.FindEventsByLocation(opt)
+	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
@@ -245,9 +241,9 @@ func (c *EventsController) NotifyByUserID(ctx *app.NotifyByUserIDEventsContext) 
 
 	// 現在地から最大通知範囲より内のイベントを取得
 	p := ctx.Payload
-	opt := NewFindEventsOptions()
+	opt := NewFindEventsOption()
 	opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
-	events, err := c.db.Events.FindEventsByLocation(opt)
+	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}

@@ -3,7 +3,6 @@ package collection
 import (
 	. "EvelyApi/model/collection/findOptions"
 	. "EvelyApi/model/document"
-	"errors"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"strings"
@@ -53,14 +52,14 @@ func (this *EventsCollection) Delete(keys Keys) error {
 }
 
 /**
- * イベントを検索する
- * @param  opt 検索時のオプション
- * @return events  検索にヒットした複数のイベント情報
- * @return err     検索時に発生したエラー
+ * イベントをクエリとオプションからから検索する
+ * @param  opt    検索オプション
+ * @param  query  クエリ
+ * @return events イベント配列
+ * @return err    検索時のエラー
  */
-func (this *EventsCollection) FindEvents(opt FindOption) (events []*EventModel, err error) {
-    // 検索条件からイベントを検索
-	q := this.Find(nil).Select(EVENT_TINY_SELECTOR)
+func (this *EventsCollection) findEvents(opt FindOption, query bson.M) (events []*EventModel, err error) {
+	q := this.Find(query).Select(EVENT_TINY_SELECTOR)
 	if opt.IsOffsetSet() {
 		q = q.Skip(opt.GetOffset())
 	}
@@ -72,16 +71,31 @@ func (this *EventsCollection) FindEvents(opt FindOption) (events []*EventModel, 
 }
 
 /**
+ * イベントを検索する
+ * @param  opt     検索時のオプション
+ * @return events  検索にヒットした複数のイベント情報
+ * @return err     検索時に発生したエラー
+ */
+func (this *EventsCollection) FindEvents(opt *FindEventsOption) (events []*EventModel, err error) {
+    if opt.IsKeywordSet() {
+        return this.findEventsByKeyword(opt)
+    }
+    if opt.IsLocationSet() {
+        return this.findEventsByLocation(opt)
+    }
+    if opt.IsHostIDSet() {
+        return this.findEventsByHostID(opt)
+    }
+	return this.findEvents(opt, nil)
+}
+
+/**
  * イベントをキーワードから検索する
  * @param  opt     検索時のオプション
  * @return events  検索にヒットした複数のイベント情報
  * @return err     検索時に発生したエラー
  */
-func (this *EventsCollection) FindEventsByKeyword(opt KeywordOption) (events []*EventModel, err error) {
-	// 設定されているかチェック
-	if !opt.IsKeywordSet() {
-		return nil, errors.New("キーワードが設定されていません")
-	}
+func (this *EventsCollection) findEventsByKeyword(opt KeywordOption) (events []*EventModel, err error) {
 	// キーワード検索クエリ生成
 	var query bson.M
 	keywords := strings.Split(opt.GetKeyword(), " ")
@@ -101,21 +115,7 @@ func (this *EventsCollection) FindEventsByKeyword(opt KeywordOption) (events []*
 			},
 		}
 	}
-
-	// 検索条件からイベントを検索
-	q := this.Find(query).Select(EVENT_TINY_SELECTOR)
-
-	// 除外件数を指定
-	if opt.IsOffsetSet() {
-		q = q.Skip(opt.GetOffset())
-	}
-	// 検索件数の上限を指定
-	if opt.IsLimitSet() {
-		q = q.Limit(opt.GetLimit())
-	}
-	// 結果を返す
-	err = q.All(&events)
-	return
+	return this.findEvents(opt, query)
 }
 
 /**
@@ -124,11 +124,7 @@ func (this *EventsCollection) FindEventsByKeyword(opt KeywordOption) (events []*
  * @return events  検索にヒットした複数のイベント情報
  * @return err     検索時に発生したエラー
  */
-func (this *EventsCollection) FindEventsByLocation(opt LocationOption) (events []*EventModel, err error) {
-	// 検索オプションが設定されているかチェック
-	if !opt.IsLocationSet() {
-		return nil, errors.New("位置情報が設定されていません")
-	}
+func (this *EventsCollection) findEventsByLocation(opt LocationOption) (events []*EventModel, err error) {
 	// 位置情報検索クエリ生成
 	lat, lng, r := opt.GetLocation()
 	query := bson.M{
@@ -142,19 +138,17 @@ func (this *EventsCollection) FindEventsByLocation(opt LocationOption) (events [
 			},
 		},
 	}
+	return this.findEvents(opt, query)
+}
 
-	// 検索条件からイベントを検索
-	q := this.Find(query).Select(EVENT_TINY_SELECTOR)
-
-	// 除外件数を指定
-	if opt.IsOffsetSet() {
-		q = q.Skip(opt.GetOffset())
-	}
-	// 検索件数の上限を指定
-	if opt.IsLimitSet() {
-		q = q.Limit(opt.GetLimit())
-	}
-	// 結果を返す
-	err = q.All(&events)
-	return
+/**
+ * イベントを作成者から検索する
+ * @param  opt     検索時のオプション
+ * @return events  検索にヒットした複数のイベント情報
+ * @return err     検索時に発生したエラー
+ */
+func (this *EventsCollection) findEventsByHostID(opt HostIDOption) (events []*EventModel, err error) {
+    // 作成者からの検索クエリ生成
+    query := bson.M{"host.id": opt.GetHostID()}
+    return this.findEvents(opt, query)
 }
