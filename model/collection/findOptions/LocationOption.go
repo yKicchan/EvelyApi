@@ -1,12 +1,12 @@
 package findOptions
 
 import (
-    . "EvelyApi/config"
+	. "EvelyApi/config"
 )
 
 // 位置情報検索のオプション
 type LocationOption interface {
-    FindOption
+	FindOption
 	SetLocation(float64, float64, int)
 	GetLocation() (float64, float64, float64)
 	IsLocationSet() bool

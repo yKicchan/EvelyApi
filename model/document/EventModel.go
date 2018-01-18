@@ -6,17 +6,17 @@ import (
 )
 
 var EVENT_DEFAULT_SELECTOR = bson.M{
-	"_id":1,
-	"title":1,
-	"body":1,
-	"host":1,
-	"mail":1,
-	"tel":1,
-	"url":1,
-	"schedules":1,
-	"reviews":1,
-	"update_date":1,
-	"created_at":1,
+	"_id":         1,
+	"title":       1,
+	"body":        1,
+	"host":        1,
+	"mail":        1,
+	"tel":         1,
+	"url":         1,
+	"schedules":   1,
+	"reviews":     1,
+	"update_date": 1,
+	"created_at":  1,
 }
 
 // イベントの一部情報のみを取得するセレクタ

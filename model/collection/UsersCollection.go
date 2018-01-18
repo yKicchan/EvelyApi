@@ -8,7 +8,6 @@ import (
 
 /**
  * Usersコレクションを操作するためのオブジェクト
- * EvelyCollectionを実装している
  */
 type UsersCollection struct {
 	*mgo.Collection

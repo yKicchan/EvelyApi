@@ -10,7 +10,6 @@ import (
 
 /**
  * Eventsコレクションを操作するためのオブジェクト
- * EvelyCollectionを実装している
  */
 type EventsCollection struct {
 	*mgo.Collection
@@ -52,7 +51,7 @@ func (this *EventsCollection) Delete(keys Keys) error {
 }
 
 /**
- * イベントをクエリとオプションからから検索する
+ * イベントをクエリとオプションから検索する
  * @param  opt    検索オプション
  * @param  query  クエリ
  * @return events イベント配列
@@ -77,15 +76,15 @@ func (this *EventsCollection) findEvents(opt FindOption, query bson.M) (events [
  * @return err     検索時に発生したエラー
  */
 func (this *EventsCollection) FindEvents(opt *FindEventsOption) (events []*EventModel, err error) {
-    if opt.IsKeywordSet() {
-        return this.findEventsByKeyword(opt)
-    }
-    if opt.IsLocationSet() {
-        return this.findEventsByLocation(opt)
-    }
-    if opt.IsHostIDSet() {
-        return this.findEventsByHostID(opt)
-    }
+	if opt.IsKeywordSet() {
+		return this.findEventsByKeyword(opt)
+	}
+	if opt.IsLocationSet() {
+		return this.findEventsByLocation(opt)
+	}
+	if opt.IsHostIDSet() {
+		return this.findEventsByHostID(opt)
+	}
 	return this.findEvents(opt, nil)
 }
 
@@ -148,7 +147,7 @@ func (this *EventsCollection) findEventsByLocation(opt LocationOption) (events [
  * @return err     検索時に発生したエラー
  */
 func (this *EventsCollection) findEventsByHostID(opt HostIDOption) (events []*EventModel, err error) {
-    // 作成者からの検索クエリ生成
-    query := bson.M{"host.id": opt.GetHostID()}
-    return this.findEvents(opt, query)
+	// 作成者からの検索クエリ生成
+	query := bson.M{"host.id": opt.GetHostID()}
+	return this.findEvents(opt, query)
 }

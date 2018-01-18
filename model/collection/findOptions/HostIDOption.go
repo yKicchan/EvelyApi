@@ -1,15 +1,15 @@
 package findOptions
 
 type HostIDOption interface {
-    FindOption
-    SetHostID(string)
-    GetHostID() string
-    IsHostIDSet() bool
+	FindOption
+	SetHostID(string)
+	GetHostID() string
+	IsHostIDSet() bool
 }
 
 type hostIDOption struct {
-    // イベントの作成者ID
-    hostID string
+	// イベントの作成者ID
+	hostID string
 }
 
 /**

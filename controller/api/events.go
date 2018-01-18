@@ -87,8 +87,8 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 	opt := NewFindEventsOption()
 	opt.SetLimit(ctx.Limit)
 	opt.SetOffset(ctx.Offset)
-    opt.SetKeyword(ctx.Keyword)
-    events, err := c.db.Events.FindEvents(opt)
+	opt.SetKeyword(ctx.Keyword)
+	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
@@ -159,21 +159,21 @@ func (c *EventsController) MyList(ctx *app.MyListEventsContext) error {
 
 	// JWTからユーザーIDを取得
 	uid, err := GetLoginID(ctx)
-    if err != nil {
-        return ctx.BadRequest(goa.ErrBadRequest(err))
-    }
+	if err != nil {
+		return ctx.BadRequest(goa.ErrBadRequest(err))
+	}
 
-    // IDからイベントを取得する
-    opt := NewFindEventsOption()
-    opt.SetLimit(ctx.Limit)
-    opt.SetOffset(ctx.Offset)
-    opt.SetHostID(uid)
-    events, err := c.db.Events.FindEvents(opt)
-    if err != nil {
-        ctx.BadRequest(err)
-    }
+	// IDからイベントを取得する
+	opt := NewFindEventsOption()
+	opt.SetLimit(ctx.Limit)
+	opt.SetOffset(ctx.Offset)
+	opt.SetHostID(uid)
+	events, err := c.db.Events.FindEvents(opt)
+	if err != nil {
+		ctx.BadRequest(err)
+	}
 
-    // イベント情報をレスポンス形式に変換して返す
+	// イベント情報をレスポンス形式に変換して返す
 	res := make(app.EventTinyCollection, len(events))
 	for i := range events {
 		res[i] = parser.ToEventTinyMedia(events[i])

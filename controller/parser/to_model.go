@@ -55,7 +55,7 @@ func ToReviewModel(p *app.ReviewPayload, id bson.ObjectId, u *UserModel) *Review
 	return &ReviewModel{
 		ID:    id,
 		Title: p.Title,
-        Body: p.Body,
+		Body:  p.Body,
 		Rate:  p.Rate,
 		Reviewer: &Reviewer{
 			ID:   u.ID,

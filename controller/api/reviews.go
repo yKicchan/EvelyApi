@@ -7,8 +7,8 @@ import (
 	"EvelyApi/model"
 	. "EvelyApi/model/collection"
 	. "EvelyApi/model/document"
-	"labix.org/v2/mgo/bson"
 	"github.com/goadesign/goa"
+	"labix.org/v2/mgo/bson"
 )
 
 // ReviewsController implements the reviews resource.
@@ -37,8 +37,8 @@ func (c *ReviewsController) Create(ctx *app.CreateReviewsContext) error {
 
 	// レビューを保存するイベントを取得
 	if !bson.IsObjectIdHex(ctx.EventID) {
-        return ctx.BadRequest(goa.ErrBadRequest("\"" + ctx.EventID + "\" is not n event ID."))
-    }
+		return ctx.BadRequest(goa.ErrBadRequest("\"" + ctx.EventID + "\" is not n event ID."))
+	}
 	keys := Keys{"_id": bson.ObjectIdHex(ctx.EventID)}
 	e, err := c.db.Events.FindOne(keys)
 	if err != nil {
