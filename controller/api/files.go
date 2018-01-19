@@ -6,6 +6,10 @@ import (
 	"github.com/goadesign/goa"
 	"io"
 	"os"
+    "strings"
+    "time"
+    "crypto/md5"
+	"encoding/hex"
 )
 
 // FilesController implements the files resource.
@@ -21,9 +25,6 @@ func NewFilesController(service *goa.Service) *FilesController {
 
 // Upload runs the upload action.
 func (c *FilesController) Upload(ctx *app.UploadFilesContext) error {
-	// FilesController_Upload: start_implement
-
-	// Put your logic here
 	reader, err := ctx.MultipartReader()
 	if err != nil {
 		return goa.ErrBadRequest("failed to load multipart request: %s", err)
@@ -31,7 +32,13 @@ func (c *FilesController) Upload(ctx *app.UploadFilesContext) error {
 	if reader == nil {
 		return goa.ErrBadRequest("not a multipart request")
 	}
-	var files []string
+    //
+	var res []string
+    convert := func (str string) string {
+    	hasher := md5.New()
+    	hasher.Write([]byte(str + time.Now().String()))
+    	return hex.EncodeToString(hasher.Sum(nil))
+    }
 	for {
 		p, err := reader.NextPart()
 		if err == io.EOF {
@@ -40,15 +47,16 @@ func (c *FilesController) Upload(ctx *app.UploadFilesContext) error {
 		if err != nil {
 			return goa.ErrBadRequest("failed to load part: %s", err)
 		}
-		f, err := os.OpenFile("./public/files/"+p.FileName(), os.O_WRONLY|os.O_CREATE, 0666)
+        fn := p.FileName()
+        filename := convert(fn) + fn[strings.LastIndex(fn, "."):]
+		f, err := os.OpenFile("./public/files/" + filename, os.O_WRONLY|os.O_CREATE, 0666)
 		if err != nil {
 			return fmt.Errorf("failed to save file: %s", err) // causes a 500 response
 		}
 		defer f.Close()
 		io.Copy(f, p)
-		files = append(files, f.Name())
+		res = append(res, filename)
 	}
 
-	return ctx.OK(files)
-	// FilesController_Upload: end_implement
+	return ctx.OK(res)
 }
