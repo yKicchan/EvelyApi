@@ -2,7 +2,7 @@ package parser
 
 import (
 	"EvelyApi/app"
-	. "EvelyApi/model/document"
+	. "EvelyApi/models/documents"
 	"labix.org/v2/mgo/bson"
 )
 
@@ -14,11 +14,14 @@ import (
 func ToEventMedia(e *EventModel) *app.Event {
 	return &app.Event{
 		ID:    e.ID.Hex(),
+		Image: toFileMedia(e.Image),
 		Title: e.Title,
 		Body:  e.Body,
+		Files: toFilesMedia(e.Files),
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
 			Name: e.Host.Name,
+			Icon: toFileMedia(e.Host.Icon),
 		},
 		Mail:       e.Mail,
 		Tel:        e.Tel,
@@ -38,10 +41,12 @@ func ToEventMedia(e *EventModel) *app.Event {
 func ToEventTinyMedia(e *EventModel) *app.EventTiny {
 	return &app.EventTiny{
 		ID:    e.ID.Hex(),
+		Image: toFileMedia(e.Image),
 		Title: e.Title,
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
 			Name: e.Host.Name,
+			Icon: toFileMedia(e.Host.Icon),
 		},
 		Schedules:  toSchedulesMedia(e.Schedules),
 		IsReviewed: len(e.Reviews) > 0,
@@ -75,6 +80,7 @@ func ToUserMedia(u *UserModel) *app.User {
 	return &app.User{
 		ID:   u.ID,
 		Name: u.Name,
+		Icon: toFileMedia(u.Icon),
 		Mail: &app.Mail{
 			Email: u.Mail.Email,
 			State: u.Mail.State,
@@ -114,10 +120,23 @@ func ToReviewMedia(r *ReviewModel) *app.Review {
 		Rate:  r.Rate,
 		Title: r.Title,
 		Body:  r.Body,
+		Files: toFilesMedia(r.Files),
 		Reviewer: &app.UserTiny{
 			ID:   r.Reviewer.ID,
 			Name: r.Reviewer.Name,
+			Icon: toFileMedia(r.Reviewer.Icon),
 		},
 		ReviewedAt: r.ReviewedAt,
 	}
+}
+
+func toFileMedia(f string) string {
+	return "http://localhost:8888/download/" + f
+}
+
+func toFilesMedia(old []string) (new []string) {
+	for _, o := range old {
+		new = append(new, toFileMedia(o))
+	}
+	return new
 }

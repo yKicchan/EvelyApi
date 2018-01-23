@@ -1,4 +1,4 @@
-package collection
+package collections
 
 import (
 	"labix.org/v2/mgo/bson"

@@ -3,8 +3,8 @@ package middleware
 import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
-	. "EvelyApi/model"
-	. "EvelyApi/model/collection"
+	. "EvelyApi/models"
+	. "EvelyApi/models/collections"
 	"context"
 	"errors"
 	"fmt"

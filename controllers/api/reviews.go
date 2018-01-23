@@ -2,11 +2,11 @@ package api
 
 import (
 	"EvelyApi/app"
-	"EvelyApi/controller/parser"
+	"EvelyApi/controllers/parser"
 	. "EvelyApi/middleware"
-	"EvelyApi/model"
-	. "EvelyApi/model/collection"
-	. "EvelyApi/model/document"
+	"EvelyApi/models"
+	. "EvelyApi/models/collections"
+	. "EvelyApi/models/documents"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
 )
@@ -14,11 +14,11 @@ import (
 // ReviewsController implements the reviews resource.
 type ReviewsController struct {
 	*goa.Controller
-	db *model.EvelyDB
+	db *models.EvelyDB
 }
 
 // NewReviewsController creates a reviews controller.
-func NewReviewsController(service *goa.Service, db *model.EvelyDB) *ReviewsController {
+func NewReviewsController(service *goa.Service, db *models.EvelyDB) *ReviewsController {
 	return &ReviewsController{
 		Controller: service.NewController("ReviewsController"),
 		db:         db,

@@ -25,7 +25,7 @@ func SendMailAuthPath() string {
 }
 
 // 新規登録用のメール送信
-func (c *Client) SendMailAuth(ctx context.Context, path string, payload *SignupPayload, contentType string) (*http.Response, error) {
+func (c *Client) SendMailAuth(ctx context.Context, path string, payload *EmailPayload, contentType string) (*http.Response, error) {
 	req, err := c.NewSendMailAuthRequest(ctx, path, payload, contentType)
 	if err != nil {
 		return nil, err
@@ -34,7 +34,7 @@ func (c *Client) SendMailAuth(ctx context.Context, path string, payload *SignupP
 }
 
 // NewSendMailAuthRequest create the request corresponding to the send_mail action endpoint of the auth resource.
-func (c *Client) NewSendMailAuthRequest(ctx context.Context, path string, payload *SignupPayload, contentType string) (*http.Request, error) {
+func (c *Client) NewSendMailAuthRequest(ctx context.Context, path string, payload *EmailPayload, contentType string) (*http.Request, error) {
 	var body bytes.Buffer
 	if contentType == "" {
 		contentType = "*/*" // Use default encoder

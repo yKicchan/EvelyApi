@@ -21,14 +21,14 @@ import (
 	"path"
 )
 
-// DownloadFiles downloads /files with the given filename and writes it to the file dest.
+// DownloadDownload downloads /files with the given filename and writes it to the file dest.
 // It returns the number of bytes downloaded in case of success.
-func (c *Client) DownloadFiles(ctx context.Context, filename, dest string) (int64, error) {
+func (c *Client) DownloadDownload(ctx context.Context, filename, dest string) (int64, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
 	}
-	p := path.Join("/files/", filename)
+	p := path.Join("/download/", filename)
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: p}
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {

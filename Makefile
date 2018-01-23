@@ -29,5 +29,5 @@ fmt:
 	@go fmt EvelyApi/controllers/parser
 	@go fmt EvelyApi/middleware
 	@go fmt EvelyApi/models
-	@go fmt EvelyApi/models/collection
-	@go fmt EvelyApi/models/document
+	@go fmt EvelyApi/models/collections
+	@go fmt EvelyApi/models/documents

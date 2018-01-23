@@ -16,10 +16,59 @@ import (
 	"unicode/utf8"
 )
 
+// 新規登録時のメール送信
+type emailPayload struct {
+	// メールアドレス
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
+}
+
+// Validate validates the emailPayload type instance.
+func (ut *emailPayload) Validate() (err error) {
+	if ut.Email == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
+	}
+	if ut.Email != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.email`, *ut.Email, goa.FormatEmail, err2))
+		}
+	}
+	return
+}
+
+// Publicize creates EmailPayload from emailPayload
+func (ut *emailPayload) Publicize() *EmailPayload {
+	var pub EmailPayload
+	if ut.Email != nil {
+		pub.Email = *ut.Email
+	}
+	return &pub
+}
+
+// 新規登録時のメール送信
+type EmailPayload struct {
+	// メールアドレス
+	Email string `form:"email" json:"email" xml:"email"`
+}
+
+// Validate validates the EmailPayload type instance.
+func (ut *EmailPayload) Validate() (err error) {
+	if ut.Email == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.email`, ut.Email, goa.FormatEmail, err2))
+	}
+	return
+}
+
 // イベント作成・編集で受け取るイベント情報
 type eventPayload struct {
 	// イベントの詳細
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	// 添付資料
+	Files []string `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
+	// イベントのヘッダーイメージ
+	Image *string `form:"image,omitempty" json:"image,omitempty" xml:"image,omitempty"`
 	// 連絡先メールアドレス
 	Mail *string `form:"mail,omitempty" json:"mail,omitempty" xml:"mail,omitempty"`
 	// 通知範囲(m)
@@ -40,13 +89,13 @@ type eventPayload struct {
 
 // Finalize sets the default values for eventPayload type instance.
 func (ut *eventPayload) Finalize() {
+	var defaultImage = ""
+	if ut.Image == nil {
+		ut.Image = &defaultImage
+	}
 	var defaultMail = ""
 	if ut.Mail == nil {
 		ut.Mail = &defaultMail
-	}
-	var defaultNoticeRange = 500
-	if ut.NoticeRange == nil {
-		ut.NoticeRange = &defaultNoticeRange
 	}
 	var defaultOpenFlg = false
 	if ut.OpenFlg == nil {
@@ -74,26 +123,11 @@ func (ut *eventPayload) Validate() (err error) {
 	if ut.Body == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "body"))
 	}
-	if ut.Mail == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "mail"))
-	}
-	if ut.Tel == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "tel"))
-	}
-	if ut.URL == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "url"))
-	}
 	if ut.Schedules == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "schedules"))
 	}
 	if ut.NoticeRange == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "noticeRange"))
-	}
-	if ut.Scope == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "scope"))
-	}
-	if ut.OpenFlg == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "openFlg"))
 	}
 	if ut.Body != nil {
 		if utf8.RuneCountInString(*ut.Body) < 1 {
@@ -156,6 +190,12 @@ func (ut *eventPayload) Publicize() *EventPayload {
 	if ut.Body != nil {
 		pub.Body = *ut.Body
 	}
+	if ut.Files != nil {
+		pub.Files = ut.Files
+	}
+	if ut.Image != nil {
+		pub.Image = *ut.Image
+	}
 	if ut.Mail != nil {
 		pub.Mail = *ut.Mail
 	}
@@ -190,6 +230,10 @@ func (ut *eventPayload) Publicize() *EventPayload {
 type EventPayload struct {
 	// イベントの詳細
 	Body string `form:"body" json:"body" xml:"body"`
+	// 添付資料
+	Files []string `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
+	// イベントのヘッダーイメージ
+	Image string `form:"image" json:"image" xml:"image"`
 	// 連絡先メールアドレス
 	Mail string `form:"mail" json:"mail" xml:"mail"`
 	// 通知範囲(m)
@@ -216,21 +260,8 @@ func (ut *EventPayload) Validate() (err error) {
 	if ut.Body == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "body"))
 	}
-	if ut.Mail == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "mail"))
-	}
-	if ut.Tel == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "tel"))
-	}
-	if ut.URL == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "url"))
-	}
 	if ut.Schedules == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "schedules"))
-	}
-
-	if ut.Scope == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "scope"))
 	}
 
 	if utf8.RuneCountInString(ut.Body) < 1 {
@@ -716,6 +747,8 @@ func (ut *PinPayload) Validate() (err error) {
 type reviewPayload struct {
 	// レビューの内容
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	// レビュー画像など
+	Files []string `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
 	// レート評価
 	Rate *int `form:"rate,omitempty" json:"rate,omitempty" xml:"rate,omitempty"`
 	// レビューのタイトル
@@ -767,6 +800,9 @@ func (ut *reviewPayload) Publicize() *ReviewPayload {
 	if ut.Body != nil {
 		pub.Body = *ut.Body
 	}
+	if ut.Files != nil {
+		pub.Files = ut.Files
+	}
 	if ut.Rate != nil {
 		pub.Rate = *ut.Rate
 	}
@@ -780,6 +816,8 @@ func (ut *reviewPayload) Publicize() *ReviewPayload {
 type ReviewPayload struct {
 	// レビューの内容
 	Body string `form:"body" json:"body" xml:"body"`
+	// レビュー画像など
+	Files []string `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
 	// レート評価
 	Rate int `form:"rate" json:"rate" xml:"rate"`
 	// レビューのタイトル
@@ -874,51 +912,6 @@ func (ut *Schedule) Validate() (err error) {
 	return
 }
 
-// 新規登録時のメール送信
-type signupPayload struct {
-	// メールアドレス
-	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
-}
-
-// Validate validates the signupPayload type instance.
-func (ut *signupPayload) Validate() (err error) {
-	if ut.Email == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "email"))
-	}
-	if ut.Email != nil {
-		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Email); err2 != nil {
-			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.email`, *ut.Email, goa.FormatEmail, err2))
-		}
-	}
-	return
-}
-
-// Publicize creates SignupPayload from signupPayload
-func (ut *signupPayload) Publicize() *SignupPayload {
-	var pub SignupPayload
-	if ut.Email != nil {
-		pub.Email = *ut.Email
-	}
-	return &pub
-}
-
-// 新規登録時のメール送信
-type SignupPayload struct {
-	// メールアドレス
-	Email string `form:"email" json:"email" xml:"email"`
-}
-
-// Validate validates the SignupPayload type instance.
-func (ut *SignupPayload) Validate() (err error) {
-	if ut.Email == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "email"))
-	}
-	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
-		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.email`, ut.Email, goa.FormatEmail, err2))
-	}
-	return
-}
-
 // イベントの開催予定日
 type upcomingDate struct {
 	// 終了日時
@@ -968,6 +961,8 @@ func (ut *UpcomingDate) Validate() (err error) {
 type userPayload struct {
 	// 端末のインスタンスID
 	InstanceID *string `form:"InstanceID,omitempty" json:"InstanceID,omitempty" xml:"InstanceID,omitempty"`
+	// アイコン画像
+	Icon *string `form:"icon,omitempty" json:"icon,omitempty" xml:"icon,omitempty"`
 	// ユーザーID
 	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	// メールアドレス
@@ -985,6 +980,10 @@ func (ut *userPayload) Finalize() {
 	var defaultInstanceID = ""
 	if ut.InstanceID == nil {
 		ut.InstanceID = &defaultInstanceID
+	}
+	var defaultIcon = ""
+	if ut.Icon == nil {
+		ut.Icon = &defaultIcon
 	}
 	var defaultTel = ""
 	if ut.Tel == nil {
@@ -1045,6 +1044,9 @@ func (ut *userPayload) Publicize() *UserPayload {
 	if ut.InstanceID != nil {
 		pub.InstanceID = *ut.InstanceID
 	}
+	if ut.Icon != nil {
+		pub.Icon = *ut.Icon
+	}
 	if ut.ID != nil {
 		pub.ID = *ut.ID
 	}
@@ -1067,6 +1069,8 @@ func (ut *userPayload) Publicize() *UserPayload {
 type UserPayload struct {
 	// 端末のインスタンスID
 	InstanceID string `form:"InstanceID" json:"InstanceID" xml:"InstanceID"`
+	// アイコン画像
+	Icon string `form:"icon" json:"icon" xml:"icon"`
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
 	// メールアドレス

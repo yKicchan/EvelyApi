@@ -3,12 +3,12 @@ package api
 import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
-	"EvelyApi/controller/parser"
+	"EvelyApi/controllers/parser"
 	. "EvelyApi/middleware"
-	"EvelyApi/model"
-	. "EvelyApi/model/collection"
-	. "EvelyApi/model/collection/findOptions"
-	. "EvelyApi/model/document"
+	"EvelyApi/models"
+	. "EvelyApi/models/collections"
+	. "EvelyApi/models/collections/findOptions"
+	. "EvelyApi/models/documents"
 	"github.com/NaySoftware/go-fcm"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
@@ -19,11 +19,11 @@ import (
 // EventsController implements the events resource.
 type EventsController struct {
 	*goa.Controller
-	db *model.EvelyDB
+	db *models.EvelyDB
 }
 
 // NewEventsController creates a events controller.
-func NewEventsController(service *goa.Service, db *model.EvelyDB) *EventsController {
+func NewEventsController(service *goa.Service, db *models.EvelyDB) *EventsController {
 	return &EventsController{
 		Controller: service.NewController("EventsController"),
 		db:         db,

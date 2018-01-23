@@ -9,7 +9,7 @@ import (
 var _ = API("EvelyApi", func() {
 
 	// APIの説明
-	Title("EvelyApi")
+	Title("EvelyApi v2.2")
 	Description("卒業制作のアプリケーションで使用するAPIです")
 
 	// 作成者へのコンタクト

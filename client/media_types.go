@@ -51,9 +51,13 @@ type Event struct {
 	Body string `form:"body" json:"body" xml:"body"`
 	// 作成日時
 	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
-	Host      *UserTiny `form:"host" json:"host" xml:"host"`
+	// 添付資料へのURL
+	Files []string  `form:"files" json:"files" xml:"files"`
+	Host  *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
+	// ヘッダー画像のURL
+	Image string `form:"image" json:"image" xml:"image"`
 	// レビューの有無
 	IsReviewed bool `form:"isReviewed" json:"isReviewed" xml:"isReviewed"`
 	// 連絡先メールアドレス
@@ -75,11 +79,17 @@ func (mt *Event) Validate() (err error) {
 	if mt.ID == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
 	}
+	if mt.Image == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "image"))
+	}
 	if mt.Title == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "title"))
 	}
 	if mt.Body == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "body"))
+	}
+	if mt.Files == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "files"))
 	}
 	if mt.Host == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "host"))
@@ -243,6 +253,8 @@ type EventTiny struct {
 	Host *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
+	// ヘッダー画像のURL
+	Image string `form:"image" json:"image" xml:"image"`
 	// レビューの有無
 	IsReviewed bool `form:"isReviewed" json:"isReviewed" xml:"isReviewed"`
 	// イベントの開催予定一覧
@@ -255,6 +267,9 @@ type EventTiny struct {
 func (mt *EventTiny) Validate() (err error) {
 	if mt.ID == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
+	}
+	if mt.Image == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "image"))
 	}
 	if mt.Title == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "title"))
@@ -380,29 +395,6 @@ func (c *Client) DecodeEventTinyCollection(resp *http.Response) (EventTinyCollec
 	return decoded, err
 }
 
-// アップロード済みのファイルのパス (default view)
-//
-// Identifier: application/vnd.file_path+json; view=default
-type FilePath struct {
-	// ファイルのパス
-	Path string `form:"path" json:"path" xml:"path"`
-}
-
-// Validate validates the FilePath media type instance.
-func (mt *FilePath) Validate() (err error) {
-	if mt.Path == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "path"))
-	}
-	return
-}
-
-// DecodeFilePath decodes the FilePath instance encoded in resp body.
-func (c *Client) DecodeFilePath(resp *http.Response) (*FilePath, error) {
-	var decoded FilePath
-	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
-	return &decoded, err
-}
-
 // DecodeErrorResponse decodes the ErrorResponse instance encoded in resp body.
 func (c *Client) DecodeErrorResponse(resp *http.Response) (*goa.ErrorResponse, error) {
 	var decoded goa.ErrorResponse
@@ -416,6 +408,8 @@ func (c *Client) DecodeErrorResponse(resp *http.Response) (*goa.ErrorResponse, e
 type Review struct {
 	// レビューの内容
 	Body string `form:"body" json:"body" xml:"body"`
+	// レビュー画像などのURL
+	Files []string `form:"files" json:"files" xml:"files"`
 	// レビューID
 	ID string `form:"id" json:"id" xml:"id"`
 	// レート評価
@@ -438,6 +432,9 @@ func (mt *Review) Validate() (err error) {
 	}
 	if mt.Body == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "body"))
+	}
+	if mt.Files == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "files"))
 	}
 	if mt.Reviewer == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "reviewer"))
@@ -526,6 +523,8 @@ func (c *Client) DecodeToken(resp *http.Response) (*Token, error) {
 type User struct {
 	// 作成日時
 	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	// アイコン画像のURL
+	Icon string `form:"icon" json:"icon" xml:"icon"`
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
 	// メールアドレス
@@ -545,6 +544,9 @@ func (mt *User) Validate() (err error) {
 	}
 	if mt.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Icon == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "icon"))
 	}
 	if mt.Mail == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "mail"))
@@ -580,6 +582,8 @@ func (mt *User) Validate() (err error) {
 //
 // Identifier: application/vnd.user+json; view=tiny
 type UserTiny struct {
+	// アイコン画像のURL
+	Icon string `form:"icon" json:"icon" xml:"icon"`
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
 	// 名前
@@ -593,6 +597,9 @@ func (mt *UserTiny) Validate() (err error) {
 	}
 	if mt.Name == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "name"))
+	}
+	if mt.Icon == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "icon"))
 	}
 	if utf8.RuneCountInString(mt.ID) < 4 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.id`, mt.ID, utf8.RuneCountInString(mt.ID), 4, true))

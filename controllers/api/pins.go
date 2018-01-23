@@ -3,8 +3,8 @@ package api
 import (
 	"EvelyApi/app"
 	. "EvelyApi/middleware"
-	"EvelyApi/model"
-	. "EvelyApi/model/collection"
+	"EvelyApi/models"
+	. "EvelyApi/models/collections"
 	"github.com/goadesign/goa"
 	"labix.org/v2/mgo/bson"
 )
@@ -12,11 +12,11 @@ import (
 // PinsController implements the pins resource.
 type PinsController struct {
 	*goa.Controller
-	db *model.EvelyDB
+	db *models.EvelyDB
 }
 
 // NewPinsController creates a pins controller.
-func NewPinsController(service *goa.Service, db *model.EvelyDB) *PinsController {
+func NewPinsController(service *goa.Service, db *models.EvelyDB) *PinsController {
 	return &PinsController{
 		Controller: service.NewController("PinsController"),
 		db:         db,

@@ -18,6 +18,20 @@ definitions:
     - email
     title: 'Mediatype identifier: application/vnd.email+json; view=default'
     type: object
+  EmailPayload:
+    description: 新規登録時のメール送信
+    example:
+      email: yKicchanApp@gmail.com
+    properties:
+      email:
+        description: メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+    required:
+    - email
+    title: EmailPayload
+    type: object
   Event:
     description: イベント情報 (default view)
     example:
@@ -25,10 +39,15 @@ definitions:
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
       createdAt: 1974-02-03T21:26:56Z
+      files:
+      - http://evely.net:8888/download/doc1.jpg
+      - http://evely.net:8888/download/doc2.pdf
       host:
+        icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
       id: 5a44d5f2775672b659ba00fa
+      image: http://evely.net:8888/download/header.jpg
       isReviewed: true
       mail: yKicchanApp@gmail.com
       schedules:
@@ -71,11 +90,25 @@ definitions:
         example: 1974-02-03T21:26:56Z
         format: date-time
         type: string
+      files:
+        description: 添付資料へのURL
+        example:
+        - http://evely.net:8888/download/doc1.jpg
+        - http://evely.net:8888/download/doc2.pdf
+        items:
+          example: Qui omnis.
+          type: string
+        type: array
       host:
         $ref: '#/definitions/UserTiny'
       id:
         description: イベントID
         example: 5a44d5f2775672b659ba00fa
+        type: string
+      image:
+        default: ""
+        description: ヘッダー画像のURL
+        example: http://evely.net:8888/download/header.jpg
         type: string
       isReviewed:
         description: レビューの有無
@@ -138,8 +171,10 @@ definitions:
         type: string
     required:
     - id
+    - image
     - title
     - body
+    - files
     - host
     - mail
     - tel
@@ -158,10 +193,15 @@ definitions:
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
       createdAt: 1974-02-03T21:26:56Z
+      files:
+      - http://evely.net:8888/download/doc1.jpg
+      - http://evely.net:8888/download/doc2.pdf
       host:
+        icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
       id: 5a44d5f2775672b659ba00fa
+      image: http://evely.net:8888/download/header.jpg
       isReviewed: true
       mail: yKicchanApp@gmail.com
       schedules:
@@ -194,10 +234,15 @@ definitions:
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
       createdAt: 1974-02-03T21:26:56Z
+      files:
+      - http://evely.net:8888/download/doc1.jpg
+      - http://evely.net:8888/download/doc2.pdf
       host:
+        icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
       id: 5a44d5f2775672b659ba00fa
+      image: http://evely.net:8888/download/header.jpg
       isReviewed: true
       mail: yKicchanApp@gmail.com
       schedules:
@@ -236,6 +281,10 @@ definitions:
       body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
+      files:
+      - doc1.jpg
+      - doc2.pdf
+      image: header.jpg
       mail: yKicchanApp@gmail.com
       noticeRange: 500
       openFlg: false
@@ -267,6 +316,20 @@ definitions:
         maxLength: 1000
         minLength: 1
         type: string
+      files:
+        description: 添付資料
+        example:
+        - doc1.jpg
+        - doc2.pdf
+        items:
+          example: Et rem odio et possimus cupiditate.
+          type: string
+        type: array
+      image:
+        default: ""
+        description: イベントのヘッダーイメージ
+        example: header.jpg
+        type: string
       mail:
         default: ""
         description: 連絡先メールアドレス
@@ -274,7 +337,6 @@ definitions:
         format: email
         type: string
       noticeRange:
-        default: 500
         description: 通知範囲(m)
         example: 500
         maximum: 5000
@@ -333,13 +395,8 @@ definitions:
     required:
     - title
     - body
-    - mail
-    - tel
-    - url
     - schedules
     - noticeRange
-    - scope
-    - openFlg
     title: EventPayload
     type: object
   Location:
@@ -483,7 +540,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Omnis reprehenderit et rem odio et.
+          example: Ipsa sit enim accusamus.
           type: string
         type: array
     required:
@@ -494,10 +551,14 @@ definitions:
     description: レビュー (default view)
     example:
       body: jrahm9nry5
+      files:
+      - http://evely.net:8888/download/angle1.jpg
+      - http://evely.net:8888/download/angle2.jpg
       id: ""
       rate: 4
       reviewedAt: 2014-07-04T20:53:13Z
       reviewer:
+        icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
       title: 5ayymcy
@@ -508,6 +569,15 @@ definitions:
         maxLength: 5000
         minLength: 1
         type: string
+      files:
+        description: レビュー画像などのURL
+        example:
+        - http://evely.net:8888/download/angle1.jpg
+        - http://evely.net:8888/download/angle2.jpg
+        items:
+          example: Natus molestiae quidem.
+          type: string
+        type: array
       id:
         description: レビューID
         example: ""
@@ -540,6 +610,7 @@ definitions:
     - rate
     - title
     - body
+    - files
     - reviewer
     - reviewedAt
     title: 'Mediatype identifier: application/vnd.review+json; view=default'
@@ -549,26 +620,38 @@ definitions:
       view)
     example:
     - body: jrahm9nry5
+      files:
+      - http://evely.net:8888/download/angle1.jpg
+      - http://evely.net:8888/download/angle2.jpg
       id: ""
       rate: 4
       reviewedAt: 2014-07-04T20:53:13Z
       reviewer:
+        icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
       title: 5ayymcy
     - body: jrahm9nry5
+      files:
+      - http://evely.net:8888/download/angle1.jpg
+      - http://evely.net:8888/download/angle2.jpg
       id: ""
       rate: 4
       reviewedAt: 2014-07-04T20:53:13Z
       reviewer:
+        icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
       title: 5ayymcy
     - body: jrahm9nry5
+      files:
+      - http://evely.net:8888/download/angle1.jpg
+      - http://evely.net:8888/download/angle2.jpg
       id: ""
       rate: 4
       reviewedAt: 2014-07-04T20:53:13Z
       reviewer:
+        icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
       title: 5ayymcy
@@ -580,6 +663,9 @@ definitions:
     description: レビュー投稿で受け取るレビュー情報
     example:
       body: jkz4yd4fa1
+      files:
+      - angle1.jpg
+      - angle2.jpg
       rate: 4
       title: gwqq84
     properties:
@@ -589,6 +675,15 @@ definitions:
         maxLength: 5000
         minLength: 1
         type: string
+      files:
+        description: レビュー画像など
+        example:
+        - angle1.jpg
+        - angle2.jpg
+        items:
+          example: Aut eius.
+          type: string
+        type: array
       rate:
         description: レート評価
         enum:
@@ -631,20 +726,6 @@ definitions:
     - upcomingDate
     title: Schedule
     type: object
-  SignupPayload:
-    description: 新規登録時のメール送信
-    example:
-      email: yKicchanApp@gmail.com
-    properties:
-      email:
-        description: メールアドレス
-        example: yKicchanApp@gmail.com
-        format: email
-        type: string
-    required:
-    - email
-    title: SignupPayload
-    type: object
   Token:
     description: アクセストークン (default view)
     example:
@@ -683,6 +764,7 @@ definitions:
     description: ユーザー情報 (default view)
     example:
       createdAt: 2003-06-21T02:17:51Z
+      icon: http://evely.net:8888/download/icon.png
       id: yKicchan
       mail: yKicchanApp@gmail.com
       name: きっちゃそ
@@ -695,6 +777,11 @@ definitions:
         description: 作成日時
         example: 2003-06-21T02:17:51Z
         format: date-time
+        type: string
+      icon:
+        default: ""
+        description: アイコン画像のURL
+        example: http://evely.net:8888/download/icon.png
         type: string
       id:
         description: ユーザーID
@@ -716,7 +803,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Quos totam ipsa.
+          example: Voluptatem sit tempore consequatur.
           type: string
         type: array
       tel:
@@ -727,6 +814,7 @@ definitions:
     required:
     - id
     - name
+    - icon
     - mail
     - tel
     - pins
@@ -737,6 +825,7 @@ definitions:
     description: アカウント作成時に受け取る情報
     example:
       InstanceID: token
+      icon: icon.png
       id: yKicchan
       mail: yKicchanApp@gmail.com
       name: きっちゃそ
@@ -747,6 +836,11 @@ definitions:
         default: ""
         description: 端末のインスタンスID
         example: token
+        type: string
+      icon:
+        default: ""
+        description: アイコン画像
+        example: icon.png
         type: string
       id:
         description: ユーザーID
@@ -785,9 +879,15 @@ definitions:
   UserTiny:
     description: ユーザー情報 (tiny view)
     example:
+      icon: http://evely.net:8888/download/icon.png
       id: yKicchan
       name: きっちゃそ
     properties:
+      icon:
+        default: ""
+        description: アイコン画像のURL
+        example: http://evely.net:8888/download/icon.png
+        type: string
       id:
         description: ユーザーID
         example: yKicchan
@@ -803,6 +903,7 @@ definitions:
     required:
     - id
     - name
+    - icon
     title: 'Mediatype identifier: application/vnd.user+json; view=tiny'
     type: object
   error:
@@ -851,7 +952,7 @@ info:
   license:
     name: Apache License 2.0
     url: https://github.com/yKicchan/EvelyApi/blob/master/LICENSE
-  title: EvelyApi
+  title: EvelyApi v2.2
   version: ""
 paths:
   /api/develop/v2/auth/signin:
@@ -920,7 +1021,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/SignupPayload'
+          $ref: '#/definitions/EmailPayload'
       produces:
       - application/vnd.goa.error
       - text/plain
@@ -1631,9 +1732,9 @@ paths:
       summary: show users
       tags:
       - users
-  /files/{filename}:
+  /download/{filename}:
     get:
-      operationId: files#/files/*filename
+      operationId: files#/download/*filename
       parameters:
       - description: Relative file path
         in: path

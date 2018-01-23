@@ -31,7 +31,7 @@ var _ = Resource("auth", func() {
 		Description("新規登録用のメール送信")
 		NoSecurity()
 		Routing(POST("/signup/send_mail"))
-		Payload(SignupPayload)
+		Payload(EmailPayload)
 		Response(OK)
 		Response(BadRequest, ErrorMedia)
 	})
@@ -301,7 +301,7 @@ var _ = Resource("files", func() {
 		Response(BadRequest, ErrorMedia)
 	})
 
-	Files("/files/*filename", "public/files/")
+	Files("/download/*filename", "public/files/")
 })
 
 var _ = Resource("reviews", func() {
@@ -353,6 +353,6 @@ var _ = Resource("swagger", func() {
 		Methods("GET") // Allow all origins to retrieve the Swagger JSON (CORS)
 	})
 	Metadata("swagger:generate", "false")
-	Files("/swagger.json", "swagger/swagger.json")
+	Files("/swagger/*filename", "public/swagger/")
 	Files("/swaggerui/*filepath", "public/swaggerui/")
 })

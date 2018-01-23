@@ -1,8 +1,8 @@
-package collection
+package collections
 
 import (
-	. "EvelyApi/model/collection/findOptions"
-	. "EvelyApi/model/document"
+	. "EvelyApi/models/collections/findOptions"
+	. "EvelyApi/models/documents"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"strings"

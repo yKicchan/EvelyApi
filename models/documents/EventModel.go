@@ -1,4 +1,4 @@
-package document
+package documents
 
 import (
 	"labix.org/v2/mgo/bson"
@@ -7,8 +7,10 @@ import (
 
 var EVENT_DEFAULT_SELECTOR = bson.M{
 	"_id":         1,
+	"image":       1,
 	"title":       1,
 	"body":        1,
+	"files": 1,
 	"host":        1,
 	"mail":        1,
 	"tel":         1,
@@ -22,6 +24,7 @@ var EVENT_DEFAULT_SELECTOR = bson.M{
 // イベントの一部情報のみを取得するセレクタ
 var EVENT_TINY_SELECTOR = bson.M{
 	"_id":       1,
+	"image": 1,
 	"title":     1,
 	"host":      1,
 	"schedules": 1,
@@ -31,8 +34,10 @@ var EVENT_TINY_SELECTOR = bson.M{
 // イベントのDBモデル
 type EventModel struct {
 	ID          bson.ObjectId   `bson:"_id"`
+	Image string `bson:"image"`
 	Title       string          `bson:"title"`
 	Body        string          `bson:"body"`
+	Files []string `bson:"files"`
 	Host        *Host           `bson:"host"`
 	Mail        string          `bson:"mail"`
 	Tel         string          `bson:"tel"`
@@ -50,6 +55,7 @@ type EventModel struct {
 type Host struct {
 	ID   string `bson:"id"`
 	Name string `bson:"name"`
+	Icon string `bson:"icon"`
 }
 
 // イベントの開催予定情報のDBモデル

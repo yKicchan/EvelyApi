@@ -5,8 +5,8 @@ package main
 import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
-	"EvelyApi/controller/api"
-    . "EvelyApi/model"
+	"EvelyApi/controllers/api"
+    . "EvelyApi/models"
 	. "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"

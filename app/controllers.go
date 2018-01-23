@@ -62,7 +62,7 @@ func MountAuthController(service *goa.Service, ctrl AuthController) {
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*SignupPayload)
+			rctx.Payload = rawPayload.(*EmailPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
@@ -162,7 +162,7 @@ func handleAuthOrigin(h goa.Handler) goa.Handler {
 
 // unmarshalSendMailAuthPayload unmarshals the request body into the context request data Payload field.
 func unmarshalSendMailAuthPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &signupPayload{}
+	payload := &emailPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
@@ -543,7 +543,7 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/files/upload", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/files/*filename", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/download/*filename", ctrl.MuxHandler("preflight", handleFilesOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -562,15 +562,15 @@ func MountFilesController(service *goa.Service, ctrl FilesController) {
 	service.Mux.Handle("POST", "/api/develop/v2/files/upload", ctrl.MuxHandler("upload", h, nil))
 	service.LogInfo("mount", "ctrl", "Files", "action", "Upload", "route", "POST /api/develop/v2/files/upload", "security", "jwt")
 
-	h = ctrl.FileHandler("/files/*filename", "public/files/")
+	h = ctrl.FileHandler("/download/*filename", "public/files/")
 	h = handleFilesOrigin(h)
-	service.Mux.Handle("GET", "/files/*filename", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/", "route", "GET /files/*filename")
+	service.Mux.Handle("GET", "/download/*filename", ctrl.MuxHandler("serve", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/", "route", "GET /download/*filename")
 
-	h = ctrl.FileHandler("/files/", "public/files/index.html")
+	h = ctrl.FileHandler("/download/", "public/files/index.html")
 	h = handleFilesOrigin(h)
-	service.Mux.Handle("GET", "/files/", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/index.html", "route", "GET /files/")
+	service.Mux.Handle("GET", "/download/", ctrl.MuxHandler("serve", h, nil))
+	service.LogInfo("mount", "ctrl", "Files", "files", "public/files/index.html", "route", "GET /download/")
 }
 
 // handleFilesOrigin applies the CORS response headers corresponding to the origin.
@@ -823,18 +823,23 @@ type SwaggerController interface {
 func MountSwaggerController(service *goa.Service, ctrl SwaggerController) {
 	initService(service)
 	var h goa.Handler
+	service.Mux.Handle("OPTIONS", "/swagger/*filename", ctrl.MuxHandler("preflight", handleSwaggerOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/swaggerui/*filepath", ctrl.MuxHandler("preflight", handleSwaggerOrigin(cors.HandlePreflight()), nil))
-	service.Mux.Handle("OPTIONS", "/swagger.json", ctrl.MuxHandler("preflight", handleSwaggerOrigin(cors.HandlePreflight()), nil))
+
+	h = ctrl.FileHandler("/swagger/*filename", "public/swagger/")
+	h = handleSwaggerOrigin(h)
+	service.Mux.Handle("GET", "/swagger/*filename", ctrl.MuxHandler("serve", h, nil))
+	service.LogInfo("mount", "ctrl", "Swagger", "files", "public/swagger/", "route", "GET /swagger/*filename")
 
 	h = ctrl.FileHandler("/swaggerui/*filepath", "public/swaggerui/")
 	h = handleSwaggerOrigin(h)
 	service.Mux.Handle("GET", "/swaggerui/*filepath", ctrl.MuxHandler("serve", h, nil))
 	service.LogInfo("mount", "ctrl", "Swagger", "files", "public/swaggerui/", "route", "GET /swaggerui/*filepath")
 
-	h = ctrl.FileHandler("/swagger.json", "swagger/swagger.json")
+	h = ctrl.FileHandler("/swagger/", "public/swagger/index.html")
 	h = handleSwaggerOrigin(h)
-	service.Mux.Handle("GET", "/swagger.json", ctrl.MuxHandler("serve", h, nil))
-	service.LogInfo("mount", "ctrl", "Swagger", "files", "swagger/swagger.json", "route", "GET /swagger.json")
+	service.Mux.Handle("GET", "/swagger/", ctrl.MuxHandler("serve", h, nil))
+	service.LogInfo("mount", "ctrl", "Swagger", "files", "public/swagger/index.html", "route", "GET /swagger/")
 
 	h = ctrl.FileHandler("/swaggerui/", "public/swaggerui/index.html")
 	h = handleSwaggerOrigin(h)

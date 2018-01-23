@@ -28,7 +28,7 @@ import (
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func SendMailAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.SignupPayload) (http.ResponseWriter, error) {
+func SendMailAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.EmailPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -107,7 +107,7 @@ func SendMailAuthBadRequest(t goatest.TInterface, ctx context.Context, service *
 // It returns the response writer so it's possible to inspect the response headers.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func SendMailAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.SignupPayload) http.ResponseWriter {
+func SendMailAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.EmailPayload) http.ResponseWriter {
 	// Setup service
 	var (
 		logBuf bytes.Buffer

@@ -23,7 +23,7 @@ type SendMailAuthContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Payload *SignupPayload
+	Payload *EmailPayload
 }
 
 // NewSendMailAuthContext parses the incoming request URL and body, performs validations and creates the

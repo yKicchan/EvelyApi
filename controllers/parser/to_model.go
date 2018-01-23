@@ -2,7 +2,7 @@ package parser
 
 import (
 	"EvelyApi/app"
-	. "EvelyApi/model/document"
+	. "EvelyApi/models/documents"
 	"labix.org/v2/mgo/bson"
 	"time"
 )
@@ -17,8 +17,10 @@ import (
 func ToEventModel(p *app.EventPayload, id bson.ObjectId, u *UserModel) *EventModel {
 	return &EventModel{
 		ID:    id,
+		Image: p.Image,
 		Title: p.Title,
 		Body:  p.Body,
+		Files: p.Files,
 		Host: &Host{
 			ID:   u.ID,
 			Name: u.Name,
@@ -56,6 +58,7 @@ func ToReviewModel(p *app.ReviewPayload, id bson.ObjectId, u *UserModel) *Review
 		ID:    id,
 		Title: p.Title,
 		Body:  p.Body,
+		Files: p.Files,
 		Rate:  p.Rate,
 		Reviewer: &Reviewer{
 			ID:   u.ID,

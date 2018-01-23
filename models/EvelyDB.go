@@ -1,8 +1,8 @@
-package model
+package models
 
 import (
 	. "EvelyApi/config"
-	. "EvelyApi/model/collection"
+	. "EvelyApi/models/collections"
 	"labix.org/v2/mgo"
 )
 

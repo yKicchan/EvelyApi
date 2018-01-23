@@ -21,6 +21,10 @@ var LoginPayload = Type("LoginPayload", func() {
 
 var EventPayload = Type("EventPayload", func() {
 	Description("イベント作成・編集で受け取るイベント情報")
+	Attribute("image", String, "イベントのヘッダーイメージ", func() {
+		Default("")
+		Example("header.jpg")
+	})
 	Attribute("title", String, "イベントの名前", func() {
 		MinLength(1)
 		MaxLength(30)
@@ -31,6 +35,9 @@ var EventPayload = Type("EventPayload", func() {
 		MaxLength(1000)
 		Example(`初心者でもGitを扱えるようになる勉強会を開催します！
 ノートPCを各自持参してください。`)
+	})
+	Attribute("files", ArrayOf(String), "添付資料", func() {
+		Example([]string{"doc1.jpg", "doc2.pdf"})
 	})
 	Attribute("mail", String, "連絡先メールアドレス", func() {
 		Format("email")
@@ -50,7 +57,6 @@ var EventPayload = Type("EventPayload", func() {
 	Attribute("noticeRange", Integer, "通知範囲(m)", func() {
 		Minimum(100)
 		Maximum(MAX_NOTICE_RANGE)
-		Default(500)
 		Example(500)
 	})
 	Attribute("scope", String, "公開範囲", func() {
@@ -62,7 +68,7 @@ var EventPayload = Type("EventPayload", func() {
 		Default(false)
 		Example(false)
 	})
-	Required("title", "body", "mail", "tel", "url", "schedules", "noticeRange", "scope", "openFlg")
+	Required("title", "body", "schedules", "noticeRange")
 })
 
 var Schedule = Type("Schedule", func() {
@@ -99,7 +105,7 @@ var UpcomingDate = Type("UpcomingDate", func() {
 	Required("startDate", "endDate")
 })
 
-var SignupPayload = Type("SignupPayload", func() {
+var EmailPayload = Type("EmailPayload", func() {
 	Description("新規登録時のメール送信")
 	Attribute("email", String, "メールアドレス", func() {
 		Format("email")
@@ -123,6 +129,10 @@ var UserPayload = Type("UserPayload", func() {
 		MinLength(1)
 		MaxLength(50)
 		Example("きっちゃそ")
+	})
+	Attribute("icon", String, "アイコン画像", func() {
+		Default("")
+		Example("icon.png")
 	})
 	Attribute("mail", String, "メールアドレス", func() {
 		Format("email")
@@ -192,6 +202,9 @@ var ReviewPayload = Type("ReviewPayload", func() {
 	Attribute("body", String, "レビューの内容", func() {
 		MinLength(1)
 		MaxLength(5000)
+	})
+	Attribute("files", ArrayOf(String), "レビュー画像など", func() {
+		Example([]string{"angle1.jpg", "angle2.jpg"})
 	})
 	Required("rate", "title", "body")
 })

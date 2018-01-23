@@ -1,7 +1,7 @@
-package collection
+package collections
 
 import (
-	. "EvelyApi/model/document"
+	. "EvelyApi/models/documents"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 )

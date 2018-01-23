@@ -1,4 +1,4 @@
-package document
+package documents
 
 import (
 	"labix.org/v2/mgo/bson"
@@ -11,6 +11,7 @@ var USER_FULL_SELECTOR = bson.M{
 	"id":        1,
 	"password":  1,
 	"name":      1,
+	"icon": 1,
 	"mail":      1,
 	"tel":       1,
 	"pins":      1,
@@ -22,7 +23,7 @@ var USER_TINY_SELECTOR = bson.M{
 	"_id":  0,
 	"id":   1,
 	"name": 1,
-	"mail": 1,
+	"icon":1,
 }
 
 // ユーザーのDBモデル
@@ -30,6 +31,7 @@ type UserModel struct {
 	ID          string          `bson:"id"`
 	Password    string          `bson:"password"`
 	Name        string          `bson:"name"`
+	Icon string `bson:"icon"`
 	Mail        *Mail           `bson:"mail"`
 	Tel         string          `bson:"tel"`
 	Pins        []bson.ObjectId `bson:"pins"`

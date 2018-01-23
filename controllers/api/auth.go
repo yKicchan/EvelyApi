@@ -3,12 +3,12 @@ package api
 import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
-	"EvelyApi/controller/mailer"
-	"EvelyApi/controller/parser"
+	"EvelyApi/controllers/mailer"
+	"EvelyApi/controllers/parser"
 	. "EvelyApi/middleware"
-	"EvelyApi/model"
-	. "EvelyApi/model/collection"
-	. "EvelyApi/model/document"
+	"EvelyApi/models"
+	. "EvelyApi/models/collections"
+	. "EvelyApi/models/documents"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
 	"golang.org/x/crypto/bcrypt"
@@ -18,11 +18,11 @@ import (
 // AuthController implements the auth resource.
 type AuthController struct {
 	*goa.Controller
-	db *model.EvelyDB
+	db *models.EvelyDB
 }
 
 // NewAuthController creates a auth controller.
-func NewAuthController(service *goa.Service, db *model.EvelyDB) *AuthController {
+func NewAuthController(service *goa.Service, db *models.EvelyDB) *AuthController {
 	return &AuthController{
 		Controller: service.NewController("AuthController"),
 		db:         db,
@@ -121,6 +121,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		ID:       p.ID,
 		Password: string(pass),
 		Name:     p.Name,
+		Icon: p.Icon,
 		Mail: &Mail{
 			Email: p.Mail,
 			State: STATE_OK,

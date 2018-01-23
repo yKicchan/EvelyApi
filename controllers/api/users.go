@@ -2,20 +2,20 @@ package api
 
 import (
 	"EvelyApi/app"
-	"EvelyApi/controller/parser"
-	"EvelyApi/model"
-	. "EvelyApi/model/collection"
+	"EvelyApi/controllers/parser"
+	"EvelyApi/models"
+	. "EvelyApi/models/collections"
 	"github.com/goadesign/goa"
 )
 
 // UsersController implements the users resource.
 type UsersController struct {
 	*goa.Controller
-	db *model.EvelyDB
+	db *models.EvelyDB
 }
 
 // NewUsersController creates a users controller.
-func NewUsersController(service *goa.Service, db *model.EvelyDB) *UsersController {
+func NewUsersController(service *goa.Service, db *models.EvelyDB) *UsersController {
 	return &UsersController{
 		Controller: service.NewController("UsersController"),
 		db:         db,

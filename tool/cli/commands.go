@@ -222,6 +222,11 @@ Payload example:
 
 {
    "body": "初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。",
+   "files": [
+      "doc1.jpg",
+      "doc2.pdf"
+   ],
+   "image": "header.jpg",
    "mail": "yKicchanApp@gmail.com",
    "noticeRange": 500,
    "openFlg": false,
@@ -269,6 +274,10 @@ Payload example:
 
 {
    "body": "jkz4yd4fa1",
+   "files": [
+      "angle1.jpg",
+      "angle2.jpg"
+   ],
    "rate": 4,
    "title": "gwqq84"
 }`,
@@ -329,6 +338,11 @@ Payload example:
 
 {
    "body": "初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。",
+   "files": [
+      "doc1.jpg",
+      "doc2.pdf"
+   ],
+   "image": "header.jpg",
    "mail": "yKicchanApp@gmail.com",
    "noticeRange": 500,
    "openFlg": false,
@@ -582,6 +596,7 @@ Payload example:
 
 {
    "InstanceID": "token",
+   "icon": "icon.png",
    "id": "yKicchan",
    "mail": "yKicchanApp@gmail.com",
    "name": "きっちゃそ",
@@ -818,16 +833,17 @@ func (cmd *DownloadCommand) Run(c *client.Client, args []string) error {
 	if rpath[0] != '/' {
 		rpath = "/" + rpath
 	}
-	if rpath == "/swagger.json" {
-		fnf = c.DownloadSwaggerJSON
+	if strings.HasPrefix(rpath, "/download/") {
+		fnd = c.DownloadDownload
+		rpath = rpath[10:]
 		if outfile == "" {
-			outfile = "swagger.json"
+			_, outfile = path.Split(rpath)
 		}
 		goto found
 	}
-	if strings.HasPrefix(rpath, "/files/") {
-		fnd = c.DownloadFiles
-		rpath = rpath[7:]
+	if strings.HasPrefix(rpath, "/swagger/") {
+		fnd = c.DownloadSwagger
+		rpath = rpath[9:]
 		if outfile == "" {
 			_, outfile = path.Split(rpath)
 		}
@@ -865,7 +881,7 @@ func (cmd *SendMailAuthCommand) Run(c *client.Client, args []string) error {
 	} else {
 		path = "/api/develop/v2/auth/signup/send_mail"
 	}
-	var payload client.SignupPayload
+	var payload client.EmailPayload
 	if cmd.Payload != "" {
 		err := json.Unmarshal([]byte(cmd.Payload), &payload)
 		if err != nil {

@@ -35,15 +35,23 @@ var EventMedia = MediaType("application/vnd.event+json", func() {
 		Attribute("noticeRange")
 		Attribute("scope")
 		Attribute("openFlg")
+		Attribute("image", String, "ヘッダー画像のURL", func() {
+			Example("http://evely.net:8888/download/header.jpg")
+		})
+		Attribute("files", ArrayOf(String), "添付資料へのURL", func() {
+			Example([]string{"http://evely.net:8888/download/doc1.jpg", "http://evely.net:8888/download/doc2.pdf"})
+		})
 		Attribute("isReviewed", Boolean, "レビューの有無")
 		Attribute("updateDate", DateTime, "最終更新日時")
 		Attribute("createdAt", DateTime, "作成日時")
 	})
-	Required("id", "title", "body", "host", "mail", "tel", "url", "schedules", "noticeRange", "scope", "openFlg", "isReviewed", "updateDate", "createdAt")
+	Required("id", "image", "title", "body", "files", "host", "mail", "tel", "url", "schedules", "noticeRange", "scope", "openFlg", "isReviewed", "updateDate", "createdAt")
 	View("default", func() {
 		Attribute("id")
+		Attribute("image")
 		Attribute("title")
 		Attribute("body")
+		Attribute("files")
 		Attribute("host", func() {
 			View("tiny")
 		})
@@ -57,6 +65,7 @@ var EventMedia = MediaType("application/vnd.event+json", func() {
 	})
 	View("tiny", func() {
 		Attribute("id")
+		Attribute("image")
 		Attribute("title")
 		Attribute("host", func() {
 			View("tiny")
@@ -90,6 +99,9 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 	Attributes(func() {
 		Attribute("id")
 		Attribute("name")
+		Attribute("icon", String, "アイコン画像のURL", func() {
+			Example("http://evely.net:8888/download/icon.png")
+		})
 		Attribute("mail", Mail)
 		Attribute("tel")
 		Attribute("pins", ArrayOf(String), "ピンしているイベントのID配列", func() {
@@ -97,10 +109,11 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 		})
 		Attribute("createdAt", DateTime, "作成日時")
 	})
-	Required("id", "name", "mail", "tel", "pins", "createdAt")
+	Required("id", "name", "icon", "mail", "tel", "pins", "createdAt")
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
+		Attribute("icon")
 		Attribute("mail")
 		Attribute("tel")
 		Attribute("pins")
@@ -109,6 +122,7 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 	View("tiny", func() {
 		Attribute("id")
 		Attribute("name")
+		Attribute("icon")
 	})
 })
 
@@ -122,19 +136,6 @@ var EmailMedia = MediaType("application/vnd.email+json", func() {
 	})
 })
 
-var FilePathMedia = MediaType("application/vnd.file_path+json", func() {
-	Description("アップロード済みのファイルのパス")
-	Attributes(func() {
-		Attribute("path", String, "ファイルのパス", func() {
-			Example("/files/image.png")
-		})
-	})
-	Required("path")
-	View("default", func() {
-		Attribute("path")
-	})
-})
-
 var ReviewMedia = MediaType("application/vnd.review+json", func() {
 	Description("レビュー")
 	Reference(ReviewPayload)
@@ -145,15 +146,19 @@ var ReviewMedia = MediaType("application/vnd.review+json", func() {
 		Attribute("rate")
 		Attribute("title")
 		Attribute("body")
+		Attribute("files", ArrayOf(String), "レビュー画像などのURL", func() {
+			Example([]string{"http://evely.net:8888/download/angle1.jpg", "http://evely.net:8888/download/angle2.jpg"})
+		})
 		Attribute("reviewer", UserMedia)
 		Attribute("reviewedAt", DateTime, "レビューした日")
 	})
-	Required("id", "rate", "title", "body", "reviewer", "reviewedAt")
+	Required("id", "rate", "title", "body", "files", "reviewer", "reviewedAt")
 	View("default", func() {
 		Attribute("id")
 		Attribute("rate")
 		Attribute("title")
 		Attribute("body")
+		Attribute("files")
 		Attribute("reviewer", func() {
 			View("tiny")
 		})
