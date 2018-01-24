@@ -10,7 +10,7 @@ type ReviewModel struct {
 	Title      string        `bson:"title"`
 	Body       string        `bson:"body"`
 	Rate       int           `bson:"rate"`
-	Files []string `bson:"files"`
+	Files      []string      `bson:"files"`
 	Reviewer   *Reviewer     `bson:"reviewer"`
 	ReviewedAt time.Time     `bson:"reviewed_at"`
 }

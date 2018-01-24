@@ -24,9 +24,6 @@ func main() {
 	service.Use(middleware.ErrorHandler(service, true))
 	service.Use(middleware.Recover())
 
-	// Mount security middleware
-	app.UseJWTMiddleware(service, NewJWTMiddleware())
-
 	// DB接続
 	session, err := mgo.Dial(DB_HOST)
 	if err != nil {
@@ -35,6 +32,12 @@ func main() {
 	// DB切断
 	defer session.Close()
 	db := NewEvelyDB(session.DB(DB_NAME))
+
+	// Mount security middleware
+	jwtm, _  := NewJWTMiddleware(db)
+	ojwtm, _ := NewOptionalJWTMiddleware(db)
+	app.UseJWTMiddleware(service, jwtm)
+	app.UseOptionalJWTMiddleware(service, ojwtm)
 
 	// Mount "auth" controller
 	c := api.NewAuthController(service, db)

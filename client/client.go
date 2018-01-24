@@ -18,9 +18,10 @@ import (
 // Client is the EvelyApi service client.
 type Client struct {
 	*goaclient.Client
-	JWTSigner goaclient.Signer
-	Encoder   *goa.HTTPEncoder
-	Decoder   *goa.HTTPDecoder
+	JWTSigner         goaclient.Signer
+	OptionalJWTSigner goaclient.Signer
+	Encoder           *goa.HTTPEncoder
+	Decoder           *goa.HTTPDecoder
 }
 
 // New instantiates the client.
@@ -49,4 +50,9 @@ func New(c goaclient.Doer) *Client {
 // SetJWTSigner sets the request signer for the jwt security scheme.
 func (c *Client) SetJWTSigner(signer goaclient.Signer) {
 	c.JWTSigner = signer
+}
+
+// SetOptionalJWTSigner sets the request signer for the optional_jwt security scheme.
+func (c *Client) SetOptionalJWTSigner(signer goaclient.Signer) {
+	c.OptionalJWTSigner = signer
 }

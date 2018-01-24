@@ -11,7 +11,6 @@ var _ = Resource("auth", func() {
 
 	Action("signin", func() {
 		Description("ログイン")
-		NoSecurity()
 		Routing(POST("/signin"))
 		Payload(LoginPayload)
 		Response(OK, TokenMedia)
@@ -20,7 +19,6 @@ var _ = Resource("auth", func() {
 
 	Action("signup", func() {
 		Description("新規登録")
-		NoSecurity()
 		Routing(POST("/signup"))
 		Payload(UserPayload)
 		Response(OK, TokenMedia)
@@ -29,7 +27,6 @@ var _ = Resource("auth", func() {
 
 	Action("send_mail", func() {
 		Description("新規登録用のメール送信")
-		NoSecurity()
 		Routing(POST("/signup/send_mail"))
 		Payload(EmailPayload)
 		Response(OK)
@@ -38,7 +35,6 @@ var _ = Resource("auth", func() {
 
 	Action("verify_token", func() {
 		Description("新規登録時のトークンのチェック")
-		NoSecurity()
 		Routing(GET("/signup/verify_token"))
 		Params(func() {
 			Param("token", String, "トークン", func() {
@@ -58,7 +54,6 @@ var _ = Resource("events", func() {
 
 	Action("list", func() {
 		Description("イベント複数取得")
-		NoSecurity()
 		Routing(GET(""))
 		Params(func() {
 			Param("limit", Integer, "取得件数", func() {
@@ -85,7 +80,6 @@ var _ = Resource("events", func() {
 
 	Action("nearby", func() {
 		Description("近くのイベントを検索する")
-		NoSecurity()
 		Routing(GET("/nearby"))
 		Params(func() {
 			Param("lat", Number, "緯度", func() {
@@ -121,7 +115,6 @@ var _ = Resource("events", func() {
 
 	Action("show", func() {
 		Description("イベント情報取得")
-		NoSecurity()
 		Routing(GET("/detail"))
 		Params(func() {
 			Param("ids", ArrayOf(String), "詳細を見るイベントのID配列", func() {
@@ -136,6 +129,9 @@ var _ = Resource("events", func() {
 
 	Action("create", func() {
 		Description("イベント作成")
+		Security(JWT, func() {
+			Scope("api:access")
+		})
 		Routing(POST(""))
 		Payload(EventPayload)
 		Response(Created, EventMedia)
@@ -145,6 +141,9 @@ var _ = Resource("events", func() {
 
 	Action("modify", func() {
 		Description("イベント編集")
+		Security(JWT, func() {
+			Scope("api:access")
+		})
 		Routing(PUT("/:event_id"))
 		Params(func() {
 			Param("event_id", String, "イベントID", func() {
@@ -161,6 +160,9 @@ var _ = Resource("events", func() {
 
 	Action("delete", func() {
 		Description("イベント削除")
+		Security(JWT, func() {
+			Scope("api:access")
+		})
 		Routing(DELETE("/:event_id"))
 		Params(func() {
 			Param("event_id", String, "イベントID", func() {
@@ -176,14 +178,12 @@ var _ = Resource("events", func() {
 
 	Action("update", func() {
 		Description("イベントの開催フラグを更新する")
-		NoSecurity()
 		Routing(GET("/update"))
 		Response(OK)
 	})
 
 	Action("notify_by_instance_id", func() {
 		Description("近くにイベントがあればインスタンスID宛に通知する")
-		NoSecurity()
 		Routing(POST("/notify/by_instance_id"))
 		Payload(NotifyByInstanceIDPayload)
 		Response(OK)
@@ -192,6 +192,9 @@ var _ = Resource("events", func() {
 
 	Action("notify_by_user_id", func() {
 		Description("近くにイベントがあればユーザーのデバイス全てに通知する")
+		Security(JWT, func() {
+			Scope("api:access")
+		})
 		Routing(POST("/notify/by_user_id"))
 		Payload(NotifyByUserIDPayload)
 		Response(OK)
@@ -202,7 +205,6 @@ var _ = Resource("events", func() {
 
 	Action("pin", func() {
 		Description("ユーザーのピンしたイベント一覧を取得する")
-		NoSecurity()
 		Routing(GET("/pin/:user_id"))
 		Params(func() {
 			Param("user_id", String, "ユーザーID", func() {
@@ -226,6 +228,9 @@ var _ = Resource("events", func() {
 
 	Action("my_list", func() {
 		Description("自分のイベント一覧を取得する")
+		Security(JWT, func() {
+			Scope("api:access")
+		})
 		Routing(GET("/my_list"))
 		Params(func() {
 			Param("limit", Integer, "取得件数", func() {
@@ -252,7 +257,6 @@ var _ = Resource("users", func() {
 
 	Action("show", func() {
 		Description("アカウント情報取得")
-		NoSecurity()
 		Routing(GET("/:user_id"))
 		Params(func() {
 			Param("user_id", String, "ユーザーID", func() {
@@ -263,10 +267,25 @@ var _ = Resource("users", func() {
 		Response(BadRequest, ErrorMedia)
 		Response(NotFound, ErrorMedia)
 	})
+
+	Action("update", func() {
+		Description("インスタンスIDの登録・更新\n認証ありで登録ユーザーを、認証なしでゲストユーザーを登録・更新する")
+		Security(OptionalJWT, func() {
+			Scope("api:access")
+		})
+		Routing(POST("/update/token"))
+		Payload(TokenPayload)
+		Response(OK)
+		Response(BadRequest, ErrorMedia)
+		Response(NotFound, ErrorMedia)
+	})
 })
 
 var _ = Resource("pins", func() {
 	BasePath("/pins")
+	Security(JWT, func() {
+		Scope("api:access")
+	})
 
 	Action("on", func() {
 		Description("ピンする")
@@ -289,7 +308,6 @@ var _ = Resource("pins", func() {
 
 var _ = Resource("files", func() {
 	BasePath("/files")
-	NoSecurity()
 
 	Action("upload", func() {
 		Description("ファイルアップロード")
@@ -309,7 +327,6 @@ var _ = Resource("reviews", func() {
 
 	Action("list", func() {
 		Description("レビューの一覧取得")
-		NoSecurity()
 		Routing(GET("/:event_id"))
 		Params(func() {
 			Param("event_id", String, "イベントID", func() {
@@ -334,6 +351,9 @@ var _ = Resource("reviews", func() {
 
 	Action("create", func() {
 		Description("レビュー投稿")
+		Security(JWT, func() {
+			Scope("api:access")
+		})
 		Routing(POST("/:event_id"))
 		Payload(ReviewPayload)
 		Params(func() {
@@ -348,7 +368,6 @@ var _ = Resource("reviews", func() {
 })
 
 var _ = Resource("swagger", func() {
-	NoSecurity()
 	Origin("*", func() {
 		Methods("GET") // Allow all origins to retrieve the Swagger JSON (CORS)
 	})

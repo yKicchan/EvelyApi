@@ -10,7 +10,7 @@ var EVENT_DEFAULT_SELECTOR = bson.M{
 	"image":       1,
 	"title":       1,
 	"body":        1,
-	"files": 1,
+	"files":       1,
 	"host":        1,
 	"mail":        1,
 	"tel":         1,
@@ -24,7 +24,7 @@ var EVENT_DEFAULT_SELECTOR = bson.M{
 // イベントの一部情報のみを取得するセレクタ
 var EVENT_TINY_SELECTOR = bson.M{
 	"_id":       1,
-	"image": 1,
+	"image":     1,
 	"title":     1,
 	"host":      1,
 	"schedules": 1,
@@ -34,10 +34,10 @@ var EVENT_TINY_SELECTOR = bson.M{
 // イベントのDBモデル
 type EventModel struct {
 	ID          bson.ObjectId   `bson:"_id"`
-	Image string `bson:"image"`
+	Image       string          `bson:"image"`
 	Title       string          `bson:"title"`
 	Body        string          `bson:"body"`
-	Files []string `bson:"files"`
+	Files       []string        `bson:"files"`
 	Host        *Host           `bson:"host"`
 	Mail        string          `bson:"mail"`
 	Tel         string          `bson:"tel"`

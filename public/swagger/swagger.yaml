@@ -739,6 +739,25 @@ definitions:
     - token
     title: 'Mediatype identifier: application/vnd.token+json; view=default'
     type: object
+  TokenPayload:
+    description: 通知先を更新・登録するためのデバイストークンとインスタンスIDのペア
+    example:
+      device_token: token
+      instance_id: id
+    properties:
+      device_token:
+        description: デバイストークン
+        example: token
+        type: string
+      instance_id:
+        description: インスタンスID
+        example: id
+        type: string
+    required:
+    - device_token
+    - instance_id
+    title: TokenPayload
+    type: object
   UpcomingDate:
     description: イベントの開催予定日
     example:
@@ -824,17 +843,17 @@ definitions:
   UserPayload:
     description: アカウント作成時に受け取る情報
     example:
-      InstanceID: token
+      device_token: token
       icon: icon.png
       id: yKicchan
+      instance_id: id
       mail: yKicchanApp@gmail.com
       name: きっちゃそ
       password: password
       tel: 090-1234-5678
     properties:
-      InstanceID:
-        default: ""
-        description: 端末のインスタンスID
+      device_token:
+        description: デバイストークン
         example: token
         type: string
       icon:
@@ -847,6 +866,10 @@ definitions:
         example: yKicchan
         maxLength: 15
         minLength: 4
+        type: string
+      instance_id:
+        description: インスタンスID
+        example: id
         type: string
       mail:
         description: メールアドレス
@@ -1732,6 +1755,44 @@ paths:
       summary: show users
       tags:
       - users
+  /api/develop/v2/users/update/token:
+    post:
+      description: |-
+        インスタンスIDの登録・更新
+        認証ありで登録ユーザーを、認証なしでゲストユーザーを登録・更新する
+
+        Required security scopes:
+          * `api:access`
+      operationId: users#update
+      parameters:
+      - description: 通知先を更新・登録するためのデバイストークンとインスタンスIDのペア
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/TokenPayload'
+      produces:
+      - application/vnd.goa.error
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - optional_jwt:
+        - api:access
+      summary: update users
+      tags:
+      - users
   /download/{filename}:
     get:
       operationId: files#/download/*filename
@@ -1765,6 +1826,15 @@ schemes:
 - http
 securityDefinitions:
   jwt:
+    description: |2-
+
+
+      **Security Scopes**:
+        * `api:access`: API access
+    in: header
+    name: Authorization
+    type: apiKey
+  optional_jwt:
     description: |2-
 
 

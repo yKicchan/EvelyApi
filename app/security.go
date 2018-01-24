@@ -39,6 +39,24 @@ func NewJWTSecurity() *goa.JWTSecurity {
 	return &def
 }
 
+// UseOptionalJWTMiddleware mounts the optional_jwt auth middleware onto the service.
+func UseOptionalJWTMiddleware(service *goa.Service, middleware goa.Middleware) {
+	service.Context = context.WithValue(service.Context, authMiddlewareKey("optional_jwt"), middleware)
+}
+
+// NewOptionalJWTSecurity creates a optional_jwt security definition.
+func NewOptionalJWTSecurity() *goa.JWTSecurity {
+	def := goa.JWTSecurity{
+		In:       goa.LocHeader,
+		Name:     "Authorization",
+		TokenURL: "",
+		Scopes: map[string]string{
+			"api:access": "API access",
+		},
+	}
+	return &def
+}
+
 // handleSecurity creates a handler that runs the auth middleware for the security scheme.
 func handleSecurity(schemeName string, h goa.Handler, scopes ...string) goa.Handler {
 	return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {

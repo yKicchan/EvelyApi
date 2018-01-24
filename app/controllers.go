@@ -888,6 +888,7 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 type UsersController interface {
 	goa.Muxer
 	Show(*ShowUsersContext) error
+	Update(*UpdateUsersContext) error
 }
 
 // MountUsersController "mounts" a Users resource controller on the given service.
@@ -895,6 +896,7 @@ func MountUsersController(service *goa.Service, ctrl UsersController) {
 	initService(service)
 	var h goa.Handler
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/users/:user_id", ctrl.MuxHandler("preflight", handleUsersOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/users/update/token", ctrl.MuxHandler("preflight", handleUsersOrigin(cors.HandlePreflight()), nil))
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -911,6 +913,29 @@ func MountUsersController(service *goa.Service, ctrl UsersController) {
 	h = handleUsersOrigin(h)
 	service.Mux.Handle("GET", "/api/develop/v2/users/:user_id", ctrl.MuxHandler("show", h, nil))
 	service.LogInfo("mount", "ctrl", "Users", "action", "Show", "route", "GET /api/develop/v2/users/:user_id")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewUpdateUsersContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*TokenPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Update(rctx)
+	}
+	h = handleSecurity("optional_jwt", h, "api:access")
+	h = handleUsersOrigin(h)
+	service.Mux.Handle("POST", "/api/develop/v2/users/update/token", ctrl.MuxHandler("update", h, unmarshalUpdateUsersPayload))
+	service.LogInfo("mount", "ctrl", "Users", "action", "Update", "route", "POST /api/develop/v2/users/update/token", "security", "optional_jwt")
 }
 
 // handleUsersOrigin applies the CORS response headers corresponding to the origin.
@@ -938,4 +963,19 @@ func handleUsersOrigin(h goa.Handler) goa.Handler {
 
 		return h(ctx, rw, req)
 	}
+}
+
+// unmarshalUpdateUsersPayload unmarshals the request body into the context request data Payload field.
+func unmarshalUpdateUsersPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &tokenPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
 }

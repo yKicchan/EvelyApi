@@ -414,6 +414,27 @@ define(['axios'] , function (axios) {
     return client(cfg);
   }
 
+  // インスタンスIDの登録・更新
+認証ありで登録ユーザーを、認証なしでゲストユーザーを登録・更新する
+  // path is the request path, the format is "/api/develop/v2/users/update/token"
+  // data contains the action payload (request body)
+  // config is an optional object to be merged into the config built by the function prior to making the request.
+  // The content of the config object is described here: https://github.com/mzabriskie/axios#request-api
+  // This function returns a promise which raises an error if the HTTP response is a 4xx or 5xx.
+  client.updateUsers = function (path, data, config) {
+    var cfg = {
+      timeout: timeout,
+      url: urlPrefix + path,
+      method: 'post',
+    data: data,
+      responseType: 'json'
+    };
+    if (config) {
+      cfg = merge(cfg, config);
+    }
+    return client(cfg);
+  }
+
   // ファイルアップロード
   // path is the request path, the format is "/api/develop/v2/files/upload"
   // config is an optional object to be merged into the config built by the function prior to making the request.

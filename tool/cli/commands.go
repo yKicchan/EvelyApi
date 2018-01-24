@@ -198,6 +198,13 @@ type (
 		PrettyPrint bool
 	}
 
+	// UpdateUsersCommand is the command line data structure for the update action of users
+	UpdateUsersCommand struct {
+		Payload     string
+		ContentType string
+		PrettyPrint bool
+	}
+
 	// DownloadCommand is the command line data structure for the download command.
 	DownloadCommand struct {
 		// OutFile is the path to the download output file.
@@ -595,9 +602,10 @@ Payload example:
 Payload example:
 
 {
-   "InstanceID": "token",
+   "device_token": "token",
    "icon": "icon.png",
    "id": "yKicchan",
+   "instance_id": "id",
    "mail": "yKicchanApp@gmail.com",
    "name": "きっちゃそ",
    "password": "password",
@@ -611,7 +619,7 @@ Payload example:
 	app.AddCommand(command)
 	command = &cobra.Command{
 		Use:   "update",
-		Short: `イベントの開催フラグを更新する`,
+		Short: `update action`,
 	}
 	tmp19 := new(UpdateEventsCommand)
 	sub = &cobra.Command{
@@ -622,33 +630,50 @@ Payload example:
 	tmp19.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp19.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
-	app.AddCommand(command)
-	command = &cobra.Command{
-		Use:   "upload",
-		Short: `ファイルアップロード`,
-	}
-	tmp20 := new(UploadFilesCommand)
+	tmp20 := new(UpdateUsersCommand)
 	sub = &cobra.Command{
-		Use:   `files ["/api/develop/v2/files/upload"]`,
+		Use:   `users ["/api/develop/v2/users/update/token"]`,
 		Short: ``,
-		RunE:  func(cmd *cobra.Command, args []string) error { return tmp20.Run(c, args) },
+		Long: `
+
+Payload example:
+
+{
+   "device_token": "token",
+   "instance_id": "id"
+}`,
+		RunE: func(cmd *cobra.Command, args []string) error { return tmp20.Run(c, args) },
 	}
 	tmp20.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp20.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 	command = &cobra.Command{
-		Use:   "verify-token",
-		Short: `新規登録時のトークンのチェック`,
+		Use:   "upload",
+		Short: `ファイルアップロード`,
 	}
-	tmp21 := new(VerifyTokenAuthCommand)
+	tmp21 := new(UploadFilesCommand)
 	sub = &cobra.Command{
-		Use:   `auth ["/api/develop/v2/auth/signup/verify_token"]`,
+		Use:   `files ["/api/develop/v2/files/upload"]`,
 		Short: ``,
 		RunE:  func(cmd *cobra.Command, args []string) error { return tmp21.Run(c, args) },
 	}
 	tmp21.RegisterFlags(sub, c)
 	sub.PersistentFlags().BoolVar(&tmp21.PrettyPrint, "pp", false, "Pretty print response body")
+	command.AddCommand(sub)
+	app.AddCommand(command)
+	command = &cobra.Command{
+		Use:   "verify-token",
+		Short: `新規登録時のトークンのチェック`,
+	}
+	tmp22 := new(VerifyTokenAuthCommand)
+	sub = &cobra.Command{
+		Use:   `auth ["/api/develop/v2/auth/signup/verify_token"]`,
+		Short: ``,
+		RunE:  func(cmd *cobra.Command, args []string) error { return tmp22.Run(c, args) },
+	}
+	tmp22.RegisterFlags(sub, c)
+	sub.PersistentFlags().BoolVar(&tmp22.PrettyPrint, "pp", false, "Pretty print response body")
 	command.AddCommand(sub)
 	app.AddCommand(command)
 
@@ -1158,33 +1183,33 @@ func (cmd *NearbyEventsCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	var tmp22 *float64
+	var tmp23 *float64
 	if cmd.Lat != "" {
 		var err error
-		tmp22, err = float64Val(cmd.Lat)
+		tmp23, err = float64Val(cmd.Lat)
 		if err != nil {
 			goa.LogError(ctx, "failed to parse flag into *float64 value", "flag", "--lat", "err", err)
 			return err
 		}
 	}
-	if tmp22 == nil {
+	if tmp23 == nil {
 		goa.LogError(ctx, "required flag is missing", "flag", "--lat")
 		return fmt.Errorf("required flag lat is missing")
 	}
-	var tmp23 *float64
+	var tmp24 *float64
 	if cmd.Lng != "" {
 		var err error
-		tmp23, err = float64Val(cmd.Lng)
+		tmp24, err = float64Val(cmd.Lng)
 		if err != nil {
 			goa.LogError(ctx, "failed to parse flag into *float64 value", "flag", "--lng", "err", err)
 			return err
 		}
 	}
-	if tmp23 == nil {
+	if tmp24 == nil {
 		goa.LogError(ctx, "required flag is missing", "flag", "--lng")
 		return fmt.Errorf("required flag lng is missing")
 	}
-	resp, err := c.NearbyEvents(ctx, path, *tmp22, *tmp23, cmd.Range, intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
+	resp, err := c.NearbyEvents(ctx, path, *tmp23, *tmp24, cmd.Range, intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1529,4 +1554,37 @@ func (cmd *ShowUsersCommand) Run(c *client.Client, args []string) error {
 func (cmd *ShowUsersCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
 	var userID string
 	cc.Flags().StringVar(&cmd.UserID, "user_id", userID, `ユーザーID`)
+}
+
+// Run makes the HTTP request corresponding to the UpdateUsersCommand command.
+func (cmd *UpdateUsersCommand) Run(c *client.Client, args []string) error {
+	var path string
+	if len(args) > 0 {
+		path = args[0]
+	} else {
+		path = "/api/develop/v2/users/update/token"
+	}
+	var payload client.TokenPayload
+	if cmd.Payload != "" {
+		err := json.Unmarshal([]byte(cmd.Payload), &payload)
+		if err != nil {
+			return fmt.Errorf("failed to deserialize payload: %s", err)
+		}
+	}
+	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
+	ctx := goa.WithLogger(context.Background(), logger)
+	resp, err := c.UpdateUsers(ctx, path, &payload, cmd.ContentType)
+	if err != nil {
+		goa.LogError(ctx, "failed", "err", err)
+		return err
+	}
+
+	goaclient.HandleResponse(c.Client, resp, cmd.PrettyPrint)
+	return nil
+}
+
+// RegisterFlags registers the command flags with the command line.
+func (cmd *UpdateUsersCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	cc.Flags().StringVar(&cmd.Payload, "payload", "", "Request body encoded in JSON")
+	cc.Flags().StringVar(&cmd.ContentType, "content", "", "Request content type override, e.g. 'application/x-www-form-urlencoded'")
 }

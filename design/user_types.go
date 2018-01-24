@@ -116,6 +116,7 @@ var EmailPayload = Type("EmailPayload", func() {
 
 var UserPayload = Type("UserPayload", func() {
 	Description("アカウント作成時に受け取る情報")
+	Reference(TokenPayload)
 	Attribute("id", String, "ユーザーID", func() {
 		MinLength(4)
 		MaxLength(15)
@@ -142,10 +143,8 @@ var UserPayload = Type("UserPayload", func() {
 		Default("")
 		Example("090-1234-5678")
 	})
-	Attribute("InstanceID", String, "端末のインスタンスID", func() {
-		Default("")
-		Example("token")
-	})
+	Attribute("device_token")
+	Attribute("instance_id")
 	Required("id", "password", "name", "mail")
 })
 
@@ -207,4 +206,15 @@ var ReviewPayload = Type("ReviewPayload", func() {
 		Example([]string{"angle1.jpg", "angle2.jpg"})
 	})
 	Required("rate", "title", "body")
+})
+
+var TokenPayload = Type("TokenPayload", func() {
+	Description("通知先を更新・登録するためのデバイストークンとインスタンスIDのペア")
+	Attribute("device_token", String, "デバイストークン", func() {
+		Example("token")
+	})
+	Attribute("instance_id", String, "インスタンスID", func() {
+		Example("id")
+	})
+	Required("device_token", "instance_id")
 })

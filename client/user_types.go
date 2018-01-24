@@ -912,6 +912,56 @@ func (ut *Schedule) Validate() (err error) {
 	return
 }
 
+// 通知先を更新・登録するためのデバイストークンとインスタンスIDのペア
+type tokenPayload struct {
+	// デバイストークン
+	DeviceToken *string `form:"device_token,omitempty" json:"device_token,omitempty" xml:"device_token,omitempty"`
+	// インスタンスID
+	InstanceID *string `form:"instance_id,omitempty" json:"instance_id,omitempty" xml:"instance_id,omitempty"`
+}
+
+// Validate validates the tokenPayload type instance.
+func (ut *tokenPayload) Validate() (err error) {
+	if ut.DeviceToken == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "device_token"))
+	}
+	if ut.InstanceID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "instance_id"))
+	}
+	return
+}
+
+// Publicize creates TokenPayload from tokenPayload
+func (ut *tokenPayload) Publicize() *TokenPayload {
+	var pub TokenPayload
+	if ut.DeviceToken != nil {
+		pub.DeviceToken = *ut.DeviceToken
+	}
+	if ut.InstanceID != nil {
+		pub.InstanceID = *ut.InstanceID
+	}
+	return &pub
+}
+
+// 通知先を更新・登録するためのデバイストークンとインスタンスIDのペア
+type TokenPayload struct {
+	// デバイストークン
+	DeviceToken string `form:"device_token" json:"device_token" xml:"device_token"`
+	// インスタンスID
+	InstanceID string `form:"instance_id" json:"instance_id" xml:"instance_id"`
+}
+
+// Validate validates the TokenPayload type instance.
+func (ut *TokenPayload) Validate() (err error) {
+	if ut.DeviceToken == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "device_token"))
+	}
+	if ut.InstanceID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "instance_id"))
+	}
+	return
+}
+
 // イベントの開催予定日
 type upcomingDate struct {
 	// 終了日時
@@ -959,12 +1009,14 @@ func (ut *UpcomingDate) Validate() (err error) {
 
 // アカウント作成時に受け取る情報
 type userPayload struct {
-	// 端末のインスタンスID
-	InstanceID *string `form:"InstanceID,omitempty" json:"InstanceID,omitempty" xml:"InstanceID,omitempty"`
+	// デバイストークン
+	DeviceToken *string `form:"device_token,omitempty" json:"device_token,omitempty" xml:"device_token,omitempty"`
 	// アイコン画像
 	Icon *string `form:"icon,omitempty" json:"icon,omitempty" xml:"icon,omitempty"`
 	// ユーザーID
 	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// インスタンスID
+	InstanceID *string `form:"instance_id,omitempty" json:"instance_id,omitempty" xml:"instance_id,omitempty"`
 	// メールアドレス
 	Mail *string `form:"mail,omitempty" json:"mail,omitempty" xml:"mail,omitempty"`
 	// 名前
@@ -977,10 +1029,6 @@ type userPayload struct {
 
 // Finalize sets the default values for userPayload type instance.
 func (ut *userPayload) Finalize() {
-	var defaultInstanceID = ""
-	if ut.InstanceID == nil {
-		ut.InstanceID = &defaultInstanceID
-	}
 	var defaultIcon = ""
 	if ut.Icon == nil {
 		ut.Icon = &defaultIcon
@@ -1041,14 +1089,17 @@ func (ut *userPayload) Validate() (err error) {
 // Publicize creates UserPayload from userPayload
 func (ut *userPayload) Publicize() *UserPayload {
 	var pub UserPayload
-	if ut.InstanceID != nil {
-		pub.InstanceID = *ut.InstanceID
+	if ut.DeviceToken != nil {
+		pub.DeviceToken = ut.DeviceToken
 	}
 	if ut.Icon != nil {
 		pub.Icon = *ut.Icon
 	}
 	if ut.ID != nil {
 		pub.ID = *ut.ID
+	}
+	if ut.InstanceID != nil {
+		pub.InstanceID = ut.InstanceID
 	}
 	if ut.Mail != nil {
 		pub.Mail = *ut.Mail
@@ -1067,12 +1118,14 @@ func (ut *userPayload) Publicize() *UserPayload {
 
 // アカウント作成時に受け取る情報
 type UserPayload struct {
-	// 端末のインスタンスID
-	InstanceID string `form:"InstanceID" json:"InstanceID" xml:"InstanceID"`
+	// デバイストークン
+	DeviceToken *string `form:"device_token,omitempty" json:"device_token,omitempty" xml:"device_token,omitempty"`
 	// アイコン画像
 	Icon string `form:"icon" json:"icon" xml:"icon"`
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
+	// インスタンスID
+	InstanceID *string `form:"instance_id,omitempty" json:"instance_id,omitempty" xml:"instance_id,omitempty"`
 	// メールアドレス
 	Mail string `form:"mail" json:"mail" xml:"mail"`
 	// 名前

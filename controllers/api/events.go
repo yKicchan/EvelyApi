@@ -271,7 +271,11 @@ func (c *EventsController) NotifyByUserID(ctx *app.NotifyByUserIDEventsContext) 
 		return ctx.NotFound(goa.ErrNotFound(err))
 	}
 	cl := fcm.NewFcmClient(FCM_SERVER_KEY)
-	cl.NewFcmRegIdsMsg(u.InstanceIds, data)
+	var ids []string
+	for _, id := range u.NotifyTargets {
+		ids = append(ids, id)
+	}
+	cl.NewFcmRegIdsMsg(ids, data)
 	status, err := cl.Send()
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))

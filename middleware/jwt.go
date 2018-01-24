@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"EvelyApi/app"
-	. "EvelyApi/config"
 	. "EvelyApi/models"
 	. "EvelyApi/models/collections"
 	"context"
@@ -12,8 +11,6 @@ import (
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware/security/jwt"
 	"io/ioutil"
-	"labix.org/v2/mgo"
-	"log"
 	"net/http"
 	"path/filepath"
 )
@@ -21,12 +18,35 @@ import (
 /**
  * JWT認証用のミドルウェアを作成する
  */
-func NewJWTMiddleware() goa.Middleware {
+func NewJWTMiddleware(db *EvelyDB) (goa.Middleware, error) {
 	keys, err := LoadJWTPublicKeys()
 	if err != nil {
-		log.Fatalf("failed to load file: %s", err)
+		return nil, err
 	}
-	return jwt.New(jwt.NewSimpleResolver(keys), validationHandler, app.NewJWTSecurity())
+	return jwt.New(jwt.NewSimpleResolver(keys), ForceFail(db), app.NewJWTSecurity()), nil
+}
+
+/**
+ * JWT認証用のミドルウェアを生成する
+ * 認証有無の両方でアクセスできるエンドポイント専用で使う
+ */
+func NewOptionalJWTMiddleware(db *EvelyDB) (goa.Middleware, error) {
+	keys, err := LoadJWTPublicKeys()
+	if err != nil {
+		return nil, err
+	}
+	jwtMiddleware := jwt.New(jwt.NewSimpleResolver(keys), ForceFail(db), app.NewJWTSecurity())
+	return func(nextHandler goa.Handler) goa.Handler {
+		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+			err := jwtMiddleware(nextHandler)(ctx, rw, req)
+			if err != nil {
+				// err が起きた場合 nextHandlerは呼ばれないが、今回は処理を継続する
+				return nextHandler(ctx, rw, req)
+			}
+			return nil
+		}
+	}, nil
+
 }
 
 /**
@@ -56,26 +76,22 @@ func LoadJWTPublicKeys() ([]jwt.Key, error) {
 	return keys, nil
 }
 
-/**
- * JWTをチェックする
- */
-var validationHandler, _ = goa.NewMiddleware(func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-	// トークンに埋め込まれたユーザーを検査
-	id, err := GetLoginID(ctx)
-	if err != nil {
-		return jwt.ErrJWTError(err)
+// ForceFail is a middleware illustrating the use of validation middleware with JWT auth.  It checks
+// for the presence of a "fail" query string and fails validation if set to the value "true".
+func ForceFail(db *EvelyDB) goa.Middleware {
+	errValidationFailed := goa.NewErrorClass("validation_failed", 401)
+	forceFail := func(h goa.Handler) goa.Handler {
+		return func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+			id, err := GetLoginID(ctx)
+			if err != nil || !db.Users.Exists(Keys{"id": id}) {
+				return errValidationFailed("forcing failure to illustrate Validation middleware")
+			}
+			return h(ctx, rw, req)
+		}
 	}
-	session, err := mgo.Dial(DB_HOST)
-	if err != nil {
-		return jwt.ErrJWTError(fmt.Sprintf("Database initialization failed: %s", err))
-	}
-	defer session.Close()
-	db := NewEvelyDB(session.DB(DB_NAME))
-	if !db.Users.Exists(Keys{"id": id}) {
-		return jwt.ErrJWTError("You are not registed user")
-	}
-	return nil
-})
+	fm, _ := goa.NewMiddleware(forceFail)
+	return fm
+}
 
 /**
  * 受け取った任意の情報を付加してトークンを生成する
@@ -111,6 +127,9 @@ func NewToken(claims jwtgo.MapClaims) (string, error) {
  */
 func GetLoginID(ctx context.Context) (string, error) {
 	token := jwt.ContextJWT(ctx)
+	if token == nil {
+		return "", errors.New("token is nothing.")
+	}
 	claims, ok := token.Claims.(jwtgo.MapClaims)
 	if !ok {
 		return "", errors.New("Unsupported claims shape")

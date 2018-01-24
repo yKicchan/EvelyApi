@@ -63,10 +63,8 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 			Token: token,
 			State: STATE_PENDING,
 		},
-		CreatedAt: claims["created_at"].(time.Time),
 	}
-	keys := Keys{"mail.email": u.Mail.Email}
-	err = c.db.Users.Save(u, keys)
+	err = c.db.Users.Save(u, Keys{"mail.email": u.Mail.Email})
 	if err != nil {
 		return ctx.BadRequest(goa.ErrInternal(err))
 	}
@@ -103,17 +101,24 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 
 // Signup runs the signup action.
 func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
-
-	// ユーザーIDが使用可能かを検査
+	// Payloadバリデーション
 	p := ctx.Payload
+	if *p.DeviceToken != "" && *p.InstanceID == "" || *p.DeviceToken == "" && *p.InstanceID != "" {
+		return ctx.BadRequest(goa.ErrBadRequest("DeviceTokenとInstanceIDを片方だけ設定することはできません。"))
+	}
+
+	// ユーザーID、メールアドレスが使用可能かを検査
 	if c.db.Users.Exists(Keys{"id": p.ID}) {
 		return ctx.BadRequest(goa.ErrBadRequest("User ID '" + p.ID + "' is already in use."))
+	}
+	if c.db.Users.Exists(Keys{"mail.email": p.Mail, "mail.state": STATE_OK}) {
+		return ctx.BadRequest(goa.ErrBadRequest("Email address '" + p.Mail + "' is already in use."))
 	}
 
 	// パスワードを暗号化
 	pass, err := bcrypt.GenerateFromPassword([]byte(p.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(err))
+		return ctx.BadRequest(goa.ErrInternal(err))
 	}
 
 	// ユーザーをDBに保存
@@ -121,26 +126,27 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		ID:       p.ID,
 		Password: string(pass),
 		Name:     p.Name,
-		Icon: p.Icon,
+		Icon:     p.Icon,
 		Mail: &Mail{
 			Email: p.Mail,
 			State: STATE_OK,
 		},
 		Tel: p.Tel,
 	}
-	if p.InstanceID != "" {
-		user.InstanceIds[0] = p.InstanceID
+	// スマホから同時に通知登録されて来た(デバイストークンとインスタンスIDが設定されて来た)とき
+	if *p.DeviceToken != "" && *p.InstanceID != "" {
+		// デバイストークンをキーに、インスタンスIDをセット
+		user.NotifyTargets[*p.DeviceToken] = *p.InstanceID
 	}
-	keys := Keys{"instance_id": p.InstanceID}
-	err = c.db.Users.Save(user, keys)
+	err = c.db.Users.Save(user, Keys{"mail.email": p.Mail, "mail.state": STATE_PENDING})
 	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(err))
+		return ctx.BadRequest(goa.ErrInternal(err))
 	}
 
 	// 登録完了メールを送信
 	err = mailer.SendSignUpCompleteMail(user.Mail.Email, user.Name)
 	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(err))
+		return ctx.BadRequest(goa.ErrInternal(err))
 	}
 
 	// JWTを生成して返す
