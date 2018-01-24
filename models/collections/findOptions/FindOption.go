@@ -6,16 +6,21 @@ type findOption struct {
 	limit int
 	// 除外件数(0があり得るのでセット判定のためにポインタ型)
 	offset *int
+	// カテゴリの絞り込み
+	categorys []string
 }
 
 // 汎用的な検索オプション
 type FindOption interface {
 	SetLimit(int)
 	SetOffset(int)
+	SetCategorys([]string)
 	GetLimit() int
 	GetOffset() int
+	GetCategorys() []string
 	IsLimitSet() bool
 	IsOffsetSet() bool
+	IsCategorysSet() bool
 }
 
 /**
@@ -39,6 +44,16 @@ func (this *findOption) SetOffset(offset int) {
 }
 
 /**
+ * 検索時にカテゴリで絞り込む
+ * @param categoy カテゴリ
+ */
+func (this *findOption) SetCategorys(categorys []string) {
+	if categorys != nil {
+		this.categorys = categorys
+	}
+}
+
+/**
  * 検索上限件数を返す
  * @return int 件数
  */
@@ -51,6 +66,12 @@ func (this *findOption) GetLimit() int { return this.limit }
 func (this *findOption) GetOffset() int { return *this.offset }
 
 /**
+ * 検索時に絞り込む
+ * @return string カテゴリ
+ */
+func (this *findOption) GetCategorys() []string { return this.categorys }
+
+/**
  * 検索件数に上限が設定されているかを判定する
  * @return bool
  */
@@ -61,3 +82,5 @@ func (this *findOption) IsLimitSet() bool { return this.limit > 0 }
  * @return bool
  */
 func (this *findOption) IsOffsetSet() bool { return this.offset != nil }
+
+func (this *findOption) IsCategorysSet() bool { return this.categorys != nil }

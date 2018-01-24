@@ -49,6 +49,8 @@ func (c *Client) DecodeEmail(resp *http.Response) (*Email, error) {
 type Event struct {
 	// イベントの詳細
 	Body string `form:"body" json:"body" xml:"body"`
+	// カテゴリ
+	Categorys []string `form:"categorys" json:"categorys" xml:"categorys"`
 	// 作成日時
 	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
 	// 添付資料へのURL
@@ -91,6 +93,9 @@ func (mt *Event) Validate() (err error) {
 	if mt.Files == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "files"))
 	}
+	if mt.Categorys == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "categorys"))
+	}
 	if mt.Host == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "host"))
 	}
@@ -112,6 +117,9 @@ func (mt *Event) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(mt.Body) > 1000 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1000, false))
+	}
+	if len(mt.Categorys) > 8 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 8, false))
 	}
 	if mt.Host != nil {
 		if err2 := mt.Host.Validate(); err2 != nil {
@@ -146,11 +154,17 @@ func (mt *Event) Validate() (err error) {
 type EventFull struct {
 	// イベントの詳細
 	Body string `form:"body" json:"body" xml:"body"`
+	// カテゴリ
+	Categorys []string `form:"categorys" json:"categorys" xml:"categorys"`
 	// 作成日時
 	CreatedAt time.Time `form:"createdAt" json:"createdAt" xml:"createdAt"`
-	Host      *UserTiny `form:"host" json:"host" xml:"host"`
+	// 添付資料へのURL
+	Files []string  `form:"files" json:"files" xml:"files"`
+	Host  *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
+	// ヘッダー画像のURL
+	Image string `form:"image" json:"image" xml:"image"`
 	// レビューの有無
 	IsReviewed bool `form:"isReviewed" json:"isReviewed" xml:"isReviewed"`
 	// 連絡先メールアドレス
@@ -178,11 +192,20 @@ func (mt *EventFull) Validate() (err error) {
 	if mt.ID == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "id"))
 	}
+	if mt.Image == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "image"))
+	}
 	if mt.Title == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "title"))
 	}
 	if mt.Body == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "body"))
+	}
+	if mt.Files == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "files"))
+	}
+	if mt.Categorys == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "categorys"))
 	}
 	if mt.Host == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "host"))
@@ -209,6 +232,9 @@ func (mt *EventFull) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(mt.Body) > 1000 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1000, false))
+	}
+	if len(mt.Categorys) > 8 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 8, false))
 	}
 	if mt.Host != nil {
 		if err2 := mt.Host.Validate(); err2 != nil {
@@ -250,7 +276,9 @@ func (mt *EventFull) Validate() (err error) {
 //
 // Identifier: application/vnd.event+json; view=tiny
 type EventTiny struct {
-	Host *UserTiny `form:"host" json:"host" xml:"host"`
+	// カテゴリ
+	Categorys []string  `form:"categorys" json:"categorys" xml:"categorys"`
+	Host      *UserTiny `form:"host" json:"host" xml:"host"`
 	// イベントID
 	ID string `form:"id" json:"id" xml:"id"`
 	// ヘッダー画像のURL
@@ -274,6 +302,9 @@ func (mt *EventTiny) Validate() (err error) {
 	if mt.Title == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "title"))
 	}
+	if mt.Categorys == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "categorys"))
+	}
 	if mt.Host == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "host"))
 	}
@@ -281,6 +312,9 @@ func (mt *EventTiny) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schedules"))
 	}
 
+	if len(mt.Categorys) > 8 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 8, false))
+	}
 	if mt.Host != nil {
 		if err2 := mt.Host.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)

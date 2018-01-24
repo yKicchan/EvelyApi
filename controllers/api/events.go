@@ -33,6 +33,14 @@ func NewEventsController(service *goa.Service, db *models.EvelyDB) *EventsContro
 // Create runs the create action.
 func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 
+	// カテゴリの存在チェック
+	p := ctx.Payload
+	for _, c := range p.Categorys {
+		if Categorys.IndexOf(c) == -1 {
+			return ctx.BadRequest(goa.ErrBadRequest("Category '" + c + "' dose not exist."))
+		}
+	}
+
 	// JWTからユーザー情報を取得
 	uid, err := GetLoginID(ctx)
 	if err != nil {
@@ -41,7 +49,6 @@ func (c *EventsController) Create(ctx *app.CreateEventsContext) error {
 	user, _ := c.db.Users.FindOne(Keys{"id": uid})
 
 	// イベントを作成
-	p := ctx.Payload
 	event := parser.ToEventModel(p, bson.NewObjectId(), user)
 	keys := Keys{"_id": event.ID}
 	err = c.db.Events.Save(event, keys)
@@ -88,6 +95,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 	opt.SetLimit(ctx.Limit)
 	opt.SetOffset(ctx.Offset)
 	opt.SetKeyword(ctx.Keyword)
+	opt.SetCategorys([]string{*ctx.Category})
 	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
@@ -126,6 +134,13 @@ func (c *EventsController) Show(ctx *app.ShowEventsContext) error {
 
 // Modify runs the modify action.
 func (c *EventsController) Modify(ctx *app.ModifyEventsContext) error {
+
+	// カテゴリの存在チェック
+	for _, c := range ctx.Payload.Categorys {
+		if Categorys.IndexOf(c) == -1 {
+			return ctx.BadRequest(goa.ErrBadRequest("Category '" + c + "' dose not exist."))
+		}
+	}
 
 	// JWTからユーザー情報を取得する
 	uid, err := GetLoginID(ctx)
@@ -188,6 +203,7 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	opt.SetLimit(ctx.Limit)
 	opt.SetOffset(ctx.Offset)
 	opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
+	opt.SetCategorys([]string{*ctx.Category})
 	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
@@ -204,7 +220,7 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 
 	// 位置情報がイベントの通知範囲内か調べ、通知範囲内だったイベントのみを返す
-	contain := func (events []*EventModel, lat, lng float64) (res []*EventModel) {
+	contain := func(events []*EventModel, lat, lng float64) (res []*EventModel) {
 		square := func(x float64) float64 { return x * x }
 		for _, e := range events {
 			// 通知範囲(m)を度単位に変換
@@ -297,19 +313,4 @@ func (c *EventsController) Pin(ctx *app.PinEventsContext) error {
 // Update runs the update action.
 func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
 	return ctx.OK([]byte("現在実装中"))
-}
-
-/**
- * 通知用のメッセージを生成し、返却する
- * @param  events 近くにあったイベント
- * @return msg    生成した通知用メッセージ
- */
-func createNotifyMessage(events []*EventModel) (msg map[string]string) {
-	// 一番近かったイベントを通知内容に設定する
-	msg["sum"] = "近くで" + events[0].Title + "が開催されています！"
-	// 他にイベントが複数件あった場合Tipsを設定
-	if len(events) > 1 {
-		msg["msg"] = "他" + strconv.Itoa(len(events)) + "件のイベント"
-	}
-	return msg
 }

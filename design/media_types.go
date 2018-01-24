@@ -25,8 +25,15 @@ var EventMedia = MediaType("application/vnd.event+json", func() {
 		Attribute("id", String, "イベントID", func() {
 			Example("5a44d5f2775672b659ba00fa")
 		})
+		Attribute("image", String, "ヘッダー画像のURL", func() {
+			Example("http://evely.net:8888/download/header.jpg")
+		})
 		Attribute("title")
 		Attribute("body")
+		Attribute("files", ArrayOf(String), "添付資料へのURL", func() {
+			Example([]string{"http://evely.net:8888/download/doc1.jpg", "http://evely.net:8888/download/doc2.pdf"})
+		})
+		Attribute("categorys")
 		Attribute("host", UserMedia)
 		Attribute("mail")
 		Attribute("tel")
@@ -35,23 +42,18 @@ var EventMedia = MediaType("application/vnd.event+json", func() {
 		Attribute("noticeRange")
 		Attribute("scope")
 		Attribute("openFlg")
-		Attribute("image", String, "ヘッダー画像のURL", func() {
-			Example("http://evely.net:8888/download/header.jpg")
-		})
-		Attribute("files", ArrayOf(String), "添付資料へのURL", func() {
-			Example([]string{"http://evely.net:8888/download/doc1.jpg", "http://evely.net:8888/download/doc2.pdf"})
-		})
 		Attribute("isReviewed", Boolean, "レビューの有無")
 		Attribute("updateDate", DateTime, "最終更新日時")
 		Attribute("createdAt", DateTime, "作成日時")
 	})
-	Required("id", "image", "title", "body", "files", "host", "mail", "tel", "url", "schedules", "noticeRange", "scope", "openFlg", "isReviewed", "updateDate", "createdAt")
+	Required("id", "image", "title", "body", "files", "categorys", "host", "mail", "tel", "url", "schedules", "noticeRange", "scope", "openFlg", "isReviewed", "updateDate", "createdAt")
 	View("default", func() {
 		Attribute("id")
 		Attribute("image")
 		Attribute("title")
 		Attribute("body")
 		Attribute("files")
+		Attribute("categorys")
 		Attribute("host", func() {
 			View("tiny")
 		})
@@ -67,6 +69,7 @@ var EventMedia = MediaType("application/vnd.event+json", func() {
 		Attribute("id")
 		Attribute("image")
 		Attribute("title")
+		Attribute("categorys")
 		Attribute("host", func() {
 			View("tiny")
 		})
@@ -75,8 +78,11 @@ var EventMedia = MediaType("application/vnd.event+json", func() {
 	})
 	View("full", func() {
 		Attribute("id")
+		Attribute("image")
 		Attribute("title")
 		Attribute("body")
+		Attribute("files")
+		Attribute("categorys")
 		Attribute("host", func() {
 			View("tiny")
 		})

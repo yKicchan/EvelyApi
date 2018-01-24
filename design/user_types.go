@@ -39,6 +39,10 @@ var EventPayload = Type("EventPayload", func() {
 	Attribute("files", ArrayOf(String), "添付資料", func() {
 		Example([]string{"doc1.jpg", "doc2.pdf"})
 	})
+	Attribute("categorys", ArrayOf(String), "カテゴリ", func() {
+		MaxLength(len(Categorys) - 1)
+		Example([]string{C_WORK_CONF, C_FESTIVAL})
+	})
 	Attribute("mail", String, "連絡先メールアドレス", func() {
 		Format("email")
 		Default("")
@@ -68,7 +72,7 @@ var EventPayload = Type("EventPayload", func() {
 		Default(false)
 		Example(false)
 	})
-	Required("title", "body", "schedules", "noticeRange")
+	Required("title", "body", "categorys", "schedules", "noticeRange")
 })
 
 var Schedule = Type("Schedule", func() {

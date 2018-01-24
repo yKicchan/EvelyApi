@@ -780,7 +780,7 @@ func DeleteEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, error) {
+func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, keyword string, limit int, offset int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -801,6 +801,10 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
@@ -822,6 +826,10 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
@@ -874,7 +882,7 @@ func ListEventsBadRequest(t goatest.TInterface, ctx context.Context, service *go
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, error) {
+func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, keyword string, limit int, offset int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -895,6 +903,10 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
@@ -916,6 +928,10 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
@@ -968,7 +984,7 @@ func ListEventsNotFound(t goatest.TInterface, ctx context.Context, service *goa.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, app.EventCollection) {
+func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, keyword string, limit int, offset int) (http.ResponseWriter, app.EventCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -989,6 +1005,10 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
@@ -1010,6 +1030,10 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
@@ -1067,7 +1091,7 @@ func ListEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, app.EventFullCollection) {
+func ListEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, keyword string, limit int, offset int) (http.ResponseWriter, app.EventFullCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1088,6 +1112,10 @@ func ListEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.Se
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
@@ -1109,6 +1137,10 @@ func ListEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.Se
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
@@ -1166,7 +1198,7 @@ func ListEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.Se
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, keyword string, limit int, offset int) (http.ResponseWriter, app.EventTinyCollection) {
+func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, keyword string, limit int, offset int) (http.ResponseWriter, app.EventTinyCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -1187,6 +1219,10 @@ func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		query["keyword"] = sliceVal
@@ -1208,6 +1244,10 @@ func ListEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Se
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{keyword}
 		prms["keyword"] = sliceVal
@@ -2288,7 +2328,7 @@ func MyListEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, error) {
+func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2309,6 +2349,10 @@ func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lat)}
 		query["lat"] = sliceVal
@@ -2338,6 +2382,10 @@ func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lat)}
 		prms["lat"] = sliceVal
@@ -2398,7 +2446,7 @@ func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventCollection) {
+func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2419,6 +2467,10 @@ func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lat)}
 		query["lat"] = sliceVal
@@ -2448,6 +2500,10 @@ func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lat)}
 		prms["lat"] = sliceVal
@@ -2513,7 +2569,7 @@ func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NearbyEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventFullCollection) {
+func NearbyEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventFullCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2534,6 +2590,10 @@ func NearbyEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lat)}
 		query["lat"] = sliceVal
@@ -2563,6 +2623,10 @@ func NearbyEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lat)}
 		prms["lat"] = sliceVal
@@ -2628,7 +2692,7 @@ func NearbyEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NearbyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventTinyCollection) {
+func NearbyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventTinyCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2649,6 +2713,10 @@ func NearbyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.
 	// Setup request context
 	rw := httptest.NewRecorder()
 	query := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		query["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lat)}
 		query["lat"] = sliceVal
@@ -2678,6 +2746,10 @@ func NearbyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.
 		panic("invalid test " + err.Error()) // bug
 	}
 	prms := url.Values{}
+	if category != nil {
+		sliceVal := []string{*category}
+		prms["category"] = sliceVal
+	}
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lat)}
 		prms["lat"] = sliceVal

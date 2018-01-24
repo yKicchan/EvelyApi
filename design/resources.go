@@ -1,6 +1,7 @@
 package design
 
 import (
+	. "EvelyApi/config"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 )
@@ -72,6 +73,9 @@ var _ = Resource("events", func() {
 				Default("")
 				Example("花澤香菜 Live")
 			})
+			Param("category", String, "カテゴリ", func() {
+				Enum(C_MUSIC, C_SPORTS, C_VOLUNTEER, C_ENTERTAINMENTS, C_WORK_CONF, C_FOOD_DRINK, C_ARTS, C_FESTIVAL, C_BARGAIN)
+			})
 		})
 		Response(OK, CollectionOf(EventMedia))
 		Response(NotFound, ErrorMedia)
@@ -106,6 +110,9 @@ var _ = Resource("events", func() {
 			Param("range", Integer, "検索範囲(半径m)", func() {
 				Minimum(10)
 				Default(500)
+			})
+			Param("category", String, "カテゴリ", func() {
+				Enum(C_MUSIC, C_SPORTS, C_VOLUNTEER, C_ENTERTAINMENTS, C_WORK_CONF, C_FOOD_DRINK, C_ARTS, C_FESTIVAL, C_BARGAIN)
 			})
 			Required("lat", "lng", "range")
 		})

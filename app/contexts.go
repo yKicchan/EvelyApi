@@ -311,9 +311,10 @@ type ListEventsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Keyword string
-	Limit   int
-	Offset  int
+	Category *string
+	Keyword  string
+	Limit    int
+	Offset   int
 }
 
 // NewListEventsContext parses the incoming request URL and body, performs validations and creates the
@@ -325,6 +326,16 @@ func NewListEventsContext(ctx context.Context, r *http.Request, service *goa.Ser
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := ListEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramCategory := req.Params["category"]
+	if len(paramCategory) > 0 {
+		rawCategory := paramCategory[0]
+		rctx.Category = &rawCategory
+		if rctx.Category != nil {
+			if !(*rctx.Category == "Music" || *rctx.Category == "Sports" || *rctx.Category == "Volunteer" || *rctx.Category == "Entertainments" || *rctx.Category == "Workshop & Conference" || *rctx.Category == "Food & Drink" || *rctx.Category == "Arts" || *rctx.Category == "Festival" || *rctx.Category == "Bargain") {
+				err = goa.MergeErrors(err, goa.InvalidEnumValueError(`category`, *rctx.Category, []interface{}{"Music", "Sports", "Volunteer", "Entertainments", "Workshop & Conference", "Food & Drink", "Arts", "Festival", "Bargain"}))
+			}
+		}
+	}
 	paramKeyword := req.Params["keyword"]
 	if len(paramKeyword) == 0 {
 		rctx.Keyword = ""
@@ -606,11 +617,12 @@ type NearbyEventsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Lat    float64
-	Limit  int
-	Lng    float64
-	Offset int
-	Range  int
+	Category *string
+	Lat      float64
+	Limit    int
+	Lng      float64
+	Offset   int
+	Range    int
 }
 
 // NewNearbyEventsContext parses the incoming request URL and body, performs validations and creates the
@@ -622,6 +634,16 @@ func NewNearbyEventsContext(ctx context.Context, r *http.Request, service *goa.S
 	req := goa.ContextRequest(ctx)
 	req.Request = r
 	rctx := NearbyEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	paramCategory := req.Params["category"]
+	if len(paramCategory) > 0 {
+		rawCategory := paramCategory[0]
+		rctx.Category = &rawCategory
+		if rctx.Category != nil {
+			if !(*rctx.Category == "Music" || *rctx.Category == "Sports" || *rctx.Category == "Volunteer" || *rctx.Category == "Entertainments" || *rctx.Category == "Workshop & Conference" || *rctx.Category == "Food & Drink" || *rctx.Category == "Arts" || *rctx.Category == "Festival" || *rctx.Category == "Bargain") {
+				err = goa.MergeErrors(err, goa.InvalidEnumValueError(`category`, *rctx.Category, []interface{}{"Music", "Sports", "Volunteer", "Entertainments", "Workshop & Conference", "Food & Drink", "Arts", "Festival", "Bargain"}))
+			}
+		}
+	}
 	paramLat := req.Params["lat"]
 	if len(paramLat) == 0 {
 		err = goa.MergeErrors(err, goa.MissingParamError("lat"))

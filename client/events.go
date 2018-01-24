@@ -109,8 +109,8 @@ func ListEventsPath() string {
 }
 
 // イベント複数取得
-func (c *Client) ListEvents(ctx context.Context, path string, keyword *string, limit *int, offset *int) (*http.Response, error) {
-	req, err := c.NewListEventsRequest(ctx, path, keyword, limit, offset)
+func (c *Client) ListEvents(ctx context.Context, path string, category *string, keyword *string, limit *int, offset *int) (*http.Response, error) {
+	req, err := c.NewListEventsRequest(ctx, path, category, keyword, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -118,13 +118,16 @@ func (c *Client) ListEvents(ctx context.Context, path string, keyword *string, l
 }
 
 // NewListEventsRequest create the request corresponding to the list action endpoint of the events resource.
-func (c *Client) NewListEventsRequest(ctx context.Context, path string, keyword *string, limit *int, offset *int) (*http.Request, error) {
+func (c *Client) NewListEventsRequest(ctx context.Context, path string, category *string, keyword *string, limit *int, offset *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
+	if category != nil {
+		values.Set("category", *category)
+	}
 	if keyword != nil {
 		values.Set("keyword", *keyword)
 	}
@@ -244,8 +247,8 @@ func NearbyEventsPath() string {
 }
 
 // 近くのイベントを検索する
-func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, lng float64, range_ int, limit *int, offset *int) (*http.Response, error) {
-	req, err := c.NewNearbyEventsRequest(ctx, path, lat, lng, range_, limit, offset)
+func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, lng float64, range_ int, category *string, limit *int, offset *int) (*http.Response, error) {
+	req, err := c.NewNearbyEventsRequest(ctx, path, lat, lng, range_, category, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +256,7 @@ func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, lng
 }
 
 // NewNearbyEventsRequest create the request corresponding to the nearby action endpoint of the events resource.
-func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat float64, lng float64, range_ int, limit *int, offset *int) (*http.Request, error) {
+func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat float64, lng float64, range_ int, category *string, limit *int, offset *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
@@ -266,6 +269,9 @@ func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat fl
 	values.Set("lng", tmp29)
 	tmp30 := strconv.Itoa(range_)
 	values.Set("range", tmp30)
+	if category != nil {
+		values.Set("category", *category)
+	}
 	if limit != nil {
 		tmp31 := strconv.Itoa(*limit)
 		values.Set("limit", tmp31)

@@ -11,6 +11,7 @@ var EVENT_DEFAULT_SELECTOR = bson.M{
 	"title":       1,
 	"body":        1,
 	"files":       1,
+	"categorys":   1,
 	"host":        1,
 	"mail":        1,
 	"tel":         1,
@@ -26,6 +27,7 @@ var EVENT_TINY_SELECTOR = bson.M{
 	"_id":       1,
 	"image":     1,
 	"title":     1,
+	"categorys":  1,
 	"host":      1,
 	"schedules": 1,
 	"reviews":   1,
@@ -38,6 +40,7 @@ type EventModel struct {
 	Title       string          `bson:"title"`
 	Body        string          `bson:"body"`
 	Files       []string        `bson:"files"`
+	Categorys   []string        `bson:"categorys"`
 	Host        *Host           `bson:"host"`
 	Mail        string          `bson:"mail"`
 	Tel         string          `bson:"tel"`

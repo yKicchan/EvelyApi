@@ -58,6 +58,14 @@ func (this *EventsCollection) Delete(keys Keys) error {
  * @return err    検索時のエラー
  */
 func (this *EventsCollection) findEvents(opt FindOption, query bson.M) (events []*EventModel, err error) {
+	if opt.IsCategorysSet() {
+		query = bson.M{
+			"$and": []interface{}{
+				query,
+				bson.M{"categorys": bson.M{"$all": opt.GetCategorys()}},
+			},
+		}
+	}
 	q := this.Find(query).Select(EVENT_TINY_SELECTOR)
 	if opt.IsOffsetSet() {
 		q = q.Skip(opt.GetOffset())

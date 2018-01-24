@@ -73,6 +73,8 @@ type (
 
 	// ListEventsCommand is the command line data structure for the list action of events
 	ListEventsCommand struct {
+		// カテゴリ
+		Category string
 		// キーワード
 		Keyword string
 		// 取得件数
@@ -102,6 +104,8 @@ type (
 
 	// NearbyEventsCommand is the command line data structure for the nearby action of events
 	NearbyEventsCommand struct {
+		// カテゴリ
+		Category string
 		// 緯度
 		Lat string
 		// 取得件数
@@ -222,6 +226,10 @@ Payload example:
 
 {
    "body": "初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。",
+   "categorys": [
+      "Workshop \u0026 Conference",
+      "Festival"
+   ],
    "files": [
       "doc1.jpg",
       "doc2.pdf"
@@ -338,6 +346,10 @@ Payload example:
 
 {
    "body": "初心者でもGitを扱えるようになる勉強会を開催します！\nノートPCを各自持参してください。",
+   "categorys": [
+      "Workshop \u0026 Conference",
+      "Festival"
+   ],
    "files": [
       "doc1.jpg",
       "doc2.pdf"
@@ -1063,7 +1075,7 @@ func (cmd *ListEventsCommand) Run(c *client.Client, args []string) error {
 	}
 	logger := goa.NewLogger(log.New(os.Stderr, "", log.LstdFlags))
 	ctx := goa.WithLogger(context.Background(), logger)
-	resp, err := c.ListEvents(ctx, path, stringFlagVal("keyword", cmd.Keyword), intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
+	resp, err := c.ListEvents(ctx, path, stringFlagVal("category", cmd.Category), stringFlagVal("keyword", cmd.Keyword), intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1075,6 +1087,8 @@ func (cmd *ListEventsCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *ListEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var category string
+	cc.Flags().StringVar(&cmd.Category, "category", category, `カテゴリ`)
 	var keyword string
 	cc.Flags().StringVar(&cmd.Keyword, "keyword", keyword, `キーワード`)
 	cc.Flags().IntVar(&cmd.Limit, "limit", 10, `取得件数`)
@@ -1180,7 +1194,7 @@ func (cmd *NearbyEventsCommand) Run(c *client.Client, args []string) error {
 		goa.LogError(ctx, "required flag is missing", "flag", "--lng")
 		return fmt.Errorf("required flag lng is missing")
 	}
-	resp, err := c.NearbyEvents(ctx, path, *tmp22, *tmp23, cmd.Range, intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
+	resp, err := c.NearbyEvents(ctx, path, *tmp22, *tmp23, cmd.Range, stringFlagVal("category", cmd.Category), intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1192,6 +1206,8 @@ func (cmd *NearbyEventsCommand) Run(c *client.Client, args []string) error {
 
 // RegisterFlags registers the command flags with the command line.
 func (cmd *NearbyEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Client) {
+	var category string
+	cc.Flags().StringVar(&cmd.Category, "category", category, `カテゴリ`)
 	var lat string
 	cc.Flags().StringVar(&cmd.Lat, "lat", lat, `緯度`)
 	cc.Flags().IntVar(&cmd.Limit, "limit", 3, `取得件数`)

@@ -16,11 +16,12 @@ import (
  */
 func ToEventModel(p *app.EventPayload, id bson.ObjectId, u *UserModel) *EventModel {
 	return &EventModel{
-		ID:    id,
-		Image: p.Image,
-		Title: p.Title,
-		Body:  p.Body,
-		Files: p.Files,
+		ID:        id,
+		Image:     p.Image,
+		Title:     p.Title,
+		Body:      p.Body,
+		Files:     p.Files,
+		Categorys: p.Categorys,
 		Host: &Host{
 			ID:   u.ID,
 			Name: u.Name,

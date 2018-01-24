@@ -65,6 +65,8 @@ func (ut *EmailPayload) Validate() (err error) {
 type eventPayload struct {
 	// イベントの詳細
 	Body *string `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	// カテゴリ
+	Categorys []string `form:"categorys,omitempty" json:"categorys,omitempty" xml:"categorys,omitempty"`
 	// 添付資料
 	Files []string `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
 	// イベントのヘッダーイメージ
@@ -123,6 +125,9 @@ func (ut *eventPayload) Validate() (err error) {
 	if ut.Body == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "body"))
 	}
+	if ut.Categorys == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "categorys"))
+	}
 	if ut.Schedules == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "schedules"))
 	}
@@ -137,6 +142,11 @@ func (ut *eventPayload) Validate() (err error) {
 	if ut.Body != nil {
 		if utf8.RuneCountInString(*ut.Body) > 1000 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.body`, *ut.Body, utf8.RuneCountInString(*ut.Body), 1000, false))
+		}
+	}
+	if ut.Categorys != nil {
+		if len(ut.Categorys) > 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.categorys`, ut.Categorys, len(ut.Categorys), 8, false))
 		}
 	}
 	if ut.Mail != nil {
@@ -190,6 +200,9 @@ func (ut *eventPayload) Publicize() *EventPayload {
 	if ut.Body != nil {
 		pub.Body = *ut.Body
 	}
+	if ut.Categorys != nil {
+		pub.Categorys = ut.Categorys
+	}
 	if ut.Files != nil {
 		pub.Files = ut.Files
 	}
@@ -230,6 +243,8 @@ func (ut *eventPayload) Publicize() *EventPayload {
 type EventPayload struct {
 	// イベントの詳細
 	Body string `form:"body" json:"body" xml:"body"`
+	// カテゴリ
+	Categorys []string `form:"categorys" json:"categorys" xml:"categorys"`
 	// 添付資料
 	Files []string `form:"files,omitempty" json:"files,omitempty" xml:"files,omitempty"`
 	// イベントのヘッダーイメージ
@@ -260,6 +275,9 @@ func (ut *EventPayload) Validate() (err error) {
 	if ut.Body == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "body"))
 	}
+	if ut.Categorys == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "categorys"))
+	}
 	if ut.Schedules == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "schedules"))
 	}
@@ -269,6 +287,9 @@ func (ut *EventPayload) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(ut.Body) > 1000 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.body`, ut.Body, utf8.RuneCountInString(ut.Body), 1000, false))
+	}
+	if len(ut.Categorys) > 8 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.categorys`, ut.Categorys, len(ut.Categorys), 8, false))
 	}
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Mail); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, ut.Mail, goa.FormatEmail, err2))

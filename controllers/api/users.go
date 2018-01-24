@@ -2,12 +2,12 @@ package api
 
 import (
 	"EvelyApi/app"
-	"EvelyApi/controllers/parser"
-	"EvelyApi/models"
 	. "EvelyApi/config"
+	"EvelyApi/controllers/parser"
+	. "EvelyApi/middleware"
+	"EvelyApi/models"
 	. "EvelyApi/models/collections"
 	. "EvelyApi/models/documents"
-	. "EvelyApi/middleware"
 	"github.com/goadesign/goa"
 )
 

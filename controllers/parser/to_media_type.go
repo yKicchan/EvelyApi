@@ -18,6 +18,7 @@ func ToEventMedia(e *EventModel) *app.Event {
 		Title: e.Title,
 		Body:  e.Body,
 		Files: toFilesMedia(e.Files),
+		Categorys: e.Categorys,
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
 			Name: e.Host.Name,
@@ -43,6 +44,7 @@ func ToEventTinyMedia(e *EventModel) *app.EventTiny {
 		ID:    e.ID.Hex(),
 		Image: toFileMedia(e.Image),
 		Title: e.Title,
+		Categorys: e.Categorys,
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
 			Name: e.Host.Name,

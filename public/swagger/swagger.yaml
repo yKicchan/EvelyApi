@@ -38,6 +38,9 @@ definitions:
       body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
+      categorys:
+      - Workshop & Conference
+      - Festival
       createdAt: 1974-02-03T21:26:56Z
       files:
       - http://evely.net:8888/download/doc1.jpg
@@ -85,6 +88,16 @@ definitions:
         maxLength: 1000
         minLength: 1
         type: string
+      categorys:
+        description: カテゴリ
+        example:
+        - Workshop & Conference
+        - Festival
+        items:
+          example: Qui omnis.
+          type: string
+        maxLength: 8
+        type: array
       createdAt:
         description: 作成日時
         example: 1974-02-03T21:26:56Z
@@ -96,7 +109,7 @@ definitions:
         - http://evely.net:8888/download/doc1.jpg
         - http://evely.net:8888/download/doc2.pdf
         items:
-          example: Qui omnis.
+          example: Et rem odio et possimus cupiditate.
           type: string
         type: array
       host:
@@ -175,6 +188,7 @@ definitions:
     - title
     - body
     - files
+    - categorys
     - host
     - mail
     - tel
@@ -192,6 +206,9 @@ definitions:
     - body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
+      categorys:
+      - Workshop & Conference
+      - Festival
       createdAt: 1974-02-03T21:26:56Z
       files:
       - http://evely.net:8888/download/doc1.jpg
@@ -233,6 +250,53 @@ definitions:
     - body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
+      categorys:
+      - Workshop & Conference
+      - Festival
+      createdAt: 1974-02-03T21:26:56Z
+      files:
+      - http://evely.net:8888/download/doc1.jpg
+      - http://evely.net:8888/download/doc2.pdf
+      host:
+        icon: http://evely.net:8888/download/icon.png
+        id: yKicchan
+        name: きっちゃそ
+      id: 5a44d5f2775672b659ba00fa
+      image: http://evely.net:8888/download/header.jpg
+      isReviewed: true
+      mail: yKicchanApp@gmail.com
+      schedules:
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
+      tel: 090-1234-5678
+      title: Git勉強会
+      updateDate: 1989-09-08T13:30:39Z
+      url: http://comp.ecc.ac.jp/
+    - body: |-
+        初心者でもGitを扱えるようになる勉強会を開催します！
+        ノートPCを各自持参してください。
+      categorys:
+      - Workshop & Conference
+      - Festival
       createdAt: 1974-02-03T21:26:56Z
       files:
       - http://evely.net:8888/download/doc1.jpg
@@ -281,6 +345,9 @@ definitions:
       body: |-
         初心者でもGitを扱えるようになる勉強会を開催します！
         ノートPCを各自持参してください。
+      categorys:
+      - Workshop & Conference
+      - Festival
       files:
       - doc1.jpg
       - doc2.pdf
@@ -316,13 +383,23 @@ definitions:
         maxLength: 1000
         minLength: 1
         type: string
+      categorys:
+        description: カテゴリ
+        example:
+        - Workshop & Conference
+        - Festival
+        items:
+          example: Qui omnis.
+          type: string
+        maxLength: 8
+        type: array
       files:
         description: 添付資料
         example:
         - doc1.jpg
         - doc2.pdf
         items:
-          example: Et rem odio et possimus cupiditate.
+          example: Totam ipsa sit enim accusamus voluptatum natus.
           type: string
         type: array
       image:
@@ -395,6 +472,7 @@ definitions:
     required:
     - title
     - body
+    - categorys
     - schedules
     - noticeRange
     title: EventPayload
@@ -519,7 +597,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Ipsa sit enim accusamus.
+          example: Delectus aut eius iusto.
           type: string
         type: array
     required:
@@ -554,7 +632,7 @@ definitions:
         - http://evely.net:8888/download/angle1.jpg
         - http://evely.net:8888/download/angle2.jpg
         items:
-          example: Natus molestiae quidem.
+          example: Voluptatem sit tempore consequatur.
           type: string
         type: array
       id:
@@ -622,18 +700,6 @@ definitions:
         id: yKicchan
         name: きっちゃそ
       title: 5ayymcy
-    - body: jrahm9nry5
-      files:
-      - http://evely.net:8888/download/angle1.jpg
-      - http://evely.net:8888/download/angle2.jpg
-      id: ""
-      rate: 4
-      reviewedAt: 2014-07-04T20:53:13Z
-      reviewer:
-        icon: http://evely.net:8888/download/icon.png
-        id: yKicchan
-        name: きっちゃそ
-      title: 5ayymcy
     items:
       $ref: '#/definitions/Review'
     title: 'Mediatype identifier: application/vnd.review+json; type=collection; view=default'
@@ -660,7 +726,7 @@ definitions:
         - angle1.jpg
         - angle2.jpg
         items:
-          example: Aut eius.
+          example: Ea et et illum cupiditate.
           type: string
         type: array
       rate:
@@ -801,7 +867,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Voluptatem sit tempore consequatur.
+          example: Necessitatibus quod provident quos.
           type: string
         type: array
       tel:
@@ -1077,6 +1143,21 @@ paths:
       description: イベント複数取得
       operationId: events#list
       parameters:
+      - description: カテゴリ
+        enum:
+        - Music
+        - Sports
+        - Volunteer
+        - Entertainments
+        - Workshop & Conference
+        - Food & Drink
+        - Arts
+        - Festival
+        - Bargain
+        in: query
+        name: category
+        required: false
+        type: string
       - default: ""
         description: キーワード
         in: query
@@ -1340,6 +1421,21 @@ paths:
       description: 近くのイベントを検索する
       operationId: events#nearby
       parameters:
+      - description: カテゴリ
+        enum:
+        - Music
+        - Sports
+        - Volunteer
+        - Entertainments
+        - Workshop & Conference
+        - Food & Drink
+        - Arts
+        - Festival
+        - Bargain
+        in: query
+        name: category
+        required: false
+        type: string
       - description: 緯度
         in: query
         maximum: 90
