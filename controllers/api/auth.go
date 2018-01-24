@@ -103,7 +103,7 @@ func (c *AuthController) Signin(ctx *app.SigninAuthContext) error {
 func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 	// Payloadバリデーション
 	p := ctx.Payload
-	if *p.DeviceToken != "" && *p.InstanceID == "" || *p.DeviceToken == "" && *p.InstanceID != "" {
+	if p.DeviceToken != "" && p.InstanceID == "" || p.DeviceToken == "" && p.InstanceID != "" {
 		return ctx.BadRequest(goa.ErrBadRequest("DeviceTokenとInstanceIDを片方だけ設定することはできません。"))
 	}
 
@@ -134,9 +134,9 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		Tel: p.Tel,
 	}
 	// スマホから同時に通知登録されて来た(デバイストークンとインスタンスIDが設定されて来た)とき
-	if *p.DeviceToken != "" && *p.InstanceID != "" {
+	if p.DeviceToken != "" && p.InstanceID != "" {
 		// デバイストークンをキーに、インスタンスIDをセット
-		user.NotifyTargets[*p.DeviceToken] = *p.InstanceID
+		user.NotifyTargets[p.DeviceToken] = p.InstanceID
 	}
 	err = c.db.Users.Save(user, Keys{"mail.email": p.Mail, "mail.state": STATE_PENDING})
 	if err != nil {

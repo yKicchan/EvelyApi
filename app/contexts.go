@@ -745,28 +745,28 @@ func (ctx *NearbyEventsContext) BadRequest(r error) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
 }
 
-// NotifyByInstanceIDEventsContext provides the events notify_by_instance_id action context.
-type NotifyByInstanceIDEventsContext struct {
+// NotifyEventsContext provides the events notify action context.
+type NotifyEventsContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Payload *NotifyByInstanceIDPayload
+	Payload *NotifyPayload
 }
 
-// NewNotifyByInstanceIDEventsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the events controller notify_by_instance_id action.
-func NewNotifyByInstanceIDEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*NotifyByInstanceIDEventsContext, error) {
+// NewNotifyEventsContext parses the incoming request URL and body, performs validations and creates the
+// context used by the events controller notify action.
+func NewNotifyEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*NotifyEventsContext, error) {
 	var err error
 	resp := goa.ContextResponse(ctx)
 	resp.Service = service
 	req := goa.ContextRequest(ctx)
 	req.Request = r
-	rctx := NotifyByInstanceIDEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
+	rctx := NotifyEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
 	return &rctx, err
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *NotifyByInstanceIDEventsContext) OK(resp []byte) error {
+func (ctx *NotifyEventsContext) OK(resp []byte) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
 		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
 	}
@@ -776,61 +776,15 @@ func (ctx *NotifyByInstanceIDEventsContext) OK(resp []byte) error {
 }
 
 // BadRequest sends a HTTP response with status code 400.
-func (ctx *NotifyByInstanceIDEventsContext) BadRequest(r error) error {
+func (ctx *NotifyEventsContext) BadRequest(r error) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
 		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
-}
-
-// NotifyByUserIDEventsContext provides the events notify_by_user_id action context.
-type NotifyByUserIDEventsContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Payload *NotifyByUserIDPayload
-}
-
-// NewNotifyByUserIDEventsContext parses the incoming request URL and body, performs validations and creates the
-// context used by the events controller notify_by_user_id action.
-func NewNotifyByUserIDEventsContext(ctx context.Context, r *http.Request, service *goa.Service) (*NotifyByUserIDEventsContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := NotifyByUserIDEventsContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *NotifyByUserIDEventsContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *NotifyByUserIDEventsContext) BadRequest(r error) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
-}
-
-// Unauthorized sends a HTTP response with status code 401.
-func (ctx *NotifyByUserIDEventsContext) Unauthorized(r error) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
 }
 
 // NotFound sends a HTTP response with status code 404.
-func (ctx *NotifyByUserIDEventsContext) NotFound(r error) error {
+func (ctx *NotifyEventsContext) NotFound(r error) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
 		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
 	}

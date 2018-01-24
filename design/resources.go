@@ -182,24 +182,15 @@ var _ = Resource("events", func() {
 		Response(OK)
 	})
 
-	Action("notify_by_instance_id", func() {
-		Description("近くにイベントがあればインスタンスID宛に通知する")
-		Routing(POST("/notify/by_instance_id"))
-		Payload(NotifyByInstanceIDPayload)
-		Response(OK)
-		Response(BadRequest, ErrorMedia)
-	})
-
-	Action("notify_by_user_id", func() {
-		Description("近くにイベントがあればユーザーのデバイス全てに通知する")
-		Security(JWT, func() {
+	Action("notify", func() {
+		Description("近くにイベントがあれば通知する")
+		Security(OptionalJWT, func() {
 			Scope("api:access")
 		})
-		Routing(POST("/notify/by_user_id"))
-		Payload(NotifyByUserIDPayload)
+		Routing(POST("/notify"))
+		Payload(NotifyPayload)
 		Response(OK)
 		Response(BadRequest, ErrorMedia)
-		Response(Unauthorized, ErrorMedia)
 		Response(NotFound, ErrorMedia)
 	})
 

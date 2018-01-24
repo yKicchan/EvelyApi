@@ -539,21 +539,27 @@ func (ut *Mail) Validate() (err error) {
 	return
 }
 
-// インスタンスIDと現在位置情報
-type notifyByInstanceIDPayload struct {
-	// 通知先となるインスタンスID
-	InstanceID *string `form:"instanceID,omitempty" json:"instanceID,omitempty" xml:"instanceID,omitempty"`
+// 通知のための現在位置情報
+// ゲストユーザーは通知先となるインスタンスIDを設定する
+type notifyPayload struct {
+	// インスタンスID
+	InstanceID *string `form:"instance_id,omitempty" json:"instance_id,omitempty" xml:"instance_id,omitempty"`
 	// 緯度
 	Lat *float64 `form:"lat,omitempty" json:"lat,omitempty" xml:"lat,omitempty"`
 	// 経度
 	Lng *float64 `form:"lng,omitempty" json:"lng,omitempty" xml:"lng,omitempty"`
 }
 
-// Validate validates the notifyByInstanceIDPayload type instance.
-func (ut *notifyByInstanceIDPayload) Validate() (err error) {
+// Finalize sets the default values for notifyPayload type instance.
+func (ut *notifyPayload) Finalize() {
+	var defaultInstanceID = ""
 	if ut.InstanceID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "instanceID"))
+		ut.InstanceID = &defaultInstanceID
 	}
+}
+
+// Validate validates the notifyPayload type instance.
+func (ut *notifyPayload) Validate() (err error) {
 	if ut.Lat == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "lat"))
 	}
@@ -583,9 +589,9 @@ func (ut *notifyByInstanceIDPayload) Validate() (err error) {
 	return
 }
 
-// Publicize creates NotifyByInstanceIDPayload from notifyByInstanceIDPayload
-func (ut *notifyByInstanceIDPayload) Publicize() *NotifyByInstanceIDPayload {
-	var pub NotifyByInstanceIDPayload
+// Publicize creates NotifyPayload from notifyPayload
+func (ut *notifyPayload) Publicize() *NotifyPayload {
+	var pub NotifyPayload
 	if ut.InstanceID != nil {
 		pub.InstanceID = *ut.InstanceID
 	}
@@ -598,98 +604,19 @@ func (ut *notifyByInstanceIDPayload) Publicize() *NotifyByInstanceIDPayload {
 	return &pub
 }
 
-// インスタンスIDと現在位置情報
-type NotifyByInstanceIDPayload struct {
-	// 通知先となるインスタンスID
-	InstanceID string `form:"instanceID" json:"instanceID" xml:"instanceID"`
+// 通知のための現在位置情報
+// ゲストユーザーは通知先となるインスタンスIDを設定する
+type NotifyPayload struct {
+	// インスタンスID
+	InstanceID string `form:"instance_id" json:"instance_id" xml:"instance_id"`
 	// 緯度
 	Lat float64 `form:"lat" json:"lat" xml:"lat"`
 	// 経度
 	Lng float64 `form:"lng" json:"lng" xml:"lng"`
 }
 
-// Validate validates the NotifyByInstanceIDPayload type instance.
-func (ut *NotifyByInstanceIDPayload) Validate() (err error) {
-	if ut.InstanceID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "instanceID"))
-	}
-
-	if ut.Lat < -90.000000 {
-		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lat`, ut.Lat, -90.000000, true))
-	}
-	if ut.Lat > 90.000000 {
-		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lat`, ut.Lat, 90.000000, false))
-	}
-	if ut.Lng < -180.000000 {
-		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lng`, ut.Lng, -180.000000, true))
-	}
-	if ut.Lng > 180.000000 {
-		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lng`, ut.Lng, 180.000000, false))
-	}
-	return
-}
-
-// 現在位置情報
-type notifyByUserIDPayload struct {
-	// 緯度
-	Lat *float64 `form:"lat,omitempty" json:"lat,omitempty" xml:"lat,omitempty"`
-	// 経度
-	Lng *float64 `form:"lng,omitempty" json:"lng,omitempty" xml:"lng,omitempty"`
-}
-
-// Validate validates the notifyByUserIDPayload type instance.
-func (ut *notifyByUserIDPayload) Validate() (err error) {
-	if ut.Lat == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "lat"))
-	}
-	if ut.Lng == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "lng"))
-	}
-	if ut.Lat != nil {
-		if *ut.Lat < -90.000000 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.lat`, *ut.Lat, -90.000000, true))
-		}
-	}
-	if ut.Lat != nil {
-		if *ut.Lat > 90.000000 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.lat`, *ut.Lat, 90.000000, false))
-		}
-	}
-	if ut.Lng != nil {
-		if *ut.Lng < -180.000000 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.lng`, *ut.Lng, -180.000000, true))
-		}
-	}
-	if ut.Lng != nil {
-		if *ut.Lng > 180.000000 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.lng`, *ut.Lng, 180.000000, false))
-		}
-	}
-	return
-}
-
-// Publicize creates NotifyByUserIDPayload from notifyByUserIDPayload
-func (ut *notifyByUserIDPayload) Publicize() *NotifyByUserIDPayload {
-	var pub NotifyByUserIDPayload
-	if ut.Lat != nil {
-		pub.Lat = *ut.Lat
-	}
-	if ut.Lng != nil {
-		pub.Lng = *ut.Lng
-	}
-	return &pub
-}
-
-// 現在位置情報
-type NotifyByUserIDPayload struct {
-	// 緯度
-	Lat float64 `form:"lat" json:"lat" xml:"lat"`
-	// 経度
-	Lng float64 `form:"lng" json:"lng" xml:"lng"`
-}
-
-// Validate validates the NotifyByUserIDPayload type instance.
-func (ut *NotifyByUserIDPayload) Validate() (err error) {
+// Validate validates the NotifyPayload type instance.
+func (ut *NotifyPayload) Validate() (err error) {
 
 	if ut.Lat < -90.000000 {
 		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.lat`, ut.Lat, -90.000000, true))
@@ -1029,9 +956,17 @@ type userPayload struct {
 
 // Finalize sets the default values for userPayload type instance.
 func (ut *userPayload) Finalize() {
+	var defaultDeviceToken = ""
+	if ut.DeviceToken == nil {
+		ut.DeviceToken = &defaultDeviceToken
+	}
 	var defaultIcon = ""
 	if ut.Icon == nil {
 		ut.Icon = &defaultIcon
+	}
+	var defaultInstanceID = ""
+	if ut.InstanceID == nil {
+		ut.InstanceID = &defaultInstanceID
 	}
 	var defaultTel = ""
 	if ut.Tel == nil {
@@ -1090,7 +1025,7 @@ func (ut *userPayload) Validate() (err error) {
 func (ut *userPayload) Publicize() *UserPayload {
 	var pub UserPayload
 	if ut.DeviceToken != nil {
-		pub.DeviceToken = ut.DeviceToken
+		pub.DeviceToken = *ut.DeviceToken
 	}
 	if ut.Icon != nil {
 		pub.Icon = *ut.Icon
@@ -1099,7 +1034,7 @@ func (ut *userPayload) Publicize() *UserPayload {
 		pub.ID = *ut.ID
 	}
 	if ut.InstanceID != nil {
-		pub.InstanceID = ut.InstanceID
+		pub.InstanceID = *ut.InstanceID
 	}
 	if ut.Mail != nil {
 		pub.Mail = *ut.Mail
@@ -1119,13 +1054,13 @@ func (ut *userPayload) Publicize() *UserPayload {
 // アカウント作成時に受け取る情報
 type UserPayload struct {
 	// デバイストークン
-	DeviceToken *string `form:"device_token,omitempty" json:"device_token,omitempty" xml:"device_token,omitempty"`
+	DeviceToken string `form:"device_token" json:"device_token" xml:"device_token"`
 	// アイコン画像
 	Icon string `form:"icon" json:"icon" xml:"icon"`
 	// ユーザーID
 	ID string `form:"id" json:"id" xml:"id"`
 	// インスタンスID
-	InstanceID *string `form:"instance_id,omitempty" json:"instance_id,omitempty" xml:"instance_id,omitempty"`
+	InstanceID string `form:"instance_id" json:"instance_id" xml:"instance_id"`
 	// メールアドレス
 	Mail string `form:"mail" json:"mail" xml:"mail"`
 	// 名前

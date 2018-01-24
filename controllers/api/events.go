@@ -200,8 +200,25 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	return ctx.OKTiny(res)
 }
 
-// NotifyByInstanceID runs the notify_by_instance_id action.
-func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsContext) error {
+// Notify runs the notify action.
+func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
+
+	// 位置情報がイベントの通知範囲内か調べ、通知範囲内だったイベントのみを返す
+	contain := func (events []*EventModel, lat, lng float64) (res []*EventModel) {
+		square := func(x float64) float64 { return x * x }
+		for _, e := range events {
+			// 通知範囲(m)を度単位に変換
+			r := float64(e.NoticeRange) * DEGREE_PER_METER
+			for _, schedule := range e.Schedules {
+				distance := math.Sqrt(square(lat-schedule.Location.LngLat[LNG]) + square(lng-schedule.Location.LngLat[LAT]))
+				if distance > r {
+					res = append(res, e)
+					break
+				}
+			}
+		}
+		return res
+	}
 
 	// 現在地から最大通知範囲より内のイベントを取得
 	p := ctx.Payload
@@ -209,72 +226,40 @@ func (c *EventsController) NotifyByInstanceID(ctx *app.NotifyByInstanceIDEventsC
 	opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
 	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(err))
+		return ctx.BadRequest(goa.ErrInternal(err))
 	}
 
-	// 近くのイベントの通知範囲内にユーザーが存在するかを調べる
-	nearbyEvents := contain(events, p.Lat, p.Lng)
-
-	// 通知するイベントがなかったときは終了
-	if len(nearbyEvents) == 0 {
+	// 通知範囲内のイベントだけに絞る
+	events = contain(events, p.Lat, p.Lng)
+	if len(events) == 0 {
 		return nil
 	}
 
-	// 通知メッセージを作成
-	data := createNotifyMessage(nearbyEvents)
-
-	// インスタンスIDを設定しプッシュ通知送信
-	ids := []string{p.InstanceID}
-	cl := fcm.NewFcmClient(FCM_SERVER_KEY)
-	cl.NewFcmRegIdsMsg(ids, data)
-	status, err := cl.Send()
-	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(err))
-	} else {
-		status.PrintResults()
-	}
-	return nil
-}
-
-// NotifyByUserID runs the notify_by_user_id action.
-func (c *EventsController) NotifyByUserID(ctx *app.NotifyByUserIDEventsContext) error {
-
-	// 現在地から最大通知範囲より内のイベントを取得
-	p := ctx.Payload
-	opt := NewFindEventsOption()
-	opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
-	events, err := c.db.Events.FindEvents(opt)
-	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(err))
+	// 通知メッージを作成
+	var data map[string]string
+	// 一番近かったイベントをTitleに設定する
+	data["sum"] = "近くで" + events[0].Title + "が開催されています！"
+	// 他にイベントが複数件あった場合Tipsを設定
+	if len(events) > 1 {
+		data["msg"] = "他" + strconv.Itoa(len(events)) + "件のイベント"
 	}
 
-	// 近くのイベントの通知範囲内にユーザーが存在するかを調べる
-	nearbyEvents := contain(events, p.Lat, p.Lng)
-
-	// 通知するイベントがなかったときは終了
-	if len(nearbyEvents) == 0 {
-		return nil
-	}
-
-	// 通知メッセージを作成
-	data := createNotifyMessage(nearbyEvents)
-
-	// JWTからユーザーIDを取得する
-	uid, err := GetLoginID(ctx)
-	if err != nil {
-		return ctx.BadRequest(goa.ErrBadRequest(err))
-	}
-
-	// インスタンスIDを設定しプッシュ通知送信
-	u, err := c.db.Users.FindOne(Keys{"id": uid})
-	if err != nil {
-		return ctx.NotFound(goa.ErrNotFound(err))
-	}
-	cl := fcm.NewFcmClient(FCM_SERVER_KEY)
+	// 通知先のインスタンスIDを設定し、プッシュ通知送信
 	var ids []string
-	for _, id := range u.NotifyTargets {
-		ids = append(ids, id)
+	uid, err := GetLoginID(ctx)
+	if err == nil { // 認証されて来たとき
+		// 登録されている全てのインスタンスIDを設定
+		u, _ := c.db.Users.FindOne(Keys{"id": uid})
+		for _, id := range u.NotifyTargets {
+			ids = append(ids, id)
+		}
+	} else if p.InstanceID != "" { // 認証されてこなかったとき
+		// POST送信されてきたインスタンスIDを設定
+		ids = []string{p.InstanceID}
+	} else { // 認証されず、インスタンスIDもないとき
+		return ctx.BadRequest(goa.ErrBadRequest("認証するか、インスタンスIDを設定してください"))
 	}
+	cl := fcm.NewFcmClient(FCM_SERVER_KEY)
 	cl.NewFcmRegIdsMsg(ids, data)
 	status, err := cl.Send()
 	if err != nil {
@@ -312,29 +297,6 @@ func (c *EventsController) Pin(ctx *app.PinEventsContext) error {
 // Update runs the update action.
 func (c *EventsController) Update(ctx *app.UpdateEventsContext) error {
 	return ctx.OK([]byte("現在実装中"))
-}
-
-/**
- * 受け取った位置情報がイベントの通知範囲内にあるかを調べ、通知範囲内だったイベントのみを返す
- * @param  events       検索対象のイベント
- * @param  lat          緯度
- * @param  lng          経度
- * @return nearbyEvents 通知範囲内にあったイベント
- */
-func contain(events []*EventModel, lat, lng float64) (nearbyEvents []*EventModel) {
-	square := func(x float64) float64 { return x * x }
-	for _, e := range events {
-		// 通知範囲(m)を度単位に変換
-		r := float64(e.NoticeRange) * DEGREE_PER_METER
-		for _, schedule := range e.Schedules {
-			distance := math.Sqrt(square(lat-schedule.Location.LngLat[LNG]) + square(lng-schedule.Location.LngLat[LAT]))
-			if distance > r {
-				nearbyEvents = append(nearbyEvents, e)
-				break
-			}
-		}
-	}
-	return nearbyEvents
 }
 
 /**

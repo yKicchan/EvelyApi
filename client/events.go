@@ -129,12 +129,12 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, keyword 
 		values.Set("keyword", *keyword)
 	}
 	if limit != nil {
-		tmp25 := strconv.Itoa(*limit)
-		values.Set("limit", tmp25)
+		tmp24 := strconv.Itoa(*limit)
+		values.Set("limit", tmp24)
 	}
 	if offset != nil {
-		tmp26 := strconv.Itoa(*offset)
-		values.Set("offset", tmp26)
+		tmp25 := strconv.Itoa(*offset)
+		values.Set("offset", tmp25)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -217,12 +217,12 @@ func (c *Client) NewMyListEventsRequest(ctx context.Context, path string, limit 
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if limit != nil {
-		tmp27 := strconv.Itoa(*limit)
-		values.Set("limit", tmp27)
+		tmp26 := strconv.Itoa(*limit)
+		values.Set("limit", tmp26)
 	}
 	if offset != nil {
-		tmp28 := strconv.Itoa(*offset)
-		values.Set("offset", tmp28)
+		tmp27 := strconv.Itoa(*offset)
+		values.Set("offset", tmp27)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -260,19 +260,19 @@ func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat fl
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	tmp29 := strconv.FormatFloat(lat, 'f', -1, 64)
-	values.Set("lat", tmp29)
-	tmp30 := strconv.FormatFloat(lng, 'f', -1, 64)
-	values.Set("lng", tmp30)
-	tmp31 := strconv.Itoa(range_)
-	values.Set("range", tmp31)
+	tmp28 := strconv.FormatFloat(lat, 'f', -1, 64)
+	values.Set("lat", tmp28)
+	tmp29 := strconv.FormatFloat(lng, 'f', -1, 64)
+	values.Set("lng", tmp29)
+	tmp30 := strconv.Itoa(range_)
+	values.Set("range", tmp30)
 	if limit != nil {
-		tmp32 := strconv.Itoa(*limit)
-		values.Set("limit", tmp32)
+		tmp31 := strconv.Itoa(*limit)
+		values.Set("limit", tmp31)
 	}
 	if offset != nil {
-		tmp33 := strconv.Itoa(*offset)
-		values.Set("offset", tmp33)
+		tmp32 := strconv.Itoa(*offset)
+		values.Set("offset", tmp32)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -282,23 +282,23 @@ func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat fl
 	return req, nil
 }
 
-// NotifyByInstanceIDEventsPath computes a request path to the notify_by_instance_id action of events.
-func NotifyByInstanceIDEventsPath() string {
+// NotifyEventsPath computes a request path to the notify action of events.
+func NotifyEventsPath() string {
 
-	return fmt.Sprintf("/api/develop/v2/events/notify/by_instance_id")
+	return fmt.Sprintf("/api/develop/v2/events/notify")
 }
 
-// 近くにイベントがあればインスタンスID宛に通知する
-func (c *Client) NotifyByInstanceIDEvents(ctx context.Context, path string, payload *NotifyByInstanceIDPayload, contentType string) (*http.Response, error) {
-	req, err := c.NewNotifyByInstanceIDEventsRequest(ctx, path, payload, contentType)
+// 近くにイベントがあれば通知する
+func (c *Client) NotifyEvents(ctx context.Context, path string, payload *NotifyPayload, contentType string) (*http.Response, error) {
+	req, err := c.NewNotifyEventsRequest(ctx, path, payload, contentType)
 	if err != nil {
 		return nil, err
 	}
 	return c.Client.Do(ctx, req)
 }
 
-// NewNotifyByInstanceIDEventsRequest create the request corresponding to the notify_by_instance_id action endpoint of the events resource.
-func (c *Client) NewNotifyByInstanceIDEventsRequest(ctx context.Context, path string, payload *NotifyByInstanceIDPayload, contentType string) (*http.Request, error) {
+// NewNotifyEventsRequest create the request corresponding to the notify action endpoint of the events resource.
+func (c *Client) NewNotifyEventsRequest(ctx context.Context, path string, payload *NotifyPayload, contentType string) (*http.Request, error) {
 	var body bytes.Buffer
 	if contentType == "" {
 		contentType = "*/*" // Use default encoder
@@ -322,51 +322,8 @@ func (c *Client) NewNotifyByInstanceIDEventsRequest(ctx context.Context, path st
 	} else {
 		header.Set("Content-Type", contentType)
 	}
-	return req, nil
-}
-
-// NotifyByUserIDEventsPath computes a request path to the notify_by_user_id action of events.
-func NotifyByUserIDEventsPath() string {
-
-	return fmt.Sprintf("/api/develop/v2/events/notify/by_user_id")
-}
-
-// 近くにイベントがあればユーザーのデバイス全てに通知する
-func (c *Client) NotifyByUserIDEvents(ctx context.Context, path string, payload *NotifyByUserIDPayload, contentType string) (*http.Response, error) {
-	req, err := c.NewNotifyByUserIDEventsRequest(ctx, path, payload, contentType)
-	if err != nil {
-		return nil, err
-	}
-	return c.Client.Do(ctx, req)
-}
-
-// NewNotifyByUserIDEventsRequest create the request corresponding to the notify_by_user_id action endpoint of the events resource.
-func (c *Client) NewNotifyByUserIDEventsRequest(ctx context.Context, path string, payload *NotifyByUserIDPayload, contentType string) (*http.Request, error) {
-	var body bytes.Buffer
-	if contentType == "" {
-		contentType = "*/*" // Use default encoder
-	}
-	err := c.Encoder.Encode(payload, &body, contentType)
-	if err != nil {
-		return nil, fmt.Errorf("failed to encode body: %s", err)
-	}
-	scheme := c.Scheme
-	if scheme == "" {
-		scheme = "http"
-	}
-	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
-	req, err := http.NewRequest("POST", u.String(), &body)
-	if err != nil {
-		return nil, err
-	}
-	header := req.Header
-	if contentType == "*/*" {
-		header.Set("Content-Type", "application/json")
-	} else {
-		header.Set("Content-Type", contentType)
-	}
-	if c.JWTSigner != nil {
-		if err := c.JWTSigner.Sign(req); err != nil {
+	if c.OptionalJWTSigner != nil {
+		if err := c.OptionalJWTSigner.Sign(req); err != nil {
 			return nil, err
 		}
 	}
@@ -398,12 +355,12 @@ func (c *Client) NewPinEventsRequest(ctx context.Context, path string, limit *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if limit != nil {
-		tmp34 := strconv.Itoa(*limit)
-		values.Set("limit", tmp34)
+		tmp33 := strconv.Itoa(*limit)
+		values.Set("limit", tmp33)
 	}
 	if offset != nil {
-		tmp35 := strconv.Itoa(*offset)
-		values.Set("offset", tmp35)
+		tmp34 := strconv.Itoa(*offset)
+		values.Set("offset", tmp34)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -437,8 +394,8 @@ func (c *Client) NewShowEventsRequest(ctx context.Context, path string, ids []st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	for _, p := range ids {
-		tmp36 := p
-		values.Add("ids", tmp36)
+		tmp35 := p
+		values.Add("ids", tmp35)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

@@ -193,33 +193,13 @@ define(['axios'] , function (axios) {
     return client(cfg);
   }
 
-  // 近くにイベントがあればインスタンスID宛に通知する
-  // path is the request path, the format is "/api/develop/v2/events/notify/by_instance_id"
+  // 近くにイベントがあれば通知する
+  // path is the request path, the format is "/api/develop/v2/events/notify"
   // data contains the action payload (request body)
   // config is an optional object to be merged into the config built by the function prior to making the request.
   // The content of the config object is described here: https://github.com/mzabriskie/axios#request-api
   // This function returns a promise which raises an error if the HTTP response is a 4xx or 5xx.
-  client.notify_by_instance_idEvents = function (path, data, config) {
-    var cfg = {
-      timeout: timeout,
-      url: urlPrefix + path,
-      method: 'post',
-    data: data,
-      responseType: 'json'
-    };
-    if (config) {
-      cfg = merge(cfg, config);
-    }
-    return client(cfg);
-  }
-
-  // 近くにイベントがあればユーザーのデバイス全てに通知する
-  // path is the request path, the format is "/api/develop/v2/events/notify/by_user_id"
-  // data contains the action payload (request body)
-  // config is an optional object to be merged into the config built by the function prior to making the request.
-  // The content of the config object is described here: https://github.com/mzabriskie/axios#request-api
-  // This function returns a promise which raises an error if the HTTP response is a 4xx or 5xx.
-  client.notify_by_user_idEvents = function (path, data, config) {
+  client.notifyEvents = function (path, data, config) {
     var cfg = {
       timeout: timeout,
       url: urlPrefix + path,
