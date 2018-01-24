@@ -95,7 +95,9 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 	opt.SetLimit(ctx.Limit)
 	opt.SetOffset(ctx.Offset)
 	opt.SetKeyword(ctx.Keyword)
-	opt.SetCategorys([]string{*ctx.Category})
+	if ctx.Category != nil {
+		opt.SetCategorys([]string{*ctx.Category})
+	}
 	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
@@ -203,7 +205,9 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	opt.SetLimit(ctx.Limit)
 	opt.SetOffset(ctx.Offset)
 	opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
-	opt.SetCategorys([]string{*ctx.Category})
+	if ctx.Category != nil {
+		opt.SetCategorys([]string{*ctx.Category})
+	}
 	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
