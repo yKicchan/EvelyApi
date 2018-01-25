@@ -14,7 +14,7 @@ import (
  */
 func sendMail(to, subject, body string, html bool) error {
 	m := gomail.NewMessage()
-	m.SetHeader("From", "evely.ecc@gmail.com")
+	m.SetHeader("From", "Evely Operation Team<evely.ecc@gmail.com>")
 	m.SetHeader("To", to)
 	m.SetHeader("Subject", "[Evely]"+subject)
 	if html {
