@@ -136,7 +136,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 	// スマホから同時に通知登録されて来た(デバイストークンとインスタンスIDが設定されて来た)とき
 	if p.DeviceToken != "" && p.InstanceID != "" {
 		// デバイストークンをキーに、インスタンスIDをセット
-		user.NotifyTargets[p.DeviceToken] = p.InstanceID
+		user.NotifyTargets = map[string]string{p.DeviceToken: p.InstanceID}
 	}
 	err = c.db.Users.Save(user, Keys{"mail.email": p.Mail, "mail.state": STATE_PENDING})
 	if err != nil {

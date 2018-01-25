@@ -9,11 +9,9 @@ import (
 var LoginPayload = Type("LoginPayload", func() {
 	Description("認証時に受け取るログイン情報")
 	Attribute("id", String, "ユーザーID", func() {
-		MinLength(1)
 		Example("yKicchan")
 	})
 	Attribute("password", String, "パスワード", func() {
-		MinLength(1)
 		Example("password")
 	})
 	Required("id", "password")
@@ -40,7 +38,8 @@ var EventPayload = Type("EventPayload", func() {
 		Example([]string{"doc1.jpg", "doc2.pdf"})
 	})
 	Attribute("categorys", ArrayOf(String), "カテゴリ", func() {
-		MaxLength(len(Categorys) - 1)
+		MinLength(1)
+		MaxLength(len(Categorys))
 		Example([]string{C_WORK_CONF, C_FESTIVAL})
 	})
 	Attribute("mail", String, "連絡先メールアドレス", func() {
@@ -57,7 +56,9 @@ var EventPayload = Type("EventPayload", func() {
 		Default("")
 		Example("http://comp.ecc.ac.jp/")
 	})
-	Attribute("schedules", ArrayOf(Schedule), "イベントの開催予定一覧")
+	Attribute("schedules", ArrayOf(Schedule), "イベントの開催予定一覧", func() {
+		MinLength(1)
+	})
 	Attribute("noticeRange", Integer, "通知範囲(m)", func() {
 		Minimum(100)
 		Maximum(MAX_NOTICE_RANGE)
@@ -122,8 +123,7 @@ var UserPayload = Type("UserPayload", func() {
 	Description("アカウント作成時に受け取る情報")
 	Reference(TokenPayload)
 	Attribute("id", String, "ユーザーID", func() {
-		MinLength(4)
-		MaxLength(15)
+		Pattern("^[a-zA-Z0-9_]{4,15}$")
 		Example("yKicchan")
 	})
 	Attribute("password", String, "パスワード", func() {
@@ -163,7 +163,7 @@ var Mail = Type("Mail", func() {
 		Example("yKicchanApp@gmail.com")
 	})
 	Attribute("state", String, "メールアドレスの状態", func() {
-		Enum("Pending", "OK", "BAN")
+		Enum("Pending", "OK", "BAN", "Guest")
 		Example("OK")
 	})
 	Required("email", "state")

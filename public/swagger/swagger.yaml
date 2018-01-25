@@ -94,9 +94,10 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Qui omnis.
+          example: Et rem odio et possimus cupiditate.
           type: string
-        maxLength: 8
+        maxLength: 9
+        minLength: 1
         type: array
       createdAt:
         description: 作成日時
@@ -109,7 +110,7 @@ definitions:
         - http://evely.net:8888/download/doc1.jpg
         - http://evely.net:8888/download/doc2.pdf
         items:
-          example: Et rem odio et possimus cupiditate.
+          example: Qui omnis.
           type: string
         type: array
       host:
@@ -159,6 +160,7 @@ definitions:
             startDate: 2005-04-23T09:00:35Z
         items:
           $ref: '#/definitions/Schedule'
+        minLength: 1
         type: array
       tel:
         default: ""
@@ -389,9 +391,10 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Qui omnis.
+          example: Et rem odio et possimus cupiditate.
           type: string
-        maxLength: 8
+        maxLength: 9
+        minLength: 1
         type: array
       files:
         description: 添付資料
@@ -443,6 +446,7 @@ definitions:
             startDate: 2005-04-23T09:00:35Z
         items:
           $ref: '#/definitions/Schedule'
+        minLength: 1
         type: array
       scope:
         default: public
@@ -517,12 +521,10 @@ definitions:
       id:
         description: ユーザーID
         example: yKicchan
-        minLength: 1
         type: string
       password:
         description: パスワード
         example: password
-        minLength: 1
         type: string
     required:
     - id
@@ -546,6 +548,7 @@ definitions:
         - Pending
         - OK
         - BAN
+        - Guest
         example: OK
         type: string
     required:
@@ -850,8 +853,7 @@ definitions:
       id:
         description: ユーザーID
         example: yKicchan
-        maxLength: 15
-        minLength: 4
+        pattern: ^[a-zA-Z0-9_]{4,15}$
         type: string
       mail:
         $ref: '#/definitions/Mail'
@@ -910,8 +912,7 @@ definitions:
       id:
         description: ユーザーID
         example: yKicchan
-        maxLength: 15
-        minLength: 4
+        pattern: ^[a-zA-Z0-9_]{4,15}$
         type: string
       instance_id:
         default: ""
@@ -961,8 +962,7 @@ definitions:
       id:
         description: ユーザーID
         example: yKicchan
-        maxLength: 15
-        minLength: 4
+        pattern: ^[a-zA-Z0-9_]{4,15}$
         type: string
       name:
         description: 名前

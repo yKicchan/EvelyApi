@@ -145,8 +145,13 @@ func (ut *eventPayload) Validate() (err error) {
 		}
 	}
 	if ut.Categorys != nil {
-		if len(ut.Categorys) > 8 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.categorys`, ut.Categorys, len(ut.Categorys), 8, false))
+		if len(ut.Categorys) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.categorys`, ut.Categorys, len(ut.Categorys), 1, true))
+		}
+	}
+	if ut.Categorys != nil {
+		if len(ut.Categorys) > 9 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.categorys`, ut.Categorys, len(ut.Categorys), 9, false))
 		}
 	}
 	if ut.Mail != nil {
@@ -162,6 +167,11 @@ func (ut *eventPayload) Validate() (err error) {
 	if ut.NoticeRange != nil {
 		if *ut.NoticeRange > 5000 {
 			err = goa.MergeErrors(err, goa.InvalidRangeError(`request.noticeRange`, *ut.NoticeRange, 5000, false))
+		}
+	}
+	if ut.Schedules != nil {
+		if len(ut.Schedules) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.schedules`, ut.Schedules, len(ut.Schedules), 1, true))
 		}
 	}
 	for _, e := range ut.Schedules {
@@ -288,8 +298,11 @@ func (ut *EventPayload) Validate() (err error) {
 	if utf8.RuneCountInString(ut.Body) > 1000 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.body`, ut.Body, utf8.RuneCountInString(ut.Body), 1000, false))
 	}
-	if len(ut.Categorys) > 8 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.categorys`, ut.Categorys, len(ut.Categorys), 8, false))
+	if len(ut.Categorys) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.categorys`, ut.Categorys, len(ut.Categorys), 1, true))
+	}
+	if len(ut.Categorys) > 9 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.categorys`, ut.Categorys, len(ut.Categorys), 9, false))
 	}
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Mail); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, ut.Mail, goa.FormatEmail, err2))
@@ -299,6 +312,9 @@ func (ut *EventPayload) Validate() (err error) {
 	}
 	if ut.NoticeRange > 5000 {
 		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.noticeRange`, ut.NoticeRange, 5000, false))
+	}
+	if len(ut.Schedules) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.schedules`, ut.Schedules, len(ut.Schedules), 1, true))
 	}
 	for _, e := range ut.Schedules {
 		if e != nil {
@@ -444,16 +460,6 @@ func (ut *loginPayload) Validate() (err error) {
 	if ut.Password == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "password"))
 	}
-	if ut.ID != nil {
-		if utf8.RuneCountInString(*ut.ID) < 1 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.id`, *ut.ID, utf8.RuneCountInString(*ut.ID), 1, true))
-		}
-	}
-	if ut.Password != nil {
-		if utf8.RuneCountInString(*ut.Password) < 1 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.password`, *ut.Password, utf8.RuneCountInString(*ut.Password), 1, true))
-		}
-	}
 	return
 }
 
@@ -485,12 +491,6 @@ func (ut *LoginPayload) Validate() (err error) {
 	if ut.Password == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "password"))
 	}
-	if utf8.RuneCountInString(ut.ID) < 1 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.id`, ut.ID, utf8.RuneCountInString(ut.ID), 1, true))
-	}
-	if utf8.RuneCountInString(ut.Password) < 1 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.password`, ut.Password, utf8.RuneCountInString(ut.Password), 1, true))
-	}
 	return
 }
 
@@ -516,8 +516,8 @@ func (ut *mail) Validate() (err error) {
 		}
 	}
 	if ut.State != nil {
-		if !(*ut.State == "Pending" || *ut.State == "OK" || *ut.State == "BAN") {
-			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`request.state`, *ut.State, []interface{}{"Pending", "OK", "BAN"}))
+		if !(*ut.State == "Pending" || *ut.State == "OK" || *ut.State == "BAN" || *ut.State == "Guest") {
+			err = goa.MergeErrors(err, goa.InvalidEnumValueError(`request.state`, *ut.State, []interface{}{"Pending", "OK", "BAN", "Guest"}))
 		}
 	}
 	return
@@ -554,8 +554,8 @@ func (ut *Mail) Validate() (err error) {
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Email); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.email`, ut.Email, goa.FormatEmail, err2))
 	}
-	if !(ut.State == "Pending" || ut.State == "OK" || ut.State == "BAN") {
-		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`type.state`, ut.State, []interface{}{"Pending", "OK", "BAN"}))
+	if !(ut.State == "Pending" || ut.State == "OK" || ut.State == "BAN" || ut.State == "Guest") {
+		err = goa.MergeErrors(err, goa.InvalidEnumValueError(`type.state`, ut.State, []interface{}{"Pending", "OK", "BAN", "Guest"}))
 	}
 	return
 }
@@ -1010,13 +1010,8 @@ func (ut *userPayload) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "mail"))
 	}
 	if ut.ID != nil {
-		if utf8.RuneCountInString(*ut.ID) < 4 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.id`, *ut.ID, utf8.RuneCountInString(*ut.ID), 4, true))
-		}
-	}
-	if ut.ID != nil {
-		if utf8.RuneCountInString(*ut.ID) > 15 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.id`, *ut.ID, utf8.RuneCountInString(*ut.ID), 15, false))
+		if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, *ut.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`request.id`, *ut.ID, `^[a-zA-Z0-9_]{4,15}$`))
 		}
 	}
 	if ut.Mail != nil {
@@ -1106,11 +1101,8 @@ func (ut *UserPayload) Validate() (err error) {
 	if ut.Mail == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "mail"))
 	}
-	if utf8.RuneCountInString(ut.ID) < 4 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.id`, ut.ID, utf8.RuneCountInString(ut.ID), 4, true))
-	}
-	if utf8.RuneCountInString(ut.ID) > 15 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.id`, ut.ID, utf8.RuneCountInString(ut.ID), 15, false))
+	if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, ut.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`type.id`, ut.ID, `^[a-zA-Z0-9_]{4,15}$`))
 	}
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Mail); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, ut.Mail, goa.FormatEmail, err2))

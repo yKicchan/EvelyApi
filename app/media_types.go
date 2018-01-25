@@ -110,8 +110,11 @@ func (mt *Event) Validate() (err error) {
 	if utf8.RuneCountInString(mt.Body) > 1000 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1000, false))
 	}
-	if len(mt.Categorys) > 8 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 8, false))
+	if len(mt.Categorys) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 1, true))
+	}
+	if len(mt.Categorys) > 9 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 9, false))
 	}
 	if mt.Host != nil {
 		if err2 := mt.Host.Validate(); err2 != nil {
@@ -120,6 +123,9 @@ func (mt *Event) Validate() (err error) {
 	}
 	if err2 := goa.ValidateFormat(goa.FormatEmail, mt.Mail); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`response.mail`, mt.Mail, goa.FormatEmail, err2))
+	}
+	if len(mt.Schedules) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.schedules`, mt.Schedules, len(mt.Schedules), 1, true))
 	}
 	for _, e := range mt.Schedules {
 		if e != nil {
@@ -225,8 +231,11 @@ func (mt *EventFull) Validate() (err error) {
 	if utf8.RuneCountInString(mt.Body) > 1000 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.body`, mt.Body, utf8.RuneCountInString(mt.Body), 1000, false))
 	}
-	if len(mt.Categorys) > 8 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 8, false))
+	if len(mt.Categorys) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 1, true))
+	}
+	if len(mt.Categorys) > 9 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 9, false))
 	}
 	if mt.Host != nil {
 		if err2 := mt.Host.Validate(); err2 != nil {
@@ -241,6 +250,9 @@ func (mt *EventFull) Validate() (err error) {
 	}
 	if mt.NoticeRange > 5000 {
 		err = goa.MergeErrors(err, goa.InvalidRangeError(`response.noticeRange`, mt.NoticeRange, 5000, false))
+	}
+	if len(mt.Schedules) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.schedules`, mt.Schedules, len(mt.Schedules), 1, true))
 	}
 	for _, e := range mt.Schedules {
 		if e != nil {
@@ -304,13 +316,19 @@ func (mt *EventTiny) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "schedules"))
 	}
 
-	if len(mt.Categorys) > 8 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 8, false))
+	if len(mt.Categorys) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 1, true))
+	}
+	if len(mt.Categorys) > 9 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.categorys`, mt.Categorys, len(mt.Categorys), 9, false))
 	}
 	if mt.Host != nil {
 		if err2 := mt.Host.Validate(); err2 != nil {
 			err = goa.MergeErrors(err, err2)
 		}
+	}
+	if len(mt.Schedules) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.schedules`, mt.Schedules, len(mt.Schedules), 1, true))
 	}
 	for _, e := range mt.Schedules {
 		if e != nil {
@@ -514,11 +532,8 @@ func (mt *User) Validate() (err error) {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "pins"))
 	}
 
-	if utf8.RuneCountInString(mt.ID) < 4 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.id`, mt.ID, utf8.RuneCountInString(mt.ID), 4, true))
-	}
-	if utf8.RuneCountInString(mt.ID) > 15 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.id`, mt.ID, utf8.RuneCountInString(mt.ID), 15, false))
+	if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, mt.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^[a-zA-Z0-9_]{4,15}$`))
 	}
 	if mt.Mail != nil {
 		if err2 := mt.Mail.Validate(); err2 != nil {
@@ -557,11 +572,8 @@ func (mt *UserTiny) Validate() (err error) {
 	if mt.Icon == "" {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "icon"))
 	}
-	if utf8.RuneCountInString(mt.ID) < 4 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.id`, mt.ID, utf8.RuneCountInString(mt.ID), 4, true))
-	}
-	if utf8.RuneCountInString(mt.ID) > 15 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.id`, mt.ID, utf8.RuneCountInString(mt.ID), 15, false))
+	if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, mt.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^[a-zA-Z0-9_]{4,15}$`))
 	}
 	if utf8.RuneCountInString(mt.Name) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 1, true))

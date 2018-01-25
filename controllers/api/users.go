@@ -42,19 +42,22 @@ func (c *UsersController) Update(ctx *app.UpdateUsersContext) error {
 		// ユーザーの通知トークン情報を更新
 		keys := Keys{"id": id}
 		u, _ := c.db.Users.FindOne(keys)
-		u.NotifyTargets[p.DeviceToken] = p.InstanceID
+		if u.NotifyTargets != nil {
+			u.NotifyTargets[p.DeviceToken] = p.InstanceID
+		} else {
+			u.NotifyTargets = map[string]string{p.DeviceToken: p.InstanceID}
+		}
 		err = c.db.Users.Save(u, keys)
 		if err != nil {
 			return ctx.BadRequest(goa.ErrInternal(err))
 		}
 	} else { // 認証されてこなかったとき
 		// ゲストユーザーとしてトークンを保存
-		nt := map[string]string{p.DeviceToken: p.InstanceID}
 		u := &UserModel{
 			Mail: &Mail{
 				State: STATE_GUEST,
 			},
-			NotifyTargets: nt,
+			NotifyTargets: map[string]string{p.DeviceToken: p.InstanceID},
 		}
 		keys := Keys{"notify_targets." + p.DeviceToken: p.InstanceID}
 		err = c.db.Users.Save(u, keys)
