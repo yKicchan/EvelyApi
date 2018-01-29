@@ -50,7 +50,7 @@ func (c *AuthController) SendMail(ctx *app.SendMailAuthContext) error {
 	}
 
 	// メール送信
-	url := "http://localhost:8888/verify_email?token=" + token
+	url := "https://intense-sea-64868.herokuapp.com/verify_email?token=" + token
 	err = mailer.SendSignUpConfirmMail(email, url)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrInternal(err))
