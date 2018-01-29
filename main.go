@@ -6,8 +6,8 @@ import (
 	"EvelyApi/app"
 	. "EvelyApi/config"
 	"EvelyApi/controllers/api"
-    . "EvelyApi/models"
 	. "EvelyApi/middleware"
+	. "EvelyApi/models"
 	"github.com/goadesign/goa"
 	"github.com/goadesign/goa/middleware"
 	"labix.org/v2/mgo"
@@ -34,7 +34,7 @@ func main() {
 	db := NewEvelyDB(session.DB(DB_NAME))
 
 	// Mount security middleware
-	jwtm, _  := NewJWTMiddleware(db)
+	jwtm, _ := NewJWTMiddleware(db)
 	ojwtm, _ := NewOptionalJWTMiddleware(db)
 	app.UseJWTMiddleware(service, jwtm)
 	app.UseOptionalJWTMiddleware(service, ojwtm)
@@ -52,7 +52,7 @@ func main() {
 	c4 := api.NewUsersController(service, db)
 	app.MountUsersController(service, c4)
 	// Mount "files" controller
-    c5 := api.NewFilesController(service)
+	c5 := api.NewFilesController(service)
 	// c5 := api.NewFilesController(service, db)
 	app.MountFilesController(service, c5)
 	// Mount "pins" controller

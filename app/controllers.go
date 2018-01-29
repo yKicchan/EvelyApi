@@ -106,7 +106,7 @@ func MountAuthController(service *goa.Service, ctrl AuthController) {
 		}
 		// Build the payload
 		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*UserPayload)
+			rctx.Payload = rawPayload.(*SignupPayload)
 		} else {
 			return goa.MissingPayloadError()
 		}
@@ -192,7 +192,7 @@ func unmarshalSigninAuthPayload(ctx context.Context, service *goa.Service, req *
 
 // unmarshalSignupAuthPayload unmarshals the request body into the context request data Payload field.
 func unmarshalSignupAuthPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
-	payload := &userPayload{}
+	payload := &signupPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}
@@ -849,16 +849,89 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 // UsersController is the controller interface for the Users actions.
 type UsersController interface {
 	goa.Muxer
+	Modify(*ModifyUsersContext) error
+	ModifyToken(*ModifyTokenUsersContext) error
+	Setting(*SettingUsersContext) error
 	Show(*ShowUsersContext) error
-	Update(*UpdateUsersContext) error
 }
 
 // MountUsersController "mounts" a Users resource controller on the given service.
 func MountUsersController(service *goa.Service, ctrl UsersController) {
 	initService(service)
 	var h goa.Handler
-	service.Mux.Handle("OPTIONS", "/api/develop/v2/users/:user_id", ctrl.MuxHandler("preflight", handleUsersOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/users", ctrl.MuxHandler("preflight", handleUsersOrigin(cors.HandlePreflight()), nil))
 	service.Mux.Handle("OPTIONS", "/api/develop/v2/users/update/token", ctrl.MuxHandler("preflight", handleUsersOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/users/setting", ctrl.MuxHandler("preflight", handleUsersOrigin(cors.HandlePreflight()), nil))
+	service.Mux.Handle("OPTIONS", "/api/develop/v2/users/:user_id", ctrl.MuxHandler("preflight", handleUsersOrigin(cors.HandlePreflight()), nil))
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewModifyUsersContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*UserModifyPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Modify(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleUsersOrigin(h)
+	service.Mux.Handle("PUT", "/api/develop/v2/users", ctrl.MuxHandler("modify", h, unmarshalModifyUsersPayload))
+	service.LogInfo("mount", "ctrl", "Users", "action", "Modify", "route", "PUT /api/develop/v2/users", "security", "jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewModifyTokenUsersContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*TokenPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.ModifyToken(rctx)
+	}
+	h = handleSecurity("optional_jwt", h, "api:access")
+	h = handleUsersOrigin(h)
+	service.Mux.Handle("POST", "/api/develop/v2/users/update/token", ctrl.MuxHandler("modify_token", h, unmarshalModifyTokenUsersPayload))
+	service.LogInfo("mount", "ctrl", "Users", "action", "ModifyToken", "route", "POST /api/develop/v2/users/update/token", "security", "optional_jwt")
+
+	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
+		// Check if there was an error loading the request
+		if err := goa.ContextError(ctx); err != nil {
+			return err
+		}
+		// Build the context
+		rctx, err := NewSettingUsersContext(ctx, req, service)
+		if err != nil {
+			return err
+		}
+		// Build the payload
+		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
+			rctx.Payload = rawPayload.(*SettingPayload)
+		} else {
+			return goa.MissingPayloadError()
+		}
+		return ctrl.Setting(rctx)
+	}
+	h = handleSecurity("jwt", h, "api:access")
+	h = handleUsersOrigin(h)
+	service.Mux.Handle("PUT", "/api/develop/v2/users/setting", ctrl.MuxHandler("setting", h, unmarshalSettingUsersPayload))
+	service.LogInfo("mount", "ctrl", "Users", "action", "Setting", "route", "PUT /api/develop/v2/users/setting", "security", "jwt")
 
 	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
 		// Check if there was an error loading the request
@@ -875,29 +948,6 @@ func MountUsersController(service *goa.Service, ctrl UsersController) {
 	h = handleUsersOrigin(h)
 	service.Mux.Handle("GET", "/api/develop/v2/users/:user_id", ctrl.MuxHandler("show", h, nil))
 	service.LogInfo("mount", "ctrl", "Users", "action", "Show", "route", "GET /api/develop/v2/users/:user_id")
-
-	h = func(ctx context.Context, rw http.ResponseWriter, req *http.Request) error {
-		// Check if there was an error loading the request
-		if err := goa.ContextError(ctx); err != nil {
-			return err
-		}
-		// Build the context
-		rctx, err := NewUpdateUsersContext(ctx, req, service)
-		if err != nil {
-			return err
-		}
-		// Build the payload
-		if rawPayload := goa.ContextRequest(ctx).Payload; rawPayload != nil {
-			rctx.Payload = rawPayload.(*TokenPayload)
-		} else {
-			return goa.MissingPayloadError()
-		}
-		return ctrl.Update(rctx)
-	}
-	h = handleSecurity("optional_jwt", h, "api:access")
-	h = handleUsersOrigin(h)
-	service.Mux.Handle("POST", "/api/develop/v2/users/update/token", ctrl.MuxHandler("update", h, unmarshalUpdateUsersPayload))
-	service.LogInfo("mount", "ctrl", "Users", "action", "Update", "route", "POST /api/develop/v2/users/update/token", "security", "optional_jwt")
 }
 
 // handleUsersOrigin applies the CORS response headers corresponding to the origin.
@@ -927,9 +977,40 @@ func handleUsersOrigin(h goa.Handler) goa.Handler {
 	}
 }
 
-// unmarshalUpdateUsersPayload unmarshals the request body into the context request data Payload field.
-func unmarshalUpdateUsersPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+// unmarshalModifyUsersPayload unmarshals the request body into the context request data Payload field.
+func unmarshalModifyUsersPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &userModifyPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	payload.Finalize()
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalModifyTokenUsersPayload unmarshals the request body into the context request data Payload field.
+func unmarshalModifyTokenUsersPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
 	payload := &tokenPayload{}
+	if err := service.DecodeRequest(req, payload); err != nil {
+		return err
+	}
+	if err := payload.Validate(); err != nil {
+		// Initialize payload with private data structure so it can be logged
+		goa.ContextRequest(ctx).Payload = payload
+		return err
+	}
+	goa.ContextRequest(ctx).Payload = payload.Publicize()
+	return nil
+}
+
+// unmarshalSettingUsersPayload unmarshals the request body into the context request data Payload field.
+func unmarshalSettingUsersPayload(ctx context.Context, service *goa.Service, req *http.Request) error {
+	payload := &settingPayload{}
 	if err := service.DecodeRequest(req, payload); err != nil {
 		return err
 	}

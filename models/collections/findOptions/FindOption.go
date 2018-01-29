@@ -8,16 +8,17 @@ type findOption struct {
 	offset *int
 	// カテゴリの絞り込み
 	categorys []string
+	ope       string
 }
 
 // 汎用的な検索オプション
 type FindOption interface {
 	SetLimit(int)
 	SetOffset(int)
-	SetCategorys([]string)
+	SetCategorys([]string, bool)
 	GetLimit() int
 	GetOffset() int
-	GetCategorys() []string
+	GetCategorys() ([]string, string)
 	IsLimitSet() bool
 	IsOffsetSet() bool
 	IsCategorysSet() bool
@@ -46,10 +47,16 @@ func (this *findOption) SetOffset(offset int) {
 /**
  * 検索時にカテゴリで絞り込む
  * @param categoy カテゴリ
+ * @param ope     絞り方 true: $all, false: $in
  */
-func (this *findOption) SetCategorys(categorys []string) {
+func (this *findOption) SetCategorys(categorys []string, ope bool) {
 	if categorys != nil {
 		this.categorys = categorys
+		if ope {
+			this.ope = "$all"
+		} else {
+			this.ope = "$in"
+		}
 	}
 }
 
@@ -67,9 +74,10 @@ func (this *findOption) GetOffset() int { return *this.offset }
 
 /**
  * 検索時に絞り込む
- * @return string カテゴリ
+ * @return []string カテゴリ
+ * @return string   絞り方
  */
-func (this *findOption) GetCategorys() []string { return this.categorys }
+func (this *findOption) GetCategorys() ([]string, string) { return this.categorys, this.ope }
 
 /**
  * 検索件数に上限が設定されているかを判定する

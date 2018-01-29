@@ -59,10 +59,11 @@ func (this *EventsCollection) Delete(keys Keys) error {
  */
 func (this *EventsCollection) findEvents(opt FindOption, query bson.M) (events []*EventModel, err error) {
 	if opt.IsCategorysSet() {
+		categorys, ope := opt.GetCategorys()
 		query = bson.M{
 			"$and": []interface{}{
 				query,
-				bson.M{"categorys": bson.M{"$all": opt.GetCategorys()}},
+				bson.M{"categorys": bson.M{ope: categorys}},
 			},
 		}
 	}

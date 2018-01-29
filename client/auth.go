@@ -111,7 +111,7 @@ func SignupAuthPath() string {
 }
 
 // 新規登録
-func (c *Client) SignupAuth(ctx context.Context, path string, payload *UserPayload, contentType string) (*http.Response, error) {
+func (c *Client) SignupAuth(ctx context.Context, path string, payload *SignupPayload, contentType string) (*http.Response, error) {
 	req, err := c.NewSignupAuthRequest(ctx, path, payload, contentType)
 	if err != nil {
 		return nil, err
@@ -120,7 +120,7 @@ func (c *Client) SignupAuth(ctx context.Context, path string, payload *UserPaylo
 }
 
 // NewSignupAuthRequest create the request corresponding to the signup action endpoint of the auth resource.
-func (c *Client) NewSignupAuthRequest(ctx context.Context, path string, payload *UserPayload, contentType string) (*http.Request, error) {
+func (c *Client) NewSignupAuthRequest(ctx context.Context, path string, payload *SignupPayload, contentType string) (*http.Request, error) {
 	var body bytes.Buffer
 	if contentType == "" {
 		contentType = "*/*" // Use default encoder

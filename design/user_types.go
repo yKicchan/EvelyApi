@@ -119,7 +119,7 @@ var EmailPayload = Type("EmailPayload", func() {
 	Required("email")
 })
 
-var UserPayload = Type("UserPayload", func() {
+var SignupPayload = Type("SignupPayload", func() {
 	Description("アカウント作成時に受け取る情報")
 	Reference(TokenPayload)
 	Attribute("id", String, "ユーザーID", func() {
@@ -134,10 +134,6 @@ var UserPayload = Type("UserPayload", func() {
 		MinLength(1)
 		MaxLength(50)
 		Example("きっちゃそ")
-	})
-	Attribute("icon", String, "アイコン画像", func() {
-		Default("")
-		Example("icon.png")
 	})
 	Attribute("mail", String, "メールアドレス", func() {
 		Format("email")
@@ -167,6 +163,32 @@ var Mail = Type("Mail", func() {
 		Example("OK")
 	})
 	Required("email", "state")
+})
+
+var UserModifyPayload = Type("UserModifyPayload", func() {
+	Description("プロフィール編集の時のペイロード")
+	Reference(SignupPayload)
+	Attribute("name", func() {
+		Default("")
+	})
+	Attribute("icon", String, "アイコン画像", func() {
+		Default("")
+		Example("icon.png")
+	})
+	Attribute("email", func() {
+		Default("")
+	})
+	Attribute("tel", func() {
+		Default("")
+	})
+})
+
+var SettingPayload = Type("SettingPayload", func() {
+	Description("ユーザー設定を変更する")
+	Attribute("preferences", ArrayOf(String), "通知を許可するカテゴリの配列", func() {
+		MaxLength(len(Categorys))
+		Example([]string{C_WORK_CONF, C_FESTIVAL})
+	})
 })
 
 var NotifyPayload = Type("NotifyPayload", func() {

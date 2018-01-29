@@ -1,6 +1,7 @@
 package design
 
 import (
+	. "EvelyApi/config"
 	. "github.com/goadesign/goa/design"
 	. "github.com/goadesign/goa/design/apidsl"
 )
@@ -101,7 +102,7 @@ var EventMedia = MediaType("application/vnd.event+json", func() {
 
 var UserMedia = MediaType("application/vnd.user+json", func() {
 	Description("ユーザー情報")
-	Reference(UserPayload)
+	Reference(SignupPayload)
 	Attributes(func() {
 		Attribute("id")
 		Attribute("name")
@@ -113,9 +114,13 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 		Attribute("pins", ArrayOf(String), "ピンしているイベントのID配列", func() {
 			Example([]string{"5a44d5f2775672b659ba00fa", "5a44d5f2775672b659ba00fb"})
 		})
+		Attribute("preferences", ArrayOf(String), "通知を許可するカテゴリの配列", func() {
+			MaxLength(len(Categorys))
+			Example([]string{C_WORK_CONF, C_FESTIVAL})
+		})
 		Attribute("createdAt", DateTime, "作成日時")
 	})
-	Required("id", "name", "icon", "mail", "tel", "pins", "createdAt")
+	Required("id", "name", "icon", "mail", "tel", "pins", "preferences", "createdAt")
 	View("default", func() {
 		Attribute("id")
 		Attribute("name")
@@ -123,6 +128,7 @@ var UserMedia = MediaType("application/vnd.user+json", func() {
 		Attribute("mail")
 		Attribute("tel")
 		Attribute("pins")
+		Attribute("preferences")
 		Attribute("createdAt")
 	})
 	View("tiny", func() {

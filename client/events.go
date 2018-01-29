@@ -132,12 +132,12 @@ func (c *Client) NewListEventsRequest(ctx context.Context, path string, category
 		values.Set("keyword", *keyword)
 	}
 	if limit != nil {
-		tmp24 := strconv.Itoa(*limit)
-		values.Set("limit", tmp24)
+		tmp26 := strconv.Itoa(*limit)
+		values.Set("limit", tmp26)
 	}
 	if offset != nil {
-		tmp25 := strconv.Itoa(*offset)
-		values.Set("offset", tmp25)
+		tmp27 := strconv.Itoa(*offset)
+		values.Set("offset", tmp27)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -220,12 +220,12 @@ func (c *Client) NewMyListEventsRequest(ctx context.Context, path string, limit 
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if limit != nil {
-		tmp26 := strconv.Itoa(*limit)
-		values.Set("limit", tmp26)
+		tmp28 := strconv.Itoa(*limit)
+		values.Set("limit", tmp28)
 	}
 	if offset != nil {
-		tmp27 := strconv.Itoa(*offset)
-		values.Set("offset", tmp27)
+		tmp29 := strconv.Itoa(*offset)
+		values.Set("offset", tmp29)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -263,22 +263,22 @@ func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat fl
 	}
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
-	tmp28 := strconv.FormatFloat(lat, 'f', -1, 64)
-	values.Set("lat", tmp28)
-	tmp29 := strconv.FormatFloat(lng, 'f', -1, 64)
-	values.Set("lng", tmp29)
-	tmp30 := strconv.Itoa(range_)
-	values.Set("range", tmp30)
+	tmp30 := strconv.FormatFloat(lat, 'f', -1, 64)
+	values.Set("lat", tmp30)
+	tmp31 := strconv.FormatFloat(lng, 'f', -1, 64)
+	values.Set("lng", tmp31)
+	tmp32 := strconv.Itoa(range_)
+	values.Set("range", tmp32)
 	if category != nil {
 		values.Set("category", *category)
 	}
 	if limit != nil {
-		tmp31 := strconv.Itoa(*limit)
-		values.Set("limit", tmp31)
+		tmp33 := strconv.Itoa(*limit)
+		values.Set("limit", tmp33)
 	}
 	if offset != nil {
-		tmp32 := strconv.Itoa(*offset)
-		values.Set("offset", tmp32)
+		tmp34 := strconv.Itoa(*offset)
+		values.Set("offset", tmp34)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -361,12 +361,12 @@ func (c *Client) NewPinEventsRequest(ctx context.Context, path string, limit *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if limit != nil {
-		tmp33 := strconv.Itoa(*limit)
-		values.Set("limit", tmp33)
+		tmp35 := strconv.Itoa(*limit)
+		values.Set("limit", tmp35)
 	}
 	if offset != nil {
-		tmp34 := strconv.Itoa(*offset)
-		values.Set("offset", tmp34)
+		tmp36 := strconv.Itoa(*offset)
+		values.Set("offset", tmp36)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -400,8 +400,8 @@ func (c *Client) NewShowEventsRequest(ctx context.Context, path string, ids []st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	for _, p := range ids {
-		tmp35 := p
-		values.Add("ids", tmp35)
+		tmp37 := p
+		values.Add("ids", tmp37)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)

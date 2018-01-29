@@ -145,6 +145,47 @@ define(['axios'] , function (axios) {
     return client(cfg);
   }
 
+  // プロフィール編集
+  // path is the request path, the format is "/api/develop/v2/users"
+  // data contains the action payload (request body)
+  // config is an optional object to be merged into the config built by the function prior to making the request.
+  // The content of the config object is described here: https://github.com/mzabriskie/axios#request-api
+  // This function returns a promise which raises an error if the HTTP response is a 4xx or 5xx.
+  client.modifyUsers = function (path, data, config) {
+    var cfg = {
+      timeout: timeout,
+      url: urlPrefix + path,
+      method: 'put',
+    data: data,
+      responseType: 'json'
+    };
+    if (config) {
+      cfg = merge(cfg, config);
+    }
+    return client(cfg);
+  }
+
+  // インスタンスIDの登録・更新
+認証ありで登録ユーザーを、認証なしでゲストユーザーを登録・更新する
+  // path is the request path, the format is "/api/develop/v2/users/update/token"
+  // data contains the action payload (request body)
+  // config is an optional object to be merged into the config built by the function prior to making the request.
+  // The content of the config object is described here: https://github.com/mzabriskie/axios#request-api
+  // This function returns a promise which raises an error if the HTTP response is a 4xx or 5xx.
+  client.modify_tokenUsers = function (path, data, config) {
+    var cfg = {
+      timeout: timeout,
+      url: urlPrefix + path,
+      method: 'post',
+    data: data,
+      responseType: 'json'
+    };
+    if (config) {
+      cfg = merge(cfg, config);
+    }
+    return client(cfg);
+  }
+
   // 自分のイベント一覧を取得する
   // path is the request path, the format is "/api/develop/v2/events/my_list"
   // limit, offset are used to build the request query string.
@@ -298,6 +339,26 @@ define(['axios'] , function (axios) {
     return client(cfg);
   }
 
+  // 設定を変更する
+  // path is the request path, the format is "/api/develop/v2/users/setting"
+  // data contains the action payload (request body)
+  // config is an optional object to be merged into the config built by the function prior to making the request.
+  // The content of the config object is described here: https://github.com/mzabriskie/axios#request-api
+  // This function returns a promise which raises an error if the HTTP response is a 4xx or 5xx.
+  client.settingUsers = function (path, data, config) {
+    var cfg = {
+      timeout: timeout,
+      url: urlPrefix + path,
+      method: 'put',
+    data: data,
+      responseType: 'json'
+    };
+    if (config) {
+      cfg = merge(cfg, config);
+    }
+    return client(cfg);
+  }
+
   // イベント情報取得
   // path is the request path, the format is "/api/develop/v2/events/detail"
   // ids is used to build the request query string.
@@ -388,27 +449,6 @@ define(['axios'] , function (axios) {
       timeout: timeout,
       url: urlPrefix + path,
       method: 'get',
-      responseType: 'json'
-    };
-    if (config) {
-      cfg = merge(cfg, config);
-    }
-    return client(cfg);
-  }
-
-  // インスタンスIDの登録・更新
-認証ありで登録ユーザーを、認証なしでゲストユーザーを登録・更新する
-  // path is the request path, the format is "/api/develop/v2/users/update/token"
-  // data contains the action payload (request body)
-  // config is an optional object to be merged into the config built by the function prior to making the request.
-  // The content of the config object is described here: https://github.com/mzabriskie/axios#request-api
-  // This function returns a promise which raises an error if the HTTP response is a 4xx or 5xx.
-  client.updateUsers = function (path, data, config) {
-    var cfg = {
-      timeout: timeout,
-      url: urlPrefix + path,
-      method: 'post',
-    data: data,
       responseType: 'json'
     };
     if (config) {

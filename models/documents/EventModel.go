@@ -27,7 +27,7 @@ var EVENT_TINY_SELECTOR = bson.M{
 	"_id":       1,
 	"image":     1,
 	"title":     1,
-	"categorys":  1,
+	"categorys": 1,
 	"host":      1,
 	"schedules": 1,
 	"reviews":   1,

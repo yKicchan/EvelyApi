@@ -344,7 +344,7 @@ func SigninAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Servic
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func SignupAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.UserPayload) (http.ResponseWriter, error) {
+func SignupAuthBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.SignupPayload) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -423,7 +423,7 @@ func SignupAuthBadRequest(t goatest.TInterface, ctx context.Context, service *go
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func SignupAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.UserPayload) (http.ResponseWriter, *app.Token) {
+func SignupAuthOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.AuthController, payload *app.SignupPayload) (http.ResponseWriter, *app.Token) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer

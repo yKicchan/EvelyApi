@@ -7,15 +7,16 @@ import (
 
 // ユーザーの全情報を抽出するセレクタ
 var USER_DEFAULT_SELECTOR = bson.M{
-	"_id":       0,
-	"id":        1,
-	"password":  1,
-	"name":      1,
-	"icon":      1,
-	"mail":      1,
-	"tel":       1,
-	"pins":      1,
-	"create_at": 1,
+	"_id":         0,
+	"id":          1,
+	"password":    1,
+	"name":        1,
+	"icon":        1,
+	"mail":        1,
+	"tel":         1,
+	"pins":        1,
+	"preferences": 1,
+	"create_at":   1,
 }
 
 // ユーザーの一部情報のみ抽出するセレクタ
@@ -36,6 +37,7 @@ type UserModel struct {
 	Tel           string            `bson:"tel"`
 	Pins          []bson.ObjectId   `bson:"pins"`
 	NotifyTargets map[string]string `bson:"notify_targets"`
+	Preferences   []string          `bson:"preferences"`
 	CreatedAt     time.Time         `bson:"created_at"`
 }
 

@@ -94,7 +94,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Et rem odio et possimus cupiditate.
+          example: Totam ipsa sit enim accusamus voluptatum natus.
           type: string
         maxLength: 9
         minLength: 1
@@ -110,7 +110,7 @@ definitions:
         - http://evely.net:8888/download/doc1.jpg
         - http://evely.net:8888/download/doc2.pdf
         items:
-          example: Qui omnis.
+          example: Et rem odio et possimus cupiditate.
           type: string
         type: array
       host:
@@ -391,7 +391,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Et rem odio et possimus cupiditate.
+          example: Totam ipsa sit enim accusamus voluptatum natus.
           type: string
         maxLength: 9
         minLength: 1
@@ -402,7 +402,7 @@ definitions:
         - doc1.jpg
         - doc2.pdf
         items:
-          example: Totam ipsa sit enim accusamus voluptatum natus.
+          example: Quidem delectus aut eius.
           type: string
         type: array
       image:
@@ -600,7 +600,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Delectus aut eius iusto.
+          example: Voluptatem sit tempore consequatur.
           type: string
         type: array
     required:
@@ -635,7 +635,7 @@ definitions:
         - http://evely.net:8888/download/angle1.jpg
         - http://evely.net:8888/download/angle2.jpg
         items:
-          example: Voluptatem sit tempore consequatur.
+          example: Ea et et illum cupiditate.
           type: string
         type: array
       id:
@@ -703,6 +703,18 @@ definitions:
         id: yKicchan
         name: きっちゃそ
       title: 5ayymcy
+    - body: jrahm9nry5
+      files:
+      - http://evely.net:8888/download/angle1.jpg
+      - http://evely.net:8888/download/angle2.jpg
+      id: ""
+      rate: 4
+      reviewedAt: 2014-07-04T20:53:13Z
+      reviewer:
+        icon: http://evely.net:8888/download/icon.png
+        id: yKicchan
+        name: きっちゃそ
+      title: 5ayymcy
     items:
       $ref: '#/definitions/Review'
     title: 'Mediatype identifier: application/vnd.review+json; type=collection; view=default'
@@ -729,7 +741,7 @@ definitions:
         - angle1.jpg
         - angle2.jpg
         items:
-          example: Ea et et illum cupiditate.
+          example: Magnam necessitatibus quod provident.
           type: string
         type: array
       rate:
@@ -773,6 +785,79 @@ definitions:
     - location
     - upcomingDate
     title: Schedule
+    type: object
+  SettingPayload:
+    description: ユーザー設定を変更する
+    example:
+      preferences:
+      - Workshop & Conference
+      - Festival
+    properties:
+      preferences:
+        description: 通知を許可するカテゴリの配列
+        example:
+        - Workshop & Conference
+        - Festival
+        items:
+          example: Neque in.
+          type: string
+        maxLength: 9
+        type: array
+    title: SettingPayload
+    type: object
+  SignupPayload:
+    description: アカウント作成時に受け取る情報
+    example:
+      device_token: token
+      id: yKicchan
+      instance_id: id
+      mail: yKicchanApp@gmail.com
+      name: きっちゃそ
+      password: password
+      tel: 090-1234-5678
+    properties:
+      device_token:
+        default: ""
+        description: デバイストークン
+        example: token
+        type: string
+      id:
+        description: ユーザーID
+        example: yKicchan
+        pattern: ^[a-zA-Z0-9_]{4,15}$
+        type: string
+      instance_id:
+        default: ""
+        description: インスタンスID
+        example: id
+        type: string
+      mail:
+        description: メールアドレス
+        example: yKicchanApp@gmail.com
+        format: email
+        type: string
+      name:
+        description: 名前
+        example: きっちゃそ
+        maxLength: 50
+        minLength: 1
+        type: string
+      password:
+        description: パスワード
+        example: password
+        minLength: 8
+        type: string
+      tel:
+        default: ""
+        description: 電話番号
+        example: 090-1234-5678
+        type: string
+    required:
+    - id
+    - password
+    - name
+    - mail
+    title: SignupPayload
     type: object
   Token:
     description: アクセストークン (default view)
@@ -838,6 +923,9 @@ definitions:
       pins:
       - 5a44d5f2775672b659ba00fa
       - 5a44d5f2775672b659ba00fb
+      preferences:
+      - Workshop & Conference
+      - Festival
       tel: 090-1234-5678
     properties:
       createdAt:
@@ -846,7 +934,6 @@ definitions:
         format: date-time
         type: string
       icon:
-        default: ""
         description: アイコン画像のURL
         example: http://evely.net:8888/download/icon.png
         type: string
@@ -869,8 +956,18 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Necessitatibus quod provident quos.
+          example: Delectus est veritatis dicta beatae non.
           type: string
+        type: array
+      preferences:
+        description: 通知を許可するカテゴリの配列
+        example:
+        - Workshop & Conference
+        - Festival
+        items:
+          example: Ex consequatur sequi inventore placeat.
+          type: string
+        maxLength: 9
         type: array
       tel:
         default: ""
@@ -884,68 +981,40 @@ definitions:
     - mail
     - tel
     - pins
+    - preferences
     - createdAt
     title: 'Mediatype identifier: application/vnd.user+json; view=default'
     type: object
-  UserPayload:
-    description: アカウント作成時に受け取る情報
+  UserModifyPayload:
+    description: プロフィール編集の時のペイロード
     example:
-      device_token: token
+      email: Qui omnis.
       icon: icon.png
-      id: yKicchan
-      instance_id: id
-      mail: yKicchanApp@gmail.com
       name: きっちゃそ
-      password: password
       tel: 090-1234-5678
     properties:
-      device_token:
+      email:
         default: ""
-        description: デバイストークン
-        example: token
+        example: Qui omnis.
         type: string
       icon:
         default: ""
         description: アイコン画像
         example: icon.png
         type: string
-      id:
-        description: ユーザーID
-        example: yKicchan
-        pattern: ^[a-zA-Z0-9_]{4,15}$
-        type: string
-      instance_id:
-        default: ""
-        description: インスタンスID
-        example: id
-        type: string
-      mail:
-        description: メールアドレス
-        example: yKicchanApp@gmail.com
-        format: email
-        type: string
       name:
+        default: ""
         description: 名前
         example: きっちゃそ
         maxLength: 50
         minLength: 1
-        type: string
-      password:
-        description: パスワード
-        example: password
-        minLength: 8
         type: string
       tel:
         default: ""
         description: 電話番号
         example: 090-1234-5678
         type: string
-    required:
-    - id
-    - password
-    - name
-    - mail
-    title: UserPayload
+    title: UserModifyPayload
     type: object
   UserTiny:
     description: ユーザー情報 (tiny view)
@@ -955,7 +1024,6 @@ definitions:
       name: きっちゃそ
     properties:
       icon:
-        default: ""
         description: アイコン画像のURL
         example: http://evely.net:8888/download/icon.png
         type: string
@@ -1063,7 +1131,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/UserPayload'
+          $ref: '#/definitions/SignupPayload'
       produces:
       - application/vnd.goa.error
       - application/vnd.token+json
@@ -1773,6 +1841,45 @@ paths:
       summary: create reviews
       tags:
       - reviews
+  /api/develop/v2/users:
+    put:
+      description: |-
+        プロフィール編集
+
+        Required security scopes:
+          * `api:access`
+      operationId: users#modify
+      parameters:
+      - description: プロフィール編集の時のペイロード
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/UserModifyPayload'
+      produces:
+      - application/vnd.goa.error
+      - application/vnd.token+json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: modify users
+      tags:
+      - users
   /api/develop/v2/users/{user_id}:
     get:
       description: アカウント情報取得
@@ -1804,6 +1911,43 @@ paths:
       summary: show users
       tags:
       - users
+  /api/develop/v2/users/setting:
+    put:
+      description: |-
+        設定を変更する
+
+        Required security scopes:
+          * `api:access`
+      operationId: users#setting
+      parameters:
+      - description: ユーザー設定を変更する
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/SettingPayload'
+      produces:
+      - application/vnd.goa.error
+      - text/plain
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/error'
+      schemes:
+      - http
+      security:
+      - jwt:
+        - api:access
+      summary: setting users
+      tags:
+      - users
   /api/develop/v2/users/update/token:
     post:
       description: |-
@@ -1812,7 +1956,7 @@ paths:
 
         Required security scopes:
           * `api:access`
-      operationId: users#update
+      operationId: users#modify_token
       parameters:
       - description: 通知先を更新・登録するためのデバイストークンとインスタンスIDのペア
         in: body
@@ -1839,7 +1983,7 @@ paths:
       security:
       - optional_jwt:
         - api:access
-      summary: update users
+      summary: modify_token users
       tags:
       - users
   /download/{filename}:

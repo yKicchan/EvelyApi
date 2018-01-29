@@ -13,11 +13,11 @@ import (
  */
 func ToEventMedia(e *EventModel) *app.Event {
 	return &app.Event{
-		ID:    e.ID.Hex(),
-		Image: toFileMedia(e.Image),
-		Title: e.Title,
-		Body:  e.Body,
-		Files: toFilesMedia(e.Files),
+		ID:        e.ID.Hex(),
+		Image:     toFileMedia(e.Image),
+		Title:     e.Title,
+		Body:      e.Body,
+		Files:     toFilesMedia(e.Files),
 		Categorys: e.Categorys,
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
@@ -41,9 +41,9 @@ func ToEventMedia(e *EventModel) *app.Event {
  */
 func ToEventTinyMedia(e *EventModel) *app.EventTiny {
 	return &app.EventTiny{
-		ID:    e.ID.Hex(),
-		Image: toFileMedia(e.Image),
-		Title: e.Title,
+		ID:        e.ID.Hex(),
+		Image:     toFileMedia(e.Image),
+		Title:     e.Title,
 		Categorys: e.Categorys,
 		Host: &app.UserTiny{
 			ID:   e.Host.ID,
@@ -87,9 +87,10 @@ func ToUserMedia(u *UserModel) *app.User {
 			Email: u.Mail.Email,
 			State: u.Mail.State,
 		},
-		Tel:       u.Tel,
-		Pins:      toPinsMedia(u.Pins),
-		CreatedAt: u.CreatedAt,
+		Tel:         u.Tel,
+		Pins:        toPinsMedia(u.Pins),
+		Preferences: u.Preferences,
+		CreatedAt:   u.CreatedAt,
 	}
 }
 

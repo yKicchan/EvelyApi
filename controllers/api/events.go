@@ -96,7 +96,7 @@ func (c *EventsController) List(ctx *app.ListEventsContext) error {
 	opt.SetOffset(ctx.Offset)
 	opt.SetKeyword(ctx.Keyword)
 	if ctx.Category != nil {
-		opt.SetCategorys([]string{*ctx.Category})
+		opt.SetCategorys([]string{*ctx.Category}, true)
 	}
 	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
@@ -206,7 +206,7 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	opt.SetOffset(ctx.Offset)
 	opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
 	if ctx.Category != nil {
-		opt.SetCategorys([]string{*ctx.Category})
+		opt.SetCategorys([]string{*ctx.Category}, true)
 	}
 	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
@@ -240,9 +240,29 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 		return res
 	}
 
-	// 現在地から最大通知範囲より内のイベントを取得
+	// イベントの検索オプション
 	p := ctx.Payload
 	opt := NewFindEventsOption()
+
+	// 通知先のインスタンスIDを設定
+	var ids []string
+	uid, err := GetLoginID(ctx)
+	if err == nil { // 認証されて来たとき
+		// 登録されている全てのインスタンスIDを設定
+		u, _ := c.db.Users.FindOne(Keys{"id": uid})
+		for _, id := range u.NotifyTargets {
+			ids = append(ids, id)
+		}
+		// ユーザーが通知を許可しているカテゴリの中からイベント検索
+		opt.SetCategorys(u.Preferences, false)
+	} else if p.InstanceID != "" { // 認証されてこなかったとき
+		// POST送信されてきたインスタンスIDを設定
+		ids = []string{p.InstanceID}
+	} else { // 認証されず、インスタンスIDもないとき
+		return ctx.BadRequest(goa.ErrBadRequest("認証するか、インスタンスIDを設定してください"))
+	}
+
+	// 現在地から最大通知範囲より内のイベントを取得
 	opt.SetLocation(p.Lat, p.Lng, MAX_NOTICE_RANGE)
 	events, err := c.db.Events.FindEvents(opt)
 	if err != nil {
@@ -252,33 +272,20 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 	// 通知範囲内のイベントだけに絞る
 	events = contain(events, p.Lat, p.Lng)
 	if len(events) == 0 {
-		return nil
+		return ctx.OK([]byte("近くに通知するイベントはありませんでした"))
 	}
 
 	// 通知メッージを作成
-	var data map[string]string
-	// 一番近かったイベントをTitleに設定する
-	data["sum"] = "近くで" + events[0].Title + "が開催されています！"
+	// 一番近いイベントをタイトルにする
+	data := map[string]string{
+		"sum": "近くで" + events[0].Title + "が開催されています！",
+	}
 	// 他にイベントが複数件あった場合Tipsを設定
 	if len(events) > 1 {
 		data["msg"] = "他" + strconv.Itoa(len(events)) + "件のイベント"
 	}
 
-	// 通知先のインスタンスIDを設定し、プッシュ通知送信
-	var ids []string
-	uid, err := GetLoginID(ctx)
-	if err == nil { // 認証されて来たとき
-		// 登録されている全てのインスタンスIDを設定
-		u, _ := c.db.Users.FindOne(Keys{"id": uid})
-		for _, id := range u.NotifyTargets {
-			ids = append(ids, id)
-		}
-	} else if p.InstanceID != "" { // 認証されてこなかったとき
-		// POST送信されてきたインスタンスIDを設定
-		ids = []string{p.InstanceID}
-	} else { // 認証されず、インスタンスIDもないとき
-		return ctx.BadRequest(goa.ErrBadRequest("認証するか、インスタンスIDを設定してください"))
-	}
+	// プッシュ通知送信
 	cl := fcm.NewFcmClient(FCM_SERVER_KEY)
 	cl.NewFcmRegIdsMsg(ids, data)
 	status, err := cl.Send()
@@ -287,7 +294,7 @@ func (c *EventsController) Notify(ctx *app.NotifyEventsContext) error {
 	} else {
 		status.PrintResults()
 	}
-	return nil
+	return ctx.OK([]byte(strconv.Itoa(len(events)) + "件のイベントを検知しました"))
 }
 
 // Pin runs the pin action.

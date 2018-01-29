@@ -21,7 +21,7 @@ var _ = Resource("auth", func() {
 	Action("signup", func() {
 		Description("新規登録")
 		Routing(POST("/signup"))
-		Payload(UserPayload)
+		Payload(SignupPayload)
 		Response(OK, TokenMedia)
 		Response(BadRequest, ErrorMedia)
 	})
@@ -266,7 +266,19 @@ var _ = Resource("users", func() {
 		Response(NotFound, ErrorMedia)
 	})
 
-	Action("update", func() {
+	Action("modify", func() {
+		Description("プロフィール編集")
+		Security(JWT, func() {
+			Scope("api:access")
+		})
+		Routing(PUT(""))
+		Payload(UserModifyPayload)
+		Response(OK, TokenMedia)
+		Response(BadRequest, ErrorMedia)
+		Response(Unauthorized, ErrorMedia)
+	})
+
+	Action("modify_token", func() {
 		Description("インスタンスIDの登録・更新\n認証ありで登録ユーザーを、認証なしでゲストユーザーを登録・更新する")
 		Security(OptionalJWT, func() {
 			Scope("api:access")
@@ -276,6 +288,18 @@ var _ = Resource("users", func() {
 		Response(OK)
 		Response(BadRequest, ErrorMedia)
 		Response(NotFound, ErrorMedia)
+	})
+
+	Action("setting", func() {
+		Description("設定を変更する")
+		Security(JWT, func() {
+			Scope("api:access")
+		})
+		Routing(PUT("/setting"))
+		Payload(SettingPayload)
+		Response(OK)
+		Response(BadRequest, ErrorMedia)
+		Response(Unauthorized, ErrorMedia)
 	})
 })
 

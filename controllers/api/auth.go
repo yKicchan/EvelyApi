@@ -126,7 +126,6 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		ID:       p.ID,
 		Password: string(pass),
 		Name:     p.Name,
-		Icon:     p.Icon,
 		Mail: &Mail{
 			Email: p.Mail,
 			State: STATE_OK,

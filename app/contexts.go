@@ -97,7 +97,7 @@ type SignupAuthContext struct {
 	context.Context
 	*goa.ResponseData
 	*goa.RequestData
-	Payload *UserPayload
+	Payload *SignupPayload
 }
 
 // NewSignupAuthContext parses the incoming request URL and body, performs validations and creates the
@@ -1279,6 +1279,142 @@ func (ctx *ListReviewsContext) NotFound(r error) error {
 	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
 }
 
+// ModifyUsersContext provides the users modify action context.
+type ModifyUsersContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *UserModifyPayload
+}
+
+// NewModifyUsersContext parses the incoming request URL and body, performs validations and creates the
+// context used by the users controller modify action.
+func NewModifyUsersContext(ctx context.Context, r *http.Request, service *goa.Service) (*ModifyUsersContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ModifyUsersContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ModifyUsersContext) OK(r *Token) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.token+json")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ModifyUsersContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *ModifyUsersContext) Unauthorized(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
+}
+
+// ModifyTokenUsersContext provides the users modify_token action context.
+type ModifyTokenUsersContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *TokenPayload
+}
+
+// NewModifyTokenUsersContext parses the incoming request URL and body, performs validations and creates the
+// context used by the users controller modify_token action.
+func NewModifyTokenUsersContext(ctx context.Context, r *http.Request, service *goa.Service) (*ModifyTokenUsersContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := ModifyTokenUsersContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *ModifyTokenUsersContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *ModifyTokenUsersContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
+// NotFound sends a HTTP response with status code 404.
+func (ctx *ModifyTokenUsersContext) NotFound(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
+}
+
+// SettingUsersContext provides the users setting action context.
+type SettingUsersContext struct {
+	context.Context
+	*goa.ResponseData
+	*goa.RequestData
+	Payload *SettingPayload
+}
+
+// NewSettingUsersContext parses the incoming request URL and body, performs validations and creates the
+// context used by the users controller setting action.
+func NewSettingUsersContext(ctx context.Context, r *http.Request, service *goa.Service) (*SettingUsersContext, error) {
+	var err error
+	resp := goa.ContextResponse(ctx)
+	resp.Service = service
+	req := goa.ContextRequest(ctx)
+	req.Request = r
+	rctx := SettingUsersContext{Context: ctx, ResponseData: resp, RequestData: req}
+	return &rctx, err
+}
+
+// OK sends a HTTP response with status code 200.
+func (ctx *SettingUsersContext) OK(resp []byte) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
+	}
+	ctx.ResponseData.WriteHeader(200)
+	_, err := ctx.ResponseData.Write(resp)
+	return err
+}
+
+// BadRequest sends a HTTP response with status code 400.
+func (ctx *SettingUsersContext) BadRequest(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
+}
+
+// Unauthorized sends a HTTP response with status code 401.
+func (ctx *SettingUsersContext) Unauthorized(r error) error {
+	if ctx.ResponseData.Header().Get("Content-Type") == "" {
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
+	}
+	return ctx.ResponseData.Service.Send(ctx.Context, 401, r)
+}
+
 // ShowUsersContext provides the users show action context.
 type ShowUsersContext struct {
 	context.Context
@@ -1330,52 +1466,6 @@ func (ctx *ShowUsersContext) BadRequest(r error) error {
 
 // NotFound sends a HTTP response with status code 404.
 func (ctx *ShowUsersContext) NotFound(r error) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 404, r)
-}
-
-// UpdateUsersContext provides the users update action context.
-type UpdateUsersContext struct {
-	context.Context
-	*goa.ResponseData
-	*goa.RequestData
-	Payload *TokenPayload
-}
-
-// NewUpdateUsersContext parses the incoming request URL and body, performs validations and creates the
-// context used by the users controller update action.
-func NewUpdateUsersContext(ctx context.Context, r *http.Request, service *goa.Service) (*UpdateUsersContext, error) {
-	var err error
-	resp := goa.ContextResponse(ctx)
-	resp.Service = service
-	req := goa.ContextRequest(ctx)
-	req.Request = r
-	rctx := UpdateUsersContext{Context: ctx, ResponseData: resp, RequestData: req}
-	return &rctx, err
-}
-
-// OK sends a HTTP response with status code 200.
-func (ctx *UpdateUsersContext) OK(resp []byte) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "text/plain")
-	}
-	ctx.ResponseData.WriteHeader(200)
-	_, err := ctx.ResponseData.Write(resp)
-	return err
-}
-
-// BadRequest sends a HTTP response with status code 400.
-func (ctx *UpdateUsersContext) BadRequest(r error) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 400, r)
-}
-
-// NotFound sends a HTTP response with status code 404.
-func (ctx *UpdateUsersContext) NotFound(r error) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
 		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.goa.error")
 	}

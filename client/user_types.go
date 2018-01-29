@@ -860,6 +860,200 @@ func (ut *Schedule) Validate() (err error) {
 	return
 }
 
+// ユーザー設定を変更する
+type settingPayload struct {
+	// 通知を許可するカテゴリの配列
+	Preferences []string `form:"preferences,omitempty" json:"preferences,omitempty" xml:"preferences,omitempty"`
+}
+
+// Validate validates the settingPayload type instance.
+func (ut *settingPayload) Validate() (err error) {
+	if ut.Preferences != nil {
+		if len(ut.Preferences) > 9 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.preferences`, ut.Preferences, len(ut.Preferences), 9, false))
+		}
+	}
+	return
+}
+
+// Publicize creates SettingPayload from settingPayload
+func (ut *settingPayload) Publicize() *SettingPayload {
+	var pub SettingPayload
+	if ut.Preferences != nil {
+		pub.Preferences = ut.Preferences
+	}
+	return &pub
+}
+
+// ユーザー設定を変更する
+type SettingPayload struct {
+	// 通知を許可するカテゴリの配列
+	Preferences []string `form:"preferences,omitempty" json:"preferences,omitempty" xml:"preferences,omitempty"`
+}
+
+// Validate validates the SettingPayload type instance.
+func (ut *SettingPayload) Validate() (err error) {
+	if ut.Preferences != nil {
+		if len(ut.Preferences) > 9 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`type.preferences`, ut.Preferences, len(ut.Preferences), 9, false))
+		}
+	}
+	return
+}
+
+// アカウント作成時に受け取る情報
+type signupPayload struct {
+	// デバイストークン
+	DeviceToken *string `form:"device_token,omitempty" json:"device_token,omitempty" xml:"device_token,omitempty"`
+	// ユーザーID
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// インスタンスID
+	InstanceID *string `form:"instance_id,omitempty" json:"instance_id,omitempty" xml:"instance_id,omitempty"`
+	// メールアドレス
+	Mail *string `form:"mail,omitempty" json:"mail,omitempty" xml:"mail,omitempty"`
+	// 名前
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// パスワード
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
+	// 電話番号
+	Tel *string `form:"tel,omitempty" json:"tel,omitempty" xml:"tel,omitempty"`
+}
+
+// Finalize sets the default values for signupPayload type instance.
+func (ut *signupPayload) Finalize() {
+	var defaultDeviceToken = ""
+	if ut.DeviceToken == nil {
+		ut.DeviceToken = &defaultDeviceToken
+	}
+	var defaultInstanceID = ""
+	if ut.InstanceID == nil {
+		ut.InstanceID = &defaultInstanceID
+	}
+	var defaultTel = ""
+	if ut.Tel == nil {
+		ut.Tel = &defaultTel
+	}
+}
+
+// Validate validates the signupPayload type instance.
+func (ut *signupPayload) Validate() (err error) {
+	if ut.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "id"))
+	}
+	if ut.Password == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "password"))
+	}
+	if ut.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
+	}
+	if ut.Mail == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "mail"))
+	}
+	if ut.ID != nil {
+		if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, *ut.ID); !ok {
+			err = goa.MergeErrors(err, goa.InvalidPatternError(`request.id`, *ut.ID, `^[a-zA-Z0-9_]{4,15}$`))
+		}
+	}
+	if ut.Mail != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Mail); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.mail`, *ut.Mail, goa.FormatEmail, err2))
+		}
+	}
+	if ut.Name != nil {
+		if utf8.RuneCountInString(*ut.Name) < 1 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 1, true))
+		}
+	}
+	if ut.Name != nil {
+		if utf8.RuneCountInString(*ut.Name) > 50 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 50, false))
+		}
+	}
+	if ut.Password != nil {
+		if utf8.RuneCountInString(*ut.Password) < 8 {
+			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.password`, *ut.Password, utf8.RuneCountInString(*ut.Password), 8, true))
+		}
+	}
+	return
+}
+
+// Publicize creates SignupPayload from signupPayload
+func (ut *signupPayload) Publicize() *SignupPayload {
+	var pub SignupPayload
+	if ut.DeviceToken != nil {
+		pub.DeviceToken = *ut.DeviceToken
+	}
+	if ut.ID != nil {
+		pub.ID = *ut.ID
+	}
+	if ut.InstanceID != nil {
+		pub.InstanceID = *ut.InstanceID
+	}
+	if ut.Mail != nil {
+		pub.Mail = *ut.Mail
+	}
+	if ut.Name != nil {
+		pub.Name = *ut.Name
+	}
+	if ut.Password != nil {
+		pub.Password = *ut.Password
+	}
+	if ut.Tel != nil {
+		pub.Tel = *ut.Tel
+	}
+	return &pub
+}
+
+// アカウント作成時に受け取る情報
+type SignupPayload struct {
+	// デバイストークン
+	DeviceToken string `form:"device_token" json:"device_token" xml:"device_token"`
+	// ユーザーID
+	ID string `form:"id" json:"id" xml:"id"`
+	// インスタンスID
+	InstanceID string `form:"instance_id" json:"instance_id" xml:"instance_id"`
+	// メールアドレス
+	Mail string `form:"mail" json:"mail" xml:"mail"`
+	// 名前
+	Name string `form:"name" json:"name" xml:"name"`
+	// パスワード
+	Password string `form:"password" json:"password" xml:"password"`
+	// 電話番号
+	Tel string `form:"tel" json:"tel" xml:"tel"`
+}
+
+// Validate validates the SignupPayload type instance.
+func (ut *SignupPayload) Validate() (err error) {
+	if ut.ID == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "id"))
+	}
+	if ut.Password == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "password"))
+	}
+	if ut.Name == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
+	}
+	if ut.Mail == "" {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "mail"))
+	}
+	if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, ut.ID); !ok {
+		err = goa.MergeErrors(err, goa.InvalidPatternError(`type.id`, ut.ID, `^[a-zA-Z0-9_]{4,15}$`))
+	}
+	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Mail); err2 != nil {
+		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, ut.Mail, goa.FormatEmail, err2))
+	}
+	if utf8.RuneCountInString(ut.Name) < 1 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 1, true))
+	}
+	if utf8.RuneCountInString(ut.Name) > 50 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 50, false))
+	}
+	if utf8.RuneCountInString(ut.Password) < 8 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.password`, ut.Password, utf8.RuneCountInString(ut.Password), 8, true))
+	}
+	return
+}
+
 // 通知先を更新・登録するためのデバイストークンとインスタンスIDのペア
 type tokenPayload struct {
 	// デバイストークン
@@ -955,39 +1149,30 @@ func (ut *UpcomingDate) Validate() (err error) {
 	return
 }
 
-// アカウント作成時に受け取る情報
-type userPayload struct {
-	// デバイストークン
-	DeviceToken *string `form:"device_token,omitempty" json:"device_token,omitempty" xml:"device_token,omitempty"`
+// プロフィール編集の時のペイロード
+type userModifyPayload struct {
+	Email *string `form:"email,omitempty" json:"email,omitempty" xml:"email,omitempty"`
 	// アイコン画像
 	Icon *string `form:"icon,omitempty" json:"icon,omitempty" xml:"icon,omitempty"`
-	// ユーザーID
-	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	// インスタンスID
-	InstanceID *string `form:"instance_id,omitempty" json:"instance_id,omitempty" xml:"instance_id,omitempty"`
-	// メールアドレス
-	Mail *string `form:"mail,omitempty" json:"mail,omitempty" xml:"mail,omitempty"`
 	// 名前
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
-	// パスワード
-	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password,omitempty"`
 	// 電話番号
 	Tel *string `form:"tel,omitempty" json:"tel,omitempty" xml:"tel,omitempty"`
 }
 
-// Finalize sets the default values for userPayload type instance.
-func (ut *userPayload) Finalize() {
-	var defaultDeviceToken = ""
-	if ut.DeviceToken == nil {
-		ut.DeviceToken = &defaultDeviceToken
+// Finalize sets the default values for userModifyPayload type instance.
+func (ut *userModifyPayload) Finalize() {
+	var defaultEmail = ""
+	if ut.Email == nil {
+		ut.Email = &defaultEmail
 	}
 	var defaultIcon = ""
 	if ut.Icon == nil {
 		ut.Icon = &defaultIcon
 	}
-	var defaultInstanceID = ""
-	if ut.InstanceID == nil {
-		ut.InstanceID = &defaultInstanceID
+	var defaultName = ""
+	if ut.Name == nil {
+		ut.Name = &defaultName
 	}
 	var defaultTel = ""
 	if ut.Tel == nil {
@@ -995,30 +1180,8 @@ func (ut *userPayload) Finalize() {
 	}
 }
 
-// Validate validates the userPayload type instance.
-func (ut *userPayload) Validate() (err error) {
-	if ut.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "id"))
-	}
-	if ut.Password == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "password"))
-	}
-	if ut.Name == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "name"))
-	}
-	if ut.Mail == nil {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`request`, "mail"))
-	}
-	if ut.ID != nil {
-		if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, *ut.ID); !ok {
-			err = goa.MergeErrors(err, goa.InvalidPatternError(`request.id`, *ut.ID, `^[a-zA-Z0-9_]{4,15}$`))
-		}
-	}
-	if ut.Mail != nil {
-		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Mail); err2 != nil {
-			err = goa.MergeErrors(err, goa.InvalidFormatError(`request.mail`, *ut.Mail, goa.FormatEmail, err2))
-		}
-	}
+// Validate validates the userModifyPayload type instance.
+func (ut *userModifyPayload) Validate() (err error) {
 	if ut.Name != nil {
 		if utf8.RuneCountInString(*ut.Name) < 1 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 1, true))
@@ -1029,37 +1192,20 @@ func (ut *userPayload) Validate() (err error) {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 50, false))
 		}
 	}
-	if ut.Password != nil {
-		if utf8.RuneCountInString(*ut.Password) < 8 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.password`, *ut.Password, utf8.RuneCountInString(*ut.Password), 8, true))
-		}
-	}
 	return
 }
 
-// Publicize creates UserPayload from userPayload
-func (ut *userPayload) Publicize() *UserPayload {
-	var pub UserPayload
-	if ut.DeviceToken != nil {
-		pub.DeviceToken = *ut.DeviceToken
+// Publicize creates UserModifyPayload from userModifyPayload
+func (ut *userModifyPayload) Publicize() *UserModifyPayload {
+	var pub UserModifyPayload
+	if ut.Email != nil {
+		pub.Email = *ut.Email
 	}
 	if ut.Icon != nil {
 		pub.Icon = *ut.Icon
 	}
-	if ut.ID != nil {
-		pub.ID = *ut.ID
-	}
-	if ut.InstanceID != nil {
-		pub.InstanceID = *ut.InstanceID
-	}
-	if ut.Mail != nil {
-		pub.Mail = *ut.Mail
-	}
 	if ut.Name != nil {
 		pub.Name = *ut.Name
-	}
-	if ut.Password != nil {
-		pub.Password = *ut.Password
 	}
 	if ut.Tel != nil {
 		pub.Tel = *ut.Tel
@@ -1067,54 +1213,24 @@ func (ut *userPayload) Publicize() *UserPayload {
 	return &pub
 }
 
-// アカウント作成時に受け取る情報
-type UserPayload struct {
-	// デバイストークン
-	DeviceToken string `form:"device_token" json:"device_token" xml:"device_token"`
+// プロフィール編集の時のペイロード
+type UserModifyPayload struct {
+	Email string `form:"email" json:"email" xml:"email"`
 	// アイコン画像
 	Icon string `form:"icon" json:"icon" xml:"icon"`
-	// ユーザーID
-	ID string `form:"id" json:"id" xml:"id"`
-	// インスタンスID
-	InstanceID string `form:"instance_id" json:"instance_id" xml:"instance_id"`
-	// メールアドレス
-	Mail string `form:"mail" json:"mail" xml:"mail"`
 	// 名前
 	Name string `form:"name" json:"name" xml:"name"`
-	// パスワード
-	Password string `form:"password" json:"password" xml:"password"`
 	// 電話番号
 	Tel string `form:"tel" json:"tel" xml:"tel"`
 }
 
-// Validate validates the UserPayload type instance.
-func (ut *UserPayload) Validate() (err error) {
-	if ut.ID == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "id"))
-	}
-	if ut.Password == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "password"))
-	}
-	if ut.Name == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "name"))
-	}
-	if ut.Mail == "" {
-		err = goa.MergeErrors(err, goa.MissingAttributeError(`type`, "mail"))
-	}
-	if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, ut.ID); !ok {
-		err = goa.MergeErrors(err, goa.InvalidPatternError(`type.id`, ut.ID, `^[a-zA-Z0-9_]{4,15}$`))
-	}
-	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Mail); err2 != nil {
-		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, ut.Mail, goa.FormatEmail, err2))
-	}
+// Validate validates the UserModifyPayload type instance.
+func (ut *UserModifyPayload) Validate() (err error) {
 	if utf8.RuneCountInString(ut.Name) < 1 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 1, true))
 	}
 	if utf8.RuneCountInString(ut.Name) > 50 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 50, false))
-	}
-	if utf8.RuneCountInString(ut.Password) < 8 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.password`, ut.Password, utf8.RuneCountInString(ut.Password), 8, true))
 	}
 	return
 }

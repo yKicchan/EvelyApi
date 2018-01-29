@@ -585,6 +585,8 @@ type User struct {
 	Name string `form:"name" json:"name" xml:"name"`
 	// ピンしているイベントのID配列
 	Pins []string `form:"pins" json:"pins" xml:"pins"`
+	// 通知を許可するカテゴリの配列
+	Preferences []string `form:"preferences" json:"preferences" xml:"preferences"`
 	// 電話番号
 	Tel string `form:"tel" json:"tel" xml:"tel"`
 }
@@ -609,6 +611,9 @@ func (mt *User) Validate() (err error) {
 	if mt.Pins == nil {
 		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "pins"))
 	}
+	if mt.Preferences == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "preferences"))
+	}
 
 	if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, mt.ID); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^[a-zA-Z0-9_]{4,15}$`))
@@ -623,6 +628,9 @@ func (mt *User) Validate() (err error) {
 	}
 	if utf8.RuneCountInString(mt.Name) > 50 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 50, false))
+	}
+	if len(mt.Preferences) > 9 {
+		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.preferences`, mt.Preferences, len(mt.Preferences), 9, false))
 	}
 	return
 }

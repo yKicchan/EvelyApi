@@ -9,6 +9,7 @@ import (
 	. "EvelyApi/models/collections"
 	. "EvelyApi/models/documents"
 	"github.com/goadesign/goa"
+	jwtgo "github.com/dgrijalva/jwt-go"
 )
 
 // UsersController implements the users resource.
@@ -34,8 +35,45 @@ func (c *UsersController) Show(ctx *app.ShowUsersContext) error {
 	return ctx.OK(parser.ToUserMedia(user))
 }
 
-// UpdateToken runs the update_token action.
-func (c *UsersController) Update(ctx *app.UpdateUsersContext) error {
+// Modify runs the modify action.
+func (c *UsersController) Modify(ctx *app.ModifyUsersContext) error {
+	id, err := GetLoginID(ctx)
+	if err != nil {
+		return ctx.Unauthorized(goa.ErrUnauthorized(err))
+	}
+	keys := Keys{"id": id}
+	u, _ := c.db.Users.FindOne(keys)
+	p := ctx.Payload
+	if p.Name != "" {
+		u.Name = p.Name
+	}
+	if p.Icon != "" {
+		u.Icon = p.Icon
+	}
+	if p.Email != "" {
+		u.Mail.Email = p.Email
+	}
+	if p.Tel != "" {
+		u.Tel = p.Tel
+	}
+	err = c.db.Users.Save(u, keys)
+	if err != nil {
+		return ctx.BadRequest(goa.ErrInternal(err))
+	}
+	// JWTを生成して返す
+	claims := jwtgo.MapClaims{
+		"scopes": "api:access",
+		"id":     id,
+	}
+	token, err := NewToken(claims)
+	if err != nil {
+		return ctx.BadRequest(goa.ErrInternal(err))
+	}
+	return ctx.OK(&app.Token{Token: "Bearer " + token})
+}
+
+// ModifyToken runs the modify_token action.
+func (c *UsersController) ModifyToken(ctx *app.ModifyTokenUsersContext) error {
 	id, err := GetLoginID(ctx)
 	p := ctx.Payload
 	if err == nil { // 認証されて来たとき
@@ -64,6 +102,28 @@ func (c *UsersController) Update(ctx *app.UpdateUsersContext) error {
 		if err != nil {
 			return ctx.BadRequest(goa.ErrInternal(err))
 		}
+	}
+	return ctx.OK([]byte("Success!!"))
+}
+
+// Setting runs the setting action.
+func (c *UsersController) Setting(ctx *app.SettingUsersContext) error {
+	// 設定変更
+	id, err := GetLoginID(ctx)
+	if err != nil {
+		return ctx.Unauthorized(goa.ErrUnauthorized(err))
+	}
+	keys := Keys{"id": id}
+	u, _ := c.db.Users.FindOne(keys)
+	p := ctx.Payload
+	// カテゴリ
+	if len(p.Preferences) > 0 {
+		u.Preferences = make([]string, len(p.Preferences))
+		copy(u.Preferences, p.Preferences)
+	}
+	err = c.db.Users.Save(u, keys)
+	if err != nil {
+		return ctx.BadRequest(goa.ErrInternal(err))
 	}
 	return ctx.OK([]byte("Success!!"))
 }
