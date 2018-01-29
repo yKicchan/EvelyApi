@@ -131,6 +131,7 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 			State: STATE_OK,
 		},
 		Tel: p.Tel,
+		Preferences: Categorys,
 	}
 	// スマホから同時に通知登録されて来た(デバイストークンとインスタンスIDが設定されて来た)とき
 	if p.DeviceToken != "" && p.InstanceID != "" {
