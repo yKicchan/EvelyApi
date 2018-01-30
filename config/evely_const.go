@@ -25,7 +25,7 @@ const (
 )
 // カテゴリ配列
 type categorys []string
-var Categorys = categorys{C_MUSIC, C_BARGAIN, C_ENTERTAINMENTS, C_FESTIVAL, C_FOOD_DRINK, C_MUSIC, C_SPORTS, C_VOLUNTEER, C_WORK_CONF}
+var Categorys = categorys{C_ARTS, C_BARGAIN, C_ENTERTAINMENTS, C_FESTIVAL, C_FOOD_DRINK, C_MUSIC, C_SPORTS, C_VOLUNTEER, C_WORK_CONF}
 
 func (this categorys) IndexOf(value string) int {
     for i, v := range this {
