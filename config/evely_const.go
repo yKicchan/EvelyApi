@@ -10,7 +10,7 @@ const (
     DEGREE_PER_METER = 0.000008983148616
 
 	// Firebaseのサーバーキー
-	FCM_SERVER_KEY = "AAAAhvF5qAM:APA91bGXVe3D_i9bWZWBI55_xqz7GbpIiNtBHmKyiu9Z7owD5EarwDREQJk8ez2scpFEbZjtgVKXBzAkTova0i_ncEXAtG8lASjHUpsxxRdSVDC_-m6dzfcsqk1N98SDbhq6S9EUbtYJ"
+	FCM_SERVER_KEY = "AAAAW_wL-Tg:APA91bFOZ1pfJ_LFUiNaqFpaN6nlAkHHYHVmMNntKLWuTxaBDrQpBtuskKvvQgNVADvqNX-zP-S8qV4bs_oFkDyk0-a8WH_yAa5QqTcl5_KvLzADUHhoOHIPOnUWk-NbSFyVkQillUHe"
 
 	// Evelyで独自定義したカテゴリ
 	C_MUSIC = "Music"
