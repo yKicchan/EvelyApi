@@ -126,11 +126,12 @@ func (c *AuthController) Signup(ctx *app.SignupAuthContext) error {
 		ID:       p.ID,
 		Password: string(pass),
 		Name:     p.Name,
+		Icon:     DEFAULT_ICON,
 		Mail: &Mail{
 			Email: p.Mail,
 			State: STATE_OK,
 		},
-		Tel: p.Tel,
+		Tel:         p.Tel,
 		Preferences: Categorys,
 	}
 	// スマホから同時に通知登録されて来た(デバイストークンとインスタンスIDが設定されて来た)とき

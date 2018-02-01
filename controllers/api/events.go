@@ -216,7 +216,7 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	for i, r := range results {
 		res[i] = &app.Nearby{
 			Distance: int(r.Distance),
-			Event: parser.ToEventTinyMedia(r.Event),
+			Event:    parser.ToEventTinyMedia(r.Event),
 		}
 	}
 	return ctx.OK(res)

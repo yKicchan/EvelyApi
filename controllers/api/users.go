@@ -8,8 +8,8 @@ import (
 	"EvelyApi/models"
 	. "EvelyApi/models/collections"
 	. "EvelyApi/models/documents"
-	"github.com/goadesign/goa"
 	jwtgo "github.com/dgrijalva/jwt-go"
+	"github.com/goadesign/goa"
 )
 
 // UsersController implements the users resource.

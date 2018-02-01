@@ -44,16 +44,13 @@ var EventPayload = Type("EventPayload", func() {
 	})
 	Attribute("mail", String, "連絡先メールアドレス", func() {
 		Format("email")
-		Default("")
 		Example("yKicchanApp@gmail.com")
 	})
 	Attribute("tel", String, "連絡先電話番号", func() {
-		Default("")
 		Example("090-1234-5678")
 	})
 	Attribute("url", String, "URL", func() {
 		Format("uri")
-		Default("")
 		Example("http://comp.ecc.ac.jp/")
 	})
 	Attribute("schedules", ArrayOf(Schedule), "イベントの開催予定一覧", func() {

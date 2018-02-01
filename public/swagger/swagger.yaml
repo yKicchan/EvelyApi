@@ -94,7 +94,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Qui omnis.
+          example: Et rem odio et possimus cupiditate.
           type: string
         maxLength: 9
         minLength: 1
@@ -110,7 +110,7 @@ definitions:
         - http://evely.net:8888/download/doc1.jpg
         - http://evely.net:8888/download/doc2.pdf
         items:
-          example: Et rem odio et possimus cupiditate.
+          example: Qui omnis.
           type: string
         type: array
       host:
@@ -129,7 +129,6 @@ definitions:
         example: true
         type: boolean
       mail:
-        default: ""
         description: 連絡先メールアドレス
         example: yKicchanApp@gmail.com
         format: email
@@ -163,7 +162,6 @@ definitions:
         minLength: 1
         type: array
       tel:
-        default: ""
         description: 連絡先電話番号
         example: 090-1234-5678
         type: string
@@ -179,7 +177,6 @@ definitions:
         format: date-time
         type: string
       url:
-        default: ""
         description: URL
         example: http://comp.ecc.ac.jp/
         format: uri
@@ -384,7 +381,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Qui omnis.
+          example: Et rem odio et possimus cupiditate.
           type: string
         maxLength: 9
         minLength: 1
@@ -404,7 +401,6 @@ definitions:
         example: header.jpg
         type: string
       mail:
-        default: ""
         description: 連絡先メールアドレス
         example: yKicchanApp@gmail.com
         format: email
@@ -443,7 +439,6 @@ definitions:
         example: public
         type: string
       tel:
-        default: ""
         description: 連絡先電話番号
         example: 090-1234-5678
         type: string
@@ -454,7 +449,6 @@ definitions:
         minLength: 1
         type: string
       url:
-        default: ""
         description: URL
         example: http://comp.ecc.ac.jp/
         format: uri
@@ -510,7 +504,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Qui omnis.
+          example: Et rem odio et possimus cupiditate.
           type: string
         maxLength: 9
         minLength: 1
@@ -1131,7 +1125,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Magnam necessitatibus quod provident.
+          example: Atque neque in mollitia.
           type: string
         type: array
       preferences:
@@ -1140,7 +1134,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Atque neque in mollitia.
+          example: Magnam necessitatibus quod provident.
           type: string
         maxLength: 9
         type: array

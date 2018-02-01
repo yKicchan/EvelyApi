@@ -15,7 +15,7 @@ import (
  * @return *EventModel DBモデルに変換したイベント情報
  */
 func ToEventModel(p *app.EventPayload, id bson.ObjectId, u *UserModel) *EventModel {
-	return &EventModel{
+	e := &EventModel{
 		ID:        id,
 		Image:     p.Image,
 		Title:     p.Title,
@@ -25,16 +25,24 @@ func ToEventModel(p *app.EventPayload, id bson.ObjectId, u *UserModel) *EventMod
 		Host: &Host{
 			ID:   u.ID,
 			Name: u.Name,
+			Icon: u.Icon,
 		},
-		Mail:        p.Mail,
-		Tel:         p.Tel,
-		URL:         p.URL,
 		Schedules:   toSchedulesModel(p.Schedules),
 		NoticeRange: p.NoticeRange,
 		Scope:       p.Scope,
 		OpenFlg:     p.OpenFlg,
 		UpdateDate:  time.Now(),
 	}
+	if p.Mail != nil {
+		e.Mail = *p.Mail
+	}
+	if p.Tel != nil {
+		e.Tel = *p.Tel
+	}
+	if p.URL != nil {
+		e.URL = *p.URL
+	}
+	return e
 }
 
 func toSchedulesModel(oldSchedules []*app.Schedule) (newSchedules []*Schedule) {

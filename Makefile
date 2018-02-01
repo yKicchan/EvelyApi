@@ -32,5 +32,5 @@ fmt:
 	@go fmt EvelyApi/models/collections
 	@go fmt EvelyApi/models/documents
 
-run: main.go
+run: main.go fmt
 	@go run main.go

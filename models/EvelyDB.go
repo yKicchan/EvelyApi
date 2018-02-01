@@ -41,7 +41,7 @@ func (this *EvelyDB) FindEventsByLocation(opt LocationOption) (results []*Result
 	command := bson.D{
 		{"geoNear", EVENTS_COLLECTION},
 		{"near", bson.M{
-			"type": "Point",
+			"type":        "Point",
 			"coordinates": []float64{lng, lat},
 		}},
 		{"spherical", true},

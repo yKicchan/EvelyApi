@@ -22,6 +22,9 @@ const (
 	C_ARTS = "Arts"
 	C_FESTIVAL = "Festival"
 	C_BARGAIN = "Bargain"
+
+	// デフォルトのアカウントアイコン
+	DEFAULT_ICON = "account.png"
 )
 // カテゴリ配列
 type categorys []string

@@ -95,10 +95,6 @@ func (ut *eventPayload) Finalize() {
 	if ut.Image == nil {
 		ut.Image = &defaultImage
 	}
-	var defaultMail = ""
-	if ut.Mail == nil {
-		ut.Mail = &defaultMail
-	}
 	var defaultOpenFlg = false
 	if ut.OpenFlg == nil {
 		ut.OpenFlg = &defaultOpenFlg
@@ -106,14 +102,6 @@ func (ut *eventPayload) Finalize() {
 	var defaultScope = "public"
 	if ut.Scope == nil {
 		ut.Scope = &defaultScope
-	}
-	var defaultTel = ""
-	if ut.Tel == nil {
-		ut.Tel = &defaultTel
-	}
-	var defaultURL = ""
-	if ut.URL == nil {
-		ut.URL = &defaultURL
 	}
 }
 
@@ -220,7 +208,7 @@ func (ut *eventPayload) Publicize() *EventPayload {
 		pub.Image = *ut.Image
 	}
 	if ut.Mail != nil {
-		pub.Mail = *ut.Mail
+		pub.Mail = ut.Mail
 	}
 	if ut.NoticeRange != nil {
 		pub.NoticeRange = *ut.NoticeRange
@@ -238,13 +226,13 @@ func (ut *eventPayload) Publicize() *EventPayload {
 		pub.Scope = *ut.Scope
 	}
 	if ut.Tel != nil {
-		pub.Tel = *ut.Tel
+		pub.Tel = ut.Tel
 	}
 	if ut.Title != nil {
 		pub.Title = *ut.Title
 	}
 	if ut.URL != nil {
-		pub.URL = *ut.URL
+		pub.URL = ut.URL
 	}
 	return &pub
 }
@@ -260,7 +248,7 @@ type EventPayload struct {
 	// イベントのヘッダーイメージ
 	Image string `form:"image" json:"image" xml:"image"`
 	// 連絡先メールアドレス
-	Mail string `form:"mail" json:"mail" xml:"mail"`
+	Mail *string `form:"mail,omitempty" json:"mail,omitempty" xml:"mail,omitempty"`
 	// 通知範囲(m)
 	NoticeRange int `form:"noticeRange" json:"noticeRange" xml:"noticeRange"`
 	// 開催中かどうか
@@ -270,11 +258,11 @@ type EventPayload struct {
 	// 公開範囲
 	Scope string `form:"scope" json:"scope" xml:"scope"`
 	// 連絡先電話番号
-	Tel string `form:"tel" json:"tel" xml:"tel"`
+	Tel *string `form:"tel,omitempty" json:"tel,omitempty" xml:"tel,omitempty"`
 	// イベントの名前
 	Title string `form:"title" json:"title" xml:"title"`
 	// URL
-	URL string `form:"url" json:"url" xml:"url"`
+	URL *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
 }
 
 // Validate validates the EventPayload type instance.
@@ -304,8 +292,10 @@ func (ut *EventPayload) Validate() (err error) {
 	if len(ut.Categorys) > 9 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.categorys`, ut.Categorys, len(ut.Categorys), 9, false))
 	}
-	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Mail); err2 != nil {
-		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, ut.Mail, goa.FormatEmail, err2))
+	if ut.Mail != nil {
+		if err2 := goa.ValidateFormat(goa.FormatEmail, *ut.Mail); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, *ut.Mail, goa.FormatEmail, err2))
+		}
 	}
 	if ut.NoticeRange < 100 {
 		err = goa.MergeErrors(err, goa.InvalidRangeError(`type.noticeRange`, ut.NoticeRange, 100, true))
@@ -332,8 +322,10 @@ func (ut *EventPayload) Validate() (err error) {
 	if utf8.RuneCountInString(ut.Title) > 30 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.title`, ut.Title, utf8.RuneCountInString(ut.Title), 30, false))
 	}
-	if err2 := goa.ValidateFormat(goa.FormatURI, ut.URL); err2 != nil {
-		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.url`, ut.URL, goa.FormatURI, err2))
+	if ut.URL != nil {
+		if err2 := goa.ValidateFormat(goa.FormatURI, *ut.URL); err2 != nil {
+			err = goa.MergeErrors(err, goa.InvalidFormatError(`type.url`, *ut.URL, goa.FormatURI, err2))
+		}
 	}
 	return
 }
