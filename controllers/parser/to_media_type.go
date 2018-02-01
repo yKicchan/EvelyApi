@@ -134,6 +134,9 @@ func ToReviewMedia(r *ReviewModel) *app.Review {
 }
 
 func toFileMedia(f string) string {
+	if f == "" {
+		return ""
+	}
 	return "http://evely.localhost/download/" + f
 }
 
