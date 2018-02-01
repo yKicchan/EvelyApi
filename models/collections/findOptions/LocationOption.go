@@ -1,14 +1,10 @@
 package findOptions
 
-import (
-	. "EvelyApi/config"
-)
-
 // 位置情報検索のオプション
 type LocationOption interface {
 	FindOption
 	SetLocation(float64, float64, int)
-	GetLocation() (float64, float64, float64)
+	GetLocation() (float64, float64, int)
 	IsLocationSet() bool
 }
 
@@ -18,7 +14,7 @@ type locationOption struct {
 	// 経度(0があり得るのでセット判定のためにポインタ型)
 	lng *float64
 	// 範囲(単位:度)
-	r float64
+	r int
 }
 
 /**
@@ -27,7 +23,7 @@ type locationOption struct {
  * @return lng 経度
  * @return r   範囲(度)
  */
-func (this *locationOption) GetLocation() (lat, lng, r float64) {
+func (this *locationOption) GetLocation() (lat, lng float64, r int) {
 	return *this.lat, *this.lng, this.r
 }
 
@@ -45,7 +41,7 @@ func (this *locationOption) SetLocation(lat, lng float64, r int) {
 		this.lng = &lng
 	}
 	if r > 0 {
-		this.r = float64(r) * DEGREE_PER_METER
+		this.r = r
 	}
 }
 
