@@ -112,8 +112,6 @@ type (
 		Limit int
 		// 経度
 		Lng string
-		// 除外件数
-		Offset int
 		// 検索範囲(半径m)
 		Range       int
 		PrettyPrint bool
@@ -263,17 +261,6 @@ Payload example:
             "endDate": "1975-07-28T07:45:40Z",
             "startDate": "2005-04-23T09:00:35Z"
          }
-      },
-      {
-         "location": {
-            "lat": 34.706424,
-            "lng": 135.50123,
-            "name": "ECCコンピュータ専門学校2303教室"
-         },
-         "upcomingDate": {
-            "endDate": "1975-07-28T07:45:40Z",
-            "startDate": "2005-04-23T09:00:35Z"
-         }
       }
    ],
    "scope": "public",
@@ -295,13 +282,13 @@ Payload example:
 Payload example:
 
 {
-   "body": "jkz4yd4fa1",
+   "body": "gva5jkz",
    "files": [
       "angle1.jpg",
       "angle2.jpg"
    ],
    "rate": 4,
-   "title": "gwqq84"
+   "title": "yd4fa13gw"
 }`,
 		RunE: func(cmd *cobra.Command, args []string) error { return tmp2.Run(c, args) },
 	}
@@ -383,17 +370,6 @@ Payload example:
             "endDate": "1975-07-28T07:45:40Z",
             "startDate": "2005-04-23T09:00:35Z"
          }
-      },
-      {
-         "location": {
-            "lat": 34.706424,
-            "lng": 135.50123,
-            "name": "ECCコンピュータ専門学校2303教室"
-         },
-         "upcomingDate": {
-            "endDate": "1975-07-28T07:45:40Z",
-            "startDate": "2005-04-23T09:00:35Z"
-         }
       }
    ],
    "scope": "public",
@@ -415,7 +391,7 @@ Payload example:
 Payload example:
 
 {
-   "email": "Qui omnis.",
+   "email": "Veritatis quam eaque.",
    "icon": "icon.png",
    "name": "きっちゃそ",
    "tel": "090-1234-5678"
@@ -1256,7 +1232,7 @@ func (cmd *NearbyEventsCommand) Run(c *client.Client, args []string) error {
 		goa.LogError(ctx, "required flag is missing", "flag", "--lng")
 		return fmt.Errorf("required flag lng is missing")
 	}
-	resp, err := c.NearbyEvents(ctx, path, *tmp24, *tmp25, cmd.Range, stringFlagVal("category", cmd.Category), intFlagVal("limit", cmd.Limit), intFlagVal("offset", cmd.Offset))
+	resp, err := c.NearbyEvents(ctx, path, *tmp24, *tmp25, cmd.Range, stringFlagVal("category", cmd.Category), intFlagVal("limit", cmd.Limit))
 	if err != nil {
 		goa.LogError(ctx, "failed", "err", err)
 		return err
@@ -1275,8 +1251,6 @@ func (cmd *NearbyEventsCommand) RegisterFlags(cc *cobra.Command, c *client.Clien
 	cc.Flags().IntVar(&cmd.Limit, "limit", 3, `取得件数`)
 	var lng string
 	cc.Flags().StringVar(&cmd.Lng, "lng", lng, `経度`)
-	var offset int
-	cc.Flags().IntVar(&cmd.Offset, "offset", offset, `除外件数`)
 	cc.Flags().IntVar(&cmd.Range, "range", 500, `検索範囲(半径m)`)
 }
 

@@ -621,7 +621,6 @@ type NearbyEventsContext struct {
 	Lat      float64
 	Limit    int
 	Lng      float64
-	Offset   int
 	Range    int
 }
 
@@ -695,20 +694,6 @@ func NewNearbyEventsContext(ctx context.Context, r *http.Request, service *goa.S
 			err = goa.MergeErrors(err, goa.InvalidRangeError(`lng`, rctx.Lng, 180.000000, false))
 		}
 	}
-	paramOffset := req.Params["offset"]
-	if len(paramOffset) == 0 {
-		rctx.Offset = 0
-	} else {
-		rawOffset := paramOffset[0]
-		if offset, err2 := strconv.Atoi(rawOffset); err2 == nil {
-			rctx.Offset = offset
-		} else {
-			err = goa.MergeErrors(err, goa.InvalidParamTypeError("offset", rawOffset, "integer"))
-		}
-		if rctx.Offset < 0 {
-			err = goa.MergeErrors(err, goa.InvalidRangeError(`offset`, rctx.Offset, 0, true))
-		}
-	}
 	paramRange := req.Params["range"]
 	if len(paramRange) == 0 {
 		rctx.Range = 500
@@ -727,34 +712,12 @@ func NewNearbyEventsContext(ctx context.Context, r *http.Request, service *goa.S
 }
 
 // OK sends a HTTP response with status code 200.
-func (ctx *NearbyEventsContext) OK(r EventCollection) error {
+func (ctx *NearbyEventsContext) OK(r NearbyCollection) error {
 	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
+		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.nearby+json; type=collection")
 	}
 	if r == nil {
-		r = EventCollection{}
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// OKFull sends a HTTP response with status code 200.
-func (ctx *NearbyEventsContext) OKFull(r EventFullCollection) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
-	}
-	if r == nil {
-		r = EventFullCollection{}
-	}
-	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
-}
-
-// OKTiny sends a HTTP response with status code 200.
-func (ctx *NearbyEventsContext) OKTiny(r EventTinyCollection) error {
-	if ctx.ResponseData.Header().Get("Content-Type") == "" {
-		ctx.ResponseData.Header().Set("Content-Type", "application/vnd.event+json; type=collection")
-	}
-	if r == nil {
-		r = EventTinyCollection{}
+		r = NearbyCollection{}
 	}
 	return ctx.ResponseData.Service.Send(ctx.Context, 200, r)
 }

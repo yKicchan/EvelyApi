@@ -2328,7 +2328,7 @@ func MyListEventsUnauthorized(t goatest.TInterface, ctx context.Context, service
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, error) {
+func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, range_ int) (http.ResponseWriter, error) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2366,10 +2366,6 @@ func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 		query["lng"] = sliceVal
 	}
 	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		query["offset"] = sliceVal
-	}
-	{
 		sliceVal := []string{strconv.Itoa(range_)}
 		query["range"] = sliceVal
 	}
@@ -2397,10 +2393,6 @@ func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 	{
 		sliceVal := []string{fmt.Sprintf("%v", lng)}
 		prms["lng"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		prms["offset"] = sliceVal
 	}
 	{
 		sliceVal := []string{strconv.Itoa(range_)}
@@ -2446,7 +2438,7 @@ func NearbyEventsBadRequest(t goatest.TInterface, ctx context.Context, service *
 // It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
 // If ctx is nil then context.Background() is used.
 // If service is nil then a default service is created.
-func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventCollection) {
+func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, range_ int) (http.ResponseWriter, app.NearbyCollection) {
 	// Setup service
 	var (
 		logBuf bytes.Buffer
@@ -2484,10 +2476,6 @@ func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 		query["lng"] = sliceVal
 	}
 	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		query["offset"] = sliceVal
-	}
-	{
 		sliceVal := []string{strconv.Itoa(range_)}
 		query["range"] = sliceVal
 	}
@@ -2517,10 +2505,6 @@ func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 		prms["lng"] = sliceVal
 	}
 	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		prms["offset"] = sliceVal
-	}
-	{
 		sliceVal := []string{strconv.Itoa(range_)}
 		prms["range"] = sliceVal
 	}
@@ -2548,258 +2532,12 @@ func NearbyEventsOK(t goatest.TInterface, ctx context.Context, service *goa.Serv
 	if rw.Code != 200 {
 		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
 	}
-	var mt app.EventCollection
+	var mt app.NearbyCollection
 	if resp != nil {
 		var _ok bool
-		mt, _ok = resp.(app.EventCollection)
+		mt, _ok = resp.(app.NearbyCollection)
 		if !_ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.EventCollection", resp, resp)
-		}
-		_err = mt.Validate()
-		if _err != nil {
-			t.Errorf("invalid response media type: %s", _err)
-		}
-	}
-
-	// Return results
-	return rw, mt
-}
-
-// NearbyEventsOKFull runs the method Nearby of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
-// If ctx is nil then context.Background() is used.
-// If service is nil then a default service is created.
-func NearbyEventsOKFull(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventFullCollection) {
-	// Setup service
-	var (
-		logBuf bytes.Buffer
-		resp   interface{}
-
-		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
-	)
-	if service == nil {
-		service = goatest.Service(&logBuf, respSetter)
-	} else {
-		logger := log.New(&logBuf, "", log.Ltime)
-		service.WithLogger(goa.NewLogger(logger))
-		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
-		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
-		service.Encoder.Register(newEncoder, "*/*")
-	}
-
-	// Setup request context
-	rw := httptest.NewRecorder()
-	query := url.Values{}
-	if category != nil {
-		sliceVal := []string{*category}
-		query["category"] = sliceVal
-	}
-	{
-		sliceVal := []string{fmt.Sprintf("%v", lat)}
-		query["lat"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		query["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{fmt.Sprintf("%v", lng)}
-		query["lng"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		query["offset"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(range_)}
-		query["range"] = sliceVal
-	}
-	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v2/events/nearby"),
-		RawQuery: query.Encode(),
-	}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		panic("invalid test " + err.Error()) // bug
-	}
-	prms := url.Values{}
-	if category != nil {
-		sliceVal := []string{*category}
-		prms["category"] = sliceVal
-	}
-	{
-		sliceVal := []string{fmt.Sprintf("%v", lat)}
-		prms["lat"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		prms["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{fmt.Sprintf("%v", lng)}
-		prms["lng"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		prms["offset"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(range_)}
-		prms["range"] = sliceVal
-	}
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
-	nearbyCtx, _err := app.NewNearbyEventsContext(goaCtx, req, service)
-	if _err != nil {
-		e, ok := _err.(goa.ServiceError)
-		if !ok {
-			panic("invalid test data " + _err.Error()) // bug
-		}
-		t.Errorf("unexpected parameter validation error: %+v", e)
-		return nil, nil
-	}
-
-	// Perform action
-	_err = ctrl.Nearby(nearbyCtx)
-
-	// Validate response
-	if _err != nil {
-		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
-	}
-	if rw.Code != 200 {
-		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
-	}
-	var mt app.EventFullCollection
-	if resp != nil {
-		var _ok bool
-		mt, _ok = resp.(app.EventFullCollection)
-		if !_ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.EventFullCollection", resp, resp)
-		}
-		_err = mt.Validate()
-		if _err != nil {
-			t.Errorf("invalid response media type: %s", _err)
-		}
-	}
-
-	// Return results
-	return rw, mt
-}
-
-// NearbyEventsOKTiny runs the method Nearby of the given controller with the given parameters.
-// It returns the response writer so it's possible to inspect the response headers and the media type struct written to the response.
-// If ctx is nil then context.Background() is used.
-// If service is nil then a default service is created.
-func NearbyEventsOKTiny(t goatest.TInterface, ctx context.Context, service *goa.Service, ctrl app.EventsController, category *string, lat float64, limit int, lng float64, offset int, range_ int) (http.ResponseWriter, app.EventTinyCollection) {
-	// Setup service
-	var (
-		logBuf bytes.Buffer
-		resp   interface{}
-
-		respSetter goatest.ResponseSetterFunc = func(r interface{}) { resp = r }
-	)
-	if service == nil {
-		service = goatest.Service(&logBuf, respSetter)
-	} else {
-		logger := log.New(&logBuf, "", log.Ltime)
-		service.WithLogger(goa.NewLogger(logger))
-		newEncoder := func(io.Writer) goa.Encoder { return respSetter }
-		service.Encoder = goa.NewHTTPEncoder() // Make sure the code ends up using this decoder
-		service.Encoder.Register(newEncoder, "*/*")
-	}
-
-	// Setup request context
-	rw := httptest.NewRecorder()
-	query := url.Values{}
-	if category != nil {
-		sliceVal := []string{*category}
-		query["category"] = sliceVal
-	}
-	{
-		sliceVal := []string{fmt.Sprintf("%v", lat)}
-		query["lat"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		query["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{fmt.Sprintf("%v", lng)}
-		query["lng"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		query["offset"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(range_)}
-		query["range"] = sliceVal
-	}
-	u := &url.URL{
-		Path:     fmt.Sprintf("/api/develop/v2/events/nearby"),
-		RawQuery: query.Encode(),
-	}
-	req, err := http.NewRequest("GET", u.String(), nil)
-	if err != nil {
-		panic("invalid test " + err.Error()) // bug
-	}
-	prms := url.Values{}
-	if category != nil {
-		sliceVal := []string{*category}
-		prms["category"] = sliceVal
-	}
-	{
-		sliceVal := []string{fmt.Sprintf("%v", lat)}
-		prms["lat"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(limit)}
-		prms["limit"] = sliceVal
-	}
-	{
-		sliceVal := []string{fmt.Sprintf("%v", lng)}
-		prms["lng"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(offset)}
-		prms["offset"] = sliceVal
-	}
-	{
-		sliceVal := []string{strconv.Itoa(range_)}
-		prms["range"] = sliceVal
-	}
-	if ctx == nil {
-		ctx = context.Background()
-	}
-	goaCtx := goa.NewContext(goa.WithAction(ctx, "EventsTest"), rw, req, prms)
-	nearbyCtx, _err := app.NewNearbyEventsContext(goaCtx, req, service)
-	if _err != nil {
-		e, ok := _err.(goa.ServiceError)
-		if !ok {
-			panic("invalid test data " + _err.Error()) // bug
-		}
-		t.Errorf("unexpected parameter validation error: %+v", e)
-		return nil, nil
-	}
-
-	// Perform action
-	_err = ctrl.Nearby(nearbyCtx)
-
-	// Validate response
-	if _err != nil {
-		t.Fatalf("controller returned %+v, logs:\n%s", _err, logBuf.String())
-	}
-	if rw.Code != 200 {
-		t.Errorf("invalid response status code: got %+v, expected 200", rw.Code)
-	}
-	var mt app.EventTinyCollection
-	if resp != nil {
-		var _ok bool
-		mt, _ok = resp.(app.EventTinyCollection)
-		if !_ok {
-			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.EventTinyCollection", resp, resp)
+			t.Fatalf("invalid response media: got variable of type %T, value %+v, expected instance of app.NearbyCollection", resp, resp)
 		}
 		_err = mt.Validate()
 		if _err != nil {

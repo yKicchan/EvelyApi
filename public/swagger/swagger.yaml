@@ -94,7 +94,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Totam ipsa sit enim accusamus voluptatum natus.
+          example: Qui omnis.
           type: string
         maxLength: 9
         minLength: 1
@@ -365,13 +365,6 @@ definitions:
         upcomingDate:
           endDate: 1975-07-28T07:45:40Z
           startDate: 2005-04-23T09:00:35Z
-      - location:
-          lat: 34.706425
-          lng: 135.50124
-          name: ECCコンピュータ専門学校2303教室
-        upcomingDate:
-          endDate: 1975-07-28T07:45:40Z
-          startDate: 2005-04-23T09:00:35Z
       scope: public
       tel: 090-1234-5678
       title: Git勉強会
@@ -391,7 +384,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Totam ipsa sit enim accusamus voluptatum natus.
+          example: Qui omnis.
           type: string
         maxLength: 9
         minLength: 1
@@ -402,7 +395,7 @@ definitions:
         - doc1.jpg
         - doc2.pdf
         items:
-          example: Quidem delectus aut eius.
+          example: Totam ipsa sit enim accusamus voluptatum natus.
           type: string
         type: array
       image:
@@ -430,13 +423,6 @@ definitions:
       schedules:
         description: イベントの開催予定一覧
         example:
-        - location:
-            lat: 34.706425
-            lng: 135.50124
-            name: ECCコンピュータ専門学校2303教室
-          upcomingDate:
-            endDate: 1975-07-28T07:45:40Z
-            startDate: 2005-04-23T09:00:35Z
         - location:
             lat: 34.706425
             lng: 135.50124
@@ -480,6 +466,113 @@ definitions:
     - schedules
     - noticeRange
     title: EventPayload
+    type: object
+  EventTiny:
+    description: イベント情報 (tiny view)
+    example:
+      categorys:
+      - Workshop & Conference
+      - Festival
+      host:
+        icon: http://evely.net:8888/download/icon.png
+        id: yKicchan
+        name: きっちゃそ
+      id: 5a44d5f2775672b659ba00fa
+      image: http://evely.net:8888/download/header.jpg
+      isReviewed: true
+      schedules:
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
+      - location:
+          lat: 34.706425
+          lng: 135.50124
+          name: ECCコンピュータ専門学校2303教室
+        upcomingDate:
+          endDate: 1975-07-28T07:45:40Z
+          startDate: 2005-04-23T09:00:35Z
+      title: Git勉強会
+    properties:
+      categorys:
+        description: カテゴリ
+        example:
+        - Workshop & Conference
+        - Festival
+        items:
+          example: Qui omnis.
+          type: string
+        maxLength: 9
+        minLength: 1
+        type: array
+      host:
+        $ref: '#/definitions/UserTiny'
+      id:
+        description: イベントID
+        example: 5a44d5f2775672b659ba00fa
+        type: string
+      image:
+        default: ""
+        description: ヘッダー画像のURL
+        example: http://evely.net:8888/download/header.jpg
+        type: string
+      isReviewed:
+        description: レビューの有無
+        example: true
+        type: boolean
+      schedules:
+        description: イベントの開催予定一覧
+        example:
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        items:
+          $ref: '#/definitions/Schedule'
+        minLength: 1
+        type: array
+      title:
+        description: イベントの名前
+        example: Git勉強会
+        maxLength: 30
+        minLength: 1
+        type: string
+    required:
+    - id
+    - image
+    - title
+    - categorys
+    - host
+    - schedules
+    - isReviewed
+    title: 'Mediatype identifier: application/vnd.event+json; view=tiny'
     type: object
   Location:
     description: イベントの開催場所
@@ -556,6 +649,100 @@ definitions:
     - state
     title: Mail
     type: object
+  Nearby:
+    description: 近くのイベント (default view)
+    example:
+      distance: 100
+      event:
+        categorys:
+        - Workshop & Conference
+        - Festival
+        host:
+          icon: http://evely.net:8888/download/icon.png
+          id: yKicchan
+          name: きっちゃそ
+        id: 5a44d5f2775672b659ba00fa
+        image: http://evely.net:8888/download/header.jpg
+        isReviewed: true
+        schedules:
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        title: Git勉強会
+    properties:
+      distance:
+        description: イベントまでの距離(m)
+        example: 100
+        format: int64
+        type: integer
+      event:
+        $ref: '#/definitions/EventTiny'
+    required:
+    - event
+    - distance
+    title: 'Mediatype identifier: application/vnd.nearby+json; view=default'
+    type: object
+  NearbyCollection:
+    description: NearbyCollection is the media type for an array of Nearby (default
+      view)
+    example:
+    - distance: 100
+      event:
+        categorys:
+        - Workshop & Conference
+        - Festival
+        host:
+          icon: http://evely.net:8888/download/icon.png
+          id: yKicchan
+          name: きっちゃそ
+        id: 5a44d5f2775672b659ba00fa
+        image: http://evely.net:8888/download/header.jpg
+        isReviewed: true
+        schedules:
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        - location:
+            lat: 34.706425
+            lng: 135.50124
+            name: ECCコンピュータ専門学校2303教室
+          upcomingDate:
+            endDate: 1975-07-28T07:45:40Z
+            startDate: 2005-04-23T09:00:35Z
+        title: Git勉強会
+    items:
+      $ref: '#/definitions/Nearby'
+    title: 'Mediatype identifier: application/vnd.nearby+json; type=collection; view=default'
+    type: array
   NotifyPayload:
     description: |-
       通知のための現在位置情報
@@ -600,7 +787,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Voluptatem sit tempore consequatur.
+          example: Aut eius.
           type: string
         type: array
     required:
@@ -610,22 +797,22 @@ definitions:
   Review:
     description: レビュー (default view)
     example:
-      body: jrahm9nry5
+      body: rahm9nry
       files:
       - http://evely.net:8888/download/angle1.jpg
       - http://evely.net:8888/download/angle2.jpg
       id: ""
       rate: 4
-      reviewedAt: 2014-07-04T20:53:13Z
+      reviewedAt: 1980-09-02T10:27:05Z
       reviewer:
         icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
-      title: 5ayymcy
+      title: o5ay
     properties:
       body:
         description: レビューの内容
-        example: jrahm9nry5
+        example: rahm9nry
         maxLength: 5000
         minLength: 1
         type: string
@@ -635,7 +822,7 @@ definitions:
         - http://evely.net:8888/download/angle1.jpg
         - http://evely.net:8888/download/angle2.jpg
         items:
-          example: Ea et et illum cupiditate.
+          example: Ullam voluptatem.
           type: string
         type: array
       id:
@@ -654,14 +841,14 @@ definitions:
         type: integer
       reviewedAt:
         description: レビューした日
-        example: 2014-07-04T20:53:13Z
+        example: 1980-09-02T10:27:05Z
         format: date-time
         type: string
       reviewer:
         $ref: '#/definitions/UserTiny'
       title:
         description: レビューのタイトル
-        example: 5ayymcy
+        example: o5ay
         maxLength: 30
         minLength: 1
         type: string
@@ -679,42 +866,30 @@ definitions:
     description: ReviewCollection is the media type for an array of Review (default
       view)
     example:
-    - body: jrahm9nry5
+    - body: rahm9nry
       files:
       - http://evely.net:8888/download/angle1.jpg
       - http://evely.net:8888/download/angle2.jpg
       id: ""
       rate: 4
-      reviewedAt: 2014-07-04T20:53:13Z
+      reviewedAt: 1980-09-02T10:27:05Z
       reviewer:
         icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
-      title: 5ayymcy
-    - body: jrahm9nry5
+      title: o5ay
+    - body: rahm9nry
       files:
       - http://evely.net:8888/download/angle1.jpg
       - http://evely.net:8888/download/angle2.jpg
       id: ""
       rate: 4
-      reviewedAt: 2014-07-04T20:53:13Z
+      reviewedAt: 1980-09-02T10:27:05Z
       reviewer:
         icon: http://evely.net:8888/download/icon.png
         id: yKicchan
         name: きっちゃそ
-      title: 5ayymcy
-    - body: jrahm9nry5
-      files:
-      - http://evely.net:8888/download/angle1.jpg
-      - http://evely.net:8888/download/angle2.jpg
-      id: ""
-      rate: 4
-      reviewedAt: 2014-07-04T20:53:13Z
-      reviewer:
-        icon: http://evely.net:8888/download/icon.png
-        id: yKicchan
-        name: きっちゃそ
-      title: 5ayymcy
+      title: o5ay
     items:
       $ref: '#/definitions/Review'
     title: 'Mediatype identifier: application/vnd.review+json; type=collection; view=default'
@@ -722,16 +897,16 @@ definitions:
   ReviewPayload:
     description: レビュー投稿で受け取るレビュー情報
     example:
-      body: jkz4yd4fa1
+      body: gva5jkz
       files:
       - angle1.jpg
       - angle2.jpg
       rate: 4
-      title: gwqq84
+      title: yd4fa13gw
     properties:
       body:
         description: レビューの内容
-        example: jkz4yd4fa1
+        example: gva5jkz
         maxLength: 5000
         minLength: 1
         type: string
@@ -741,7 +916,7 @@ definitions:
         - angle1.jpg
         - angle2.jpg
         items:
-          example: Magnam necessitatibus quod provident.
+          example: Tempore consequatur dicta.
           type: string
         type: array
       rate:
@@ -756,7 +931,7 @@ definitions:
         type: integer
       title:
         description: レビューのタイトル
-        example: gwqq84
+        example: yd4fa13gw
         maxLength: 30
         minLength: 1
         type: string
@@ -799,7 +974,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Neque in.
+          example: Et illum cupiditate.
           type: string
         maxLength: 9
         type: array
@@ -956,7 +1131,7 @@ definitions:
         - 5a44d5f2775672b659ba00fa
         - 5a44d5f2775672b659ba00fb
         items:
-          example: Delectus est veritatis dicta beatae non.
+          example: Magnam necessitatibus quod provident.
           type: string
         type: array
       preferences:
@@ -965,7 +1140,7 @@ definitions:
         - Workshop & Conference
         - Festival
         items:
-          example: Ex consequatur sequi inventore placeat.
+          example: Atque neque in mollitia.
           type: string
         maxLength: 9
         type: array
@@ -988,14 +1163,14 @@ definitions:
   UserModifyPayload:
     description: プロフィール編集の時のペイロード
     example:
-      email: Qui omnis.
+      email: Veritatis quam eaque.
       icon: icon.png
       name: きっちゃそ
       tel: 090-1234-5678
     properties:
       email:
         default: ""
-        example: Qui omnis.
+        example: Veritatis quam eaque.
         type: string
       icon:
         default: ""
@@ -1526,13 +1701,6 @@ paths:
         name: lng
         required: true
         type: number
-      - default: 0
-        description: 除外件数
-        in: query
-        minimum: 0
-        name: offset
-        required: false
-        type: integer
       - default: 500
         description: 検索範囲(半径m)
         in: query
@@ -1541,13 +1709,13 @@ paths:
         required: true
         type: integer
       produces:
-      - application/vnd.event+json; type=collection
       - application/vnd.goa.error
+      - application/vnd.nearby+json; type=collection
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/EventCollection'
+            $ref: '#/definitions/NearbyCollection'
         "400":
           description: Bad Request
           schema:

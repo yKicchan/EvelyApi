@@ -211,11 +211,11 @@ define(['axios'] , function (axios) {
 
   // 近くのイベントを検索する
   // path is the request path, the format is "/api/develop/v2/events/nearby"
-  // category, lat, limit, lng, offset, range are used to build the request query string.
+  // category, lat, limit, lng, range are used to build the request query string.
   // config is an optional object to be merged into the config built by the function prior to making the request.
   // The content of the config object is described here: https://github.com/mzabriskie/axios#request-api
   // This function returns a promise which raises an error if the HTTP response is a 4xx or 5xx.
-  client.nearbyEvents = function (path, category, lat, limit, lng, offset, range, config) {
+  client.nearbyEvents = function (path, category, lat, limit, lng, range, config) {
     var cfg = {
       timeout: timeout,
       url: urlPrefix + path,
@@ -225,7 +225,6 @@ define(['axios'] , function (axios) {
         lat: lat,
         limit: limit,
         lng: lng,
-        offset: offset,
         range: range
       },
       responseType: 'json'

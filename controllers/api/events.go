@@ -203,21 +203,23 @@ func (c *EventsController) Nearby(ctx *app.NearbyEventsContext) error {
 	// パラメーターの位置情報から付近のイベントを検索
 	opt := NewFindEventsOption()
 	opt.SetLimit(ctx.Limit)
-	opt.SetOffset(ctx.Offset)
 	opt.SetLocation(ctx.Lat, ctx.Lng, ctx.Range)
 	if ctx.Category != nil {
 		opt.SetCategorys([]string{*ctx.Category}, true)
 	}
-	events, err := c.db.Events.FindEvents(opt)
+	results, err := c.db.FindEventsByLocation(opt)
 	if err != nil {
 		return ctx.BadRequest(goa.ErrBadRequest(err))
 	}
 	// イベント情報をレスポンス形式に変換して返す
-	res := make(app.EventTinyCollection, len(events))
-	for i := range events {
-		res[i] = parser.ToEventTinyMedia(events[i])
+	res := make(app.NearbyCollection, len(results))
+	for i, r := range results {
+		res[i] = &app.Nearby{
+			Distance: int(r.Distance),
+			Event: parser.ToEventTinyMedia(r.Event),
+		}
 	}
-	return ctx.OKTiny(res)
+	return ctx.OK(res)
 }
 
 // Notify runs the notify action.

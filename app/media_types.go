@@ -397,6 +397,46 @@ func (mt EventTinyCollection) Validate() (err error) {
 	return
 }
 
+// 近くのイベント (default view)
+//
+// Identifier: application/vnd.nearby+json; view=default
+type Nearby struct {
+	// イベントまでの距離(m)
+	Distance int        `form:"distance" json:"distance" xml:"distance"`
+	Event    *EventTiny `form:"event" json:"event" xml:"event"`
+}
+
+// Validate validates the Nearby media type instance.
+func (mt *Nearby) Validate() (err error) {
+	if mt.Event == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "event"))
+	}
+
+	if mt.Event != nil {
+		if err2 := mt.Event.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// NearbyCollection is the media type for an array of Nearby (default view)
+//
+// Identifier: application/vnd.nearby+json; type=collection; view=default
+type NearbyCollection []*Nearby
+
+// Validate validates the NearbyCollection media type instance.
+func (mt NearbyCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
 // レビュー (default view)
 //
 // Identifier: application/vnd.review+json; view=default

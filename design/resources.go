@@ -102,11 +102,6 @@ var _ = Resource("events", func() {
 				Default(3)
 				Example(3)
 			})
-			Param("offset", Integer, "除外件数", func() {
-				Minimum(0)
-				Default(0)
-				Example(10)
-			})
 			Param("range", Integer, "検索範囲(半径m)", func() {
 				Minimum(10)
 				Default(500)
@@ -116,7 +111,7 @@ var _ = Resource("events", func() {
 			})
 			Required("lat", "lng", "range")
 		})
-		Response(OK, CollectionOf(EventMedia))
+		Response(OK, CollectionOf(NearbyMedia))
 		Response(BadRequest, ErrorMedia)
 	})
 

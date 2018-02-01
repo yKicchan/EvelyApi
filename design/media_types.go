@@ -177,3 +177,20 @@ var ReviewMedia = MediaType("application/vnd.review+json", func() {
 		Attribute("reviewedAt")
 	})
 })
+
+var NearbyMedia = MediaType("application/vnd.nearby+json", func() {
+	Description("近くのイベント")
+	Attributes(func() {
+		Attribute("event", EventMedia)
+		Attribute("distance", Integer, "イベントまでの距離(m)", func() {
+			Example(100)
+		})
+	})
+	Required("event", "distance")
+	View("default", func() {
+		Attribute("event", func() {
+			View("tiny")
+		})
+		Attribute("distance")
+	})
+})

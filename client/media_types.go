@@ -454,6 +454,60 @@ func (c *Client) DecodeErrorResponse(resp *http.Response) (*goa.ErrorResponse, e
 	return &decoded, err
 }
 
+// 近くのイベント (default view)
+//
+// Identifier: application/vnd.nearby+json; view=default
+type Nearby struct {
+	// イベントまでの距離(m)
+	Distance int        `form:"distance" json:"distance" xml:"distance"`
+	Event    *EventTiny `form:"event" json:"event" xml:"event"`
+}
+
+// Validate validates the Nearby media type instance.
+func (mt *Nearby) Validate() (err error) {
+	if mt.Event == nil {
+		err = goa.MergeErrors(err, goa.MissingAttributeError(`response`, "event"))
+	}
+
+	if mt.Event != nil {
+		if err2 := mt.Event.Validate(); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// DecodeNearby decodes the Nearby instance encoded in resp body.
+func (c *Client) DecodeNearby(resp *http.Response) (*Nearby, error) {
+	var decoded Nearby
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return &decoded, err
+}
+
+// NearbyCollection is the media type for an array of Nearby (default view)
+//
+// Identifier: application/vnd.nearby+json; type=collection; view=default
+type NearbyCollection []*Nearby
+
+// Validate validates the NearbyCollection media type instance.
+func (mt NearbyCollection) Validate() (err error) {
+	for _, e := range mt {
+		if e != nil {
+			if err2 := e.Validate(); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// DecodeNearbyCollection decodes the NearbyCollection instance encoded in resp body.
+func (c *Client) DecodeNearbyCollection(resp *http.Response) (NearbyCollection, error) {
+	var decoded NearbyCollection
+	err := c.Decoder.Decode(&decoded, resp.Body, resp.Header.Get("Content-Type"))
+	return decoded, err
+}
+
 // レビュー (default view)
 //
 // Identifier: application/vnd.review+json; view=default

@@ -247,8 +247,8 @@ func NearbyEventsPath() string {
 }
 
 // 近くのイベントを検索する
-func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, lng float64, range_ int, category *string, limit *int, offset *int) (*http.Response, error) {
-	req, err := c.NewNearbyEventsRequest(ctx, path, lat, lng, range_, category, limit, offset)
+func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, lng float64, range_ int, category *string, limit *int) (*http.Response, error) {
+	req, err := c.NewNearbyEventsRequest(ctx, path, lat, lng, range_, category, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +256,7 @@ func (c *Client) NearbyEvents(ctx context.Context, path string, lat float64, lng
 }
 
 // NewNearbyEventsRequest create the request corresponding to the nearby action endpoint of the events resource.
-func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat float64, lng float64, range_ int, category *string, limit *int, offset *int) (*http.Request, error) {
+func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat float64, lng float64, range_ int, category *string, limit *int) (*http.Request, error) {
 	scheme := c.Scheme
 	if scheme == "" {
 		scheme = "http"
@@ -275,10 +275,6 @@ func (c *Client) NewNearbyEventsRequest(ctx context.Context, path string, lat fl
 	if limit != nil {
 		tmp33 := strconv.Itoa(*limit)
 		values.Set("limit", tmp33)
-	}
-	if offset != nil {
-		tmp34 := strconv.Itoa(*offset)
-		values.Set("offset", tmp34)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -361,12 +357,12 @@ func (c *Client) NewPinEventsRequest(ctx context.Context, path string, limit *in
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	if limit != nil {
-		tmp35 := strconv.Itoa(*limit)
-		values.Set("limit", tmp35)
+		tmp34 := strconv.Itoa(*limit)
+		values.Set("limit", tmp34)
 	}
 	if offset != nil {
-		tmp36 := strconv.Itoa(*offset)
-		values.Set("offset", tmp36)
+		tmp35 := strconv.Itoa(*offset)
+		values.Set("offset", tmp35)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
@@ -400,8 +396,8 @@ func (c *Client) NewShowEventsRequest(ctx context.Context, path string, ids []st
 	u := url.URL{Host: c.Host, Scheme: scheme, Path: path}
 	values := u.Query()
 	for _, p := range ids {
-		tmp37 := p
-		values.Add("ids", tmp37)
+		tmp36 := p
+		values.Add("ids", tmp36)
 	}
 	u.RawQuery = values.Encode()
 	req, err := http.NewRequest("GET", u.String(), nil)
