@@ -38,21 +38,21 @@ func (this *EvelyDB) FindEventsByLocation(opt LocationOption) (results []*Result
 	// 位置情報検索クエリ生成
 	lat, lng, r := opt.GetLocation()
 	// リザルトを受け取る時
-	command := bson.M{
-		"geoNear": EVENTS_COLLECTION,
-		"near": bson.M{
+	command := bson.D{
+		{"geoNear", EVENTS_COLLECTION},
+		{"near", bson.M{
 			"type": "Point",
 			"coordinates": []float64{lng, lat},
-		},
-		"spherical": true,
-		"maxDistance": r,
+		}},
+		{"spherical", true},
+		{"maxDistance", r},
 	}
 	if opt.IsLimitSet() {
-		command["limit"] = opt.GetLimit()
+		command = append(command, bson.DocElem{"limit", opt.GetLimit()})
 	}
 	if opt.IsCategorysSet() {
 		categorys, ope := opt.GetCategorys()
-		command["query"] = bson.M{"categorys": bson.M{ope: categorys}}
+		command = append(command, bson.DocElem{"query", bson.M{"categorys": bson.M{ope: categorys}}})
 	}
 	res := &RunResult{}
 	err = this.Run(command, res)
