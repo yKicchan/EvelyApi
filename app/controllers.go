@@ -142,7 +142,7 @@ func handleAuthOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+		if cors.MatchOrigin(origin, "http://evely.localhost/swaggerui") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -427,7 +427,7 @@ func handleEventsOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+		if cors.MatchOrigin(origin, "http://evely.localhost/swaggerui") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -544,7 +544,7 @@ func handleFilesOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+		if cors.MatchOrigin(origin, "http://evely.localhost/swaggerui") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -632,7 +632,7 @@ func handlePinsOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+		if cors.MatchOrigin(origin, "http://evely.localhost/swaggerui") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -742,7 +742,7 @@ func handleReviewsOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+		if cors.MatchOrigin(origin, "http://evely.localhost/swaggerui") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -828,7 +828,7 @@ func handleSwaggerOrigin(h goa.Handler) goa.Handler {
 			}
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+		if cors.MatchOrigin(origin, "http://evely.localhost/swaggerui") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")
@@ -959,7 +959,7 @@ func handleUsersOrigin(h goa.Handler) goa.Handler {
 			// Not a CORS request
 			return h(ctx, rw, req)
 		}
-		if cors.MatchOrigin(origin, "http://localhost:8888/swaggerui") {
+		if cors.MatchOrigin(origin, "http://evely.localhost/swaggerui") {
 			ctx = goa.WithLogContext(ctx, "origin", origin)
 			rw.Header().Set("Access-Control-Allow-Origin", origin)
 			rw.Header().Set("Vary", "Origin")

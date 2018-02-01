@@ -63,7 +63,7 @@ func main() {
 	app.MountReviewsController(service, c7)
 
 	// Start service
-	if err := service.ListenAndServe(":8888"); err != nil {
+	if err := service.ListenAndServe(":80"); err != nil {
 		service.LogError("startup", "err", err)
 	}
 

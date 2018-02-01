@@ -1081,7 +1081,7 @@ definitions:
         type: string
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
-host: localhost:8888
+host: evely.localhost
 info:
   contact:
     email: yKicchanApp@gmail.com

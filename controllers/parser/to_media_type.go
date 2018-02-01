@@ -134,7 +134,7 @@ func ToReviewMedia(r *ReviewModel) *app.Review {
 }
 
 func toFileMedia(f string) string {
-	return "http://localhost:8888/download/" + f
+	return "http://evely.localhost/download/" + f
 }
 
 func toFilesMedia(old []string) (new []string) {
