@@ -74,7 +74,7 @@ func (this *EventsCollection) findEvents(opt FindOption, query bson.M) (events [
 	if opt.IsLimitSet() {
 		q = q.Limit(opt.GetLimit())
 	}
-	err = q.Sort("-created_at").All(&events)
+	err = q.Sort("-update_date").All(&events)
 	return
 }
 
