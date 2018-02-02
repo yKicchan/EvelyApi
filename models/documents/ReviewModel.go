@@ -6,17 +6,17 @@ import (
 )
 
 type ReviewModel struct {
-	ID         bson.ObjectId `bson:"_id"`
-	Title      string        `bson:"title"`
-	Body       string        `bson:"body"`
-	Rate       int           `bson:"rate"`
-	Files      []string      `bson:"files"`
-	Reviewer   *Reviewer     `bson:"reviewer"`
-	ReviewedAt time.Time     `bson:"reviewed_at"`
+	ID         bson.ObjectId `bson:"_id,omitempty"`
+	Title      string        `bson:"title,omitempty"`
+	Body       string        `bson:"body,omitempty"`
+	Rate       int           `bson:"rate,omitempty"`
+	Files      []string      `bson:"files,omitempty"`
+	Reviewer   *Reviewer     `bson:"reviewer,omitempty"`
+	ReviewedAt time.Time     `bson:"reviewed_at,omitempty"`
 }
 
 type Reviewer struct {
-	ID   string `bson:"id"`
-	Name string `bson:"name"`
-	Icon string `bson:"icon"`
+	ID   string `bson:"id,omitempty"`
+	Name string `bson:"name,omitempty"`
+	Icon string `bson:"icon,omitempty"`
 }

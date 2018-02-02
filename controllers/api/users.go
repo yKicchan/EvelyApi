@@ -10,6 +10,7 @@ import (
 	. "EvelyApi/models/documents"
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/goadesign/goa"
+	"labix.org/v2/mgo/bson"
 )
 
 // UsersController implements the users resource.
@@ -43,6 +44,7 @@ func (c *UsersController) Modify(ctx *app.ModifyUsersContext) error {
 	}
 	keys := Keys{"id": id}
 	u, _ := c.db.Users.FindOne(keys)
+	// ペイロードにセットされた値を設定していく
 	p := ctx.Payload
 	if p.Name != "" {
 		u.Name = p.Name
@@ -56,7 +58,30 @@ func (c *UsersController) Modify(ctx *app.ModifyUsersContext) error {
 	if p.Tel != "" {
 		u.Tel = p.Tel
 	}
+	e := &EventModel{
+		Host: &Host{
+			ID:   u.ID,
+			Name: u.Name,
+			Icon: u.Icon,
+		},
+	}
+	r := &ReviewModel{
+		Reviewer: &Reviewer{
+			ID:   u.ID,
+			Name: u.Name,
+			Icon: u.Icon,
+		},
+	}
+	// DB更新
 	err = c.db.Users.Save(u, keys)
+	if err != nil {
+		return ctx.BadRequest(goa.ErrInternal(err))
+	}
+	err = c.db.Events.SaveAll(e, bson.M{"host.id": id})
+	if err != nil {
+		return ctx.BadRequest(goa.ErrInternal(err))
+	}
+	err = c.db.Reviews.SaveAll(r, bson.M{"reviewer.id": id})
 	if err != nil {
 		return ctx.BadRequest(goa.ErrInternal(err))
 	}

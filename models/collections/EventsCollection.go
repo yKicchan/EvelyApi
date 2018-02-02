@@ -5,6 +5,7 @@ import (
 	. "EvelyApi/models/documents"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"log"
 	"strings"
 )
 
@@ -28,6 +29,18 @@ func NewEventsCollection(c *mgo.Collection) *EventsCollection {
 func (this *EventsCollection) Save(event *EventModel, keys Keys) error {
 	update := bson.M{"$set": event}
 	_, err := this.Upsert(keys.ToQuery(), update)
+	return err
+}
+
+/**
+ * 条件にあうイベントを全て更新する
+ * @param event イベント情報
+ * @param keys  検索条件
+ */
+func (this *EventsCollection) SaveAll(event *EventModel, query bson.M) error {
+	update := bson.M{"$set": event}
+	info, err := this.UpdateAll(query, update)
+	log.Printf("[Events] SaveAll info: %v", info)
 	return err
 }
 

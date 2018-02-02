@@ -72,6 +72,7 @@ func ToReviewModel(p *app.ReviewPayload, id bson.ObjectId, u *UserModel) *Review
 		Reviewer: &Reviewer{
 			ID:   u.ID,
 			Name: u.Name,
+			Icon: u.Icon,
 		},
 	}
 }

@@ -4,6 +4,7 @@ import (
 	. "EvelyApi/models/documents"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"log"
 )
 
 /**
@@ -26,6 +27,18 @@ func NewReviewsCollection(c *mgo.Collection) *ReviewsCollection {
 func (this *ReviewsCollection) Save(review *ReviewModel, keys Keys) error {
 	update := bson.M{"$set": review}
 	_, err := this.Upsert(keys.ToQuery(), update)
+	return err
+}
+
+/**
+ * 条件にあうレビューを全て更新する
+ * @param event レビュー情報
+ * @param keys  検索条件
+ */
+func (this *ReviewsCollection) SaveAll(review *ReviewModel, query bson.M) error {
+	update := bson.M{"$set": review}
+	info, err := this.UpdateAll(query, update)
+	log.Printf("[Events] SaveAll info: %v", info)
 	return err
 }
 
