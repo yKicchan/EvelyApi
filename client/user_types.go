@@ -952,11 +952,6 @@ func (ut *signupPayload) Validate() (err error) {
 		}
 	}
 	if ut.Name != nil {
-		if utf8.RuneCountInString(*ut.Name) < 1 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 1, true))
-		}
-	}
-	if ut.Name != nil {
 		if utf8.RuneCountInString(*ut.Name) > 50 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 50, false))
 		}
@@ -1033,9 +1028,6 @@ func (ut *SignupPayload) Validate() (err error) {
 	}
 	if err2 := goa.ValidateFormat(goa.FormatEmail, ut.Mail); err2 != nil {
 		err = goa.MergeErrors(err, goa.InvalidFormatError(`type.mail`, ut.Mail, goa.FormatEmail, err2))
-	}
-	if utf8.RuneCountInString(ut.Name) < 1 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 1, true))
 	}
 	if utf8.RuneCountInString(ut.Name) > 50 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 50, false))
@@ -1175,11 +1167,6 @@ func (ut *userModifyPayload) Finalize() {
 // Validate validates the userModifyPayload type instance.
 func (ut *userModifyPayload) Validate() (err error) {
 	if ut.Name != nil {
-		if utf8.RuneCountInString(*ut.Name) < 1 {
-			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 1, true))
-		}
-	}
-	if ut.Name != nil {
 		if utf8.RuneCountInString(*ut.Name) > 50 {
 			err = goa.MergeErrors(err, goa.InvalidLengthError(`request.name`, *ut.Name, utf8.RuneCountInString(*ut.Name), 50, false))
 		}
@@ -1218,9 +1205,6 @@ type UserModifyPayload struct {
 
 // Validate validates the UserModifyPayload type instance.
 func (ut *UserModifyPayload) Validate() (err error) {
-	if utf8.RuneCountInString(ut.Name) < 1 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 1, true))
-	}
 	if utf8.RuneCountInString(ut.Name) > 50 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`type.name`, ut.Name, utf8.RuneCountInString(ut.Name), 50, false))
 	}

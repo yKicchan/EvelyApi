@@ -585,9 +585,6 @@ func (mt *User) Validate() (err error) {
 			err = goa.MergeErrors(err, err2)
 		}
 	}
-	if utf8.RuneCountInString(mt.Name) < 1 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 1, true))
-	}
 	if utf8.RuneCountInString(mt.Name) > 50 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 50, false))
 	}
@@ -622,9 +619,6 @@ func (mt *UserTiny) Validate() (err error) {
 	}
 	if ok := goa.ValidatePattern(`^[a-zA-Z0-9_]{4,15}$`, mt.ID); !ok {
 		err = goa.MergeErrors(err, goa.InvalidPatternError(`response.id`, mt.ID, `^[a-zA-Z0-9_]{4,15}$`))
-	}
-	if utf8.RuneCountInString(mt.Name) < 1 {
-		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 1, true))
 	}
 	if utf8.RuneCountInString(mt.Name) > 50 {
 		err = goa.MergeErrors(err, goa.InvalidLengthError(`response.name`, mt.Name, utf8.RuneCountInString(mt.Name), 50, false))

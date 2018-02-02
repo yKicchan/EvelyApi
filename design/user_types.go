@@ -128,7 +128,6 @@ var SignupPayload = Type("SignupPayload", func() {
 		Example("password")
 	})
 	Attribute("name", String, "名前", func() {
-		MinLength(1)
 		MaxLength(50)
 		Example("きっちゃそ")
 	})
